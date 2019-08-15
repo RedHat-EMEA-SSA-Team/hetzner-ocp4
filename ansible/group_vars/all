@@ -1,9 +1,6 @@
 # sudo user for the apiserver instance
 user: root
 
-# cluster name
-cluster_name: foobar
-
 # reverse domain for the cluster
 rev_domain: 222.168.192.in-addr.arpa
 
