@@ -1,17 +1,8 @@
 # sudo user for the apiserver instance
 user: root
 
-# forward domain for the cluster
-fwd_domain: rh.etisalat.lab
-
-# cluster name
-cluster_name: foobar
-
 # reverse domain for the cluster
 rev_domain: 222.168.192.in-addr.arpa
-
-# wildcard domain for the cluster
-wild_domain: apps.rh.etisalat.lab
 
 # forwarder to access the internet for your prviate DNS server
 forward_dns: 8.8.8.8
@@ -47,17 +38,15 @@ coreos_version: 42.80.20190801.0
 libvirt_storage_pool: default
 
 
-####
-ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.1.9.tar.gz"
+#ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.1.9.tar.gz"
+ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-14-112500/openshift-install-linux-4.2.0-0.nightly-2019-08-14-112500.tar.gz"
 
-####oc client
-ocpclient_url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.1.9.tar.gz'
+
+#ocpclient_url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.1.9.tar.gz'
+ocpclient_url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-14-112500/openshift-client-linux-4.2.0-0.nightly-2019-08-14-112500.tar.gz'
 
 # subnet address for the openshift cluster
 subnet: 192.168.222
-
-# apiserver
-api: ninja
 
 # cidr for the openshift cluster subnet
 cidr: /24
