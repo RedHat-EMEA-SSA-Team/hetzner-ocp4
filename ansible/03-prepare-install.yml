@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  vars_files:
+  - ../cluster.yml
+  gather_facts: false
+  roles:
+    - bind
+    - loadbalancer
+    - ign

@@ -1,0 +1,9 @@
+- include: prepare-storage.yml
+- include: kvm-packages.yml
+- include: download-image.yml
+- include: enable-nested-v.yml
+- include: net-create-loop.yml
+- include: enable-remote-virsh.yml
+- include: prepare-terraformenv.yml
+- name: upgrade redhat
+  yum: name=* state=latest

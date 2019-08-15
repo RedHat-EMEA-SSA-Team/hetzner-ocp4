@@ -1,0 +1,86 @@
+---
+# file: roles/bind/tasks/main.yml
+# - name: Wait 300 seconds, with a 30 second delay, for ssh on the apiserver to come up
+#   wait_for_connection:
+#     delay: 30
+#     timeout: 300
+
+- name: Copy named.conf for temporary external name resolution
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: Install bind
+  yum:
+    use_backend: yum
+    name:
+      - bind
+      - bind-utils
+    state: present
+
+- name: Copy named conf
+  template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: 0660
+- name: Make named directory
+  file:
+    path: /etc/named
+    state: directory
+    owner: root
+    group: named
+    mode: 0750
+- name: Copy named conf local
+  template:
+    src: named.conf.local.j2
+    dest: /etc/named/named.conf.local
+    owner: root
+    group: named
+    mode: 0640
+- name: Make zones dir
+  file:
+    path: /etc/named/zones
+    state: directory
+    owner: root
+    group: named
+    mode: 0750
+# - debug:
+#     msg: "API:  {{api}}"
+# - name: test
+#   template:
+#     src: db.forward.template.j2
+#     dest: db.forward.j2
+#     delegate_to: localhost
+
+- name: Copy forward zone
+  template:
+    src: db.forward.j2
+    dest: /etc/named/zones/db.{{cluster_name}}.{{public_domain}}
+    owner: root
+    group: named
+    mode: 0640
+- name: Copy reverse zone
+  template:
+    src: db.reverse.j2
+    dest: /etc/named/zones/db.{{ rev_domain }}
+    owner: root
+    group: named
+    mode: 0640
+- name: Copy wildcard zone
+  template:
+    src: db.wild.j2
+    dest: /etc/named/zones/db.apps.{{cluster_name}}.{{public_domain}}
+    owner: root
+    group: named
+    mode: 0640
+- name: restart named
+  service:
+    name: named
+    state: restarted
+    enabled: true

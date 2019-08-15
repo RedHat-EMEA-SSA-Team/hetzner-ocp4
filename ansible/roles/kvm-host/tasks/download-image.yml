@@ -1,0 +1,4 @@
+- name: download CoreOS image
+  get_url:
+    url: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest/rhcos-{{ coreos_version }}-qemu.qcow2"
+    dest: "{{ coreos_image_location }}"

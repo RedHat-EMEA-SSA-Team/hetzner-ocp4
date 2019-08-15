@@ -1,0 +1,36 @@
+---
+# file: roles/loadbalancer/tasks/main.yml
+- name: Put SELinux in permissive mode
+  selinux:
+    policy: targeted
+    state: disabled
+- name: Install haproxy
+  yum:
+    name:
+      - haproxy
+    state: present
+- name: Copy haproxy configuration file
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+- name: Enable and start haproxy
+  systemd:
+    name: haproxy
+    state: restarted
+    enabled: yes
+
+- name: Create /var/www/html directory
+  file:
+    path: /var/www/html
+    state: directory
+
+- name: Copy python webserver service unit
+  copy:
+    src: ignition-webserver.service
+    dest: /etc/systemd/system
+
+- name: Enable and start ignition-webserver.service
+  systemd:
+    name: ignition-webserver
+    enabled: yes
+    state: started

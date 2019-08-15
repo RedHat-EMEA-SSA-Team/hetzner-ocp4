@@ -1,0 +1,31 @@
+{
+  "ignition": {
+    "config": {
+      "append": [
+        {
+          "source": "http://{{subnet}}.1:8000/bootstrap.ign",
+          "verification": {}
+        }
+      ]
+    },
+    "security": {},
+    "timeouts": {},
+    "version": "2.2.0"
+  },
+  "networkd": {},
+  "passwd": {
+    "users": [
+      {
+        "groups": [
+          "sudo"
+        ],
+        "name": "core",
+        "sshAuthorizedKeys": [
+          "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        ]
+      }
+    ]
+  },
+  "storage": {},
+  "systemd": {}
+}

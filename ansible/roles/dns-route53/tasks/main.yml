@@ -1,0 +1,13 @@
+- name: create route53 DNS records
+  route53:
+    state: present
+    zone: "{{ public_domain }}"
+    record: "{{ item }}.{{ cluster_name }}.{{ public_domain }}"
+    type: A
+    ttl: 7200
+    value: "{{hostvars['localhost']['ansible_default_ipv4']['address']}}"
+    wait: yes
+  with_items:
+  - api-int
+  - api
+  - '*.apps'

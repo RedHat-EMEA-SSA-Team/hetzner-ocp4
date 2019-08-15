@@ -1,0 +1,28 @@
+variable "install-dir" {
+  type = "string"
+  default = "/root/{{ cluster_name }}-install"
+}
+variable "coreos-image" {
+  type = "string"
+  default = "{{coreos_image_location}}"
+}
+variable "storage-pool" {
+  type = "string"
+  default = "{{libvirt_storage_pool}}"
+}
+variable "host-master-mem" {
+  type = "string"
+  default = "{{ host_master_mem }}"
+}
+variable "host-worker-mem" {
+  type = "string"
+  default = "{{ host_worker_mem }}"
+}
+variable "host-master-cores" {
+  type = "string"
+  default = "{{ host_master_cores }}"
+}
+variable "host-worker-cores" {
+  type = "string"
+  default = "{{ host_worker_cores }}"
+}

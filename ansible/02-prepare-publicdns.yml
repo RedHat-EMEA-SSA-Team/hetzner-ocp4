@@ -1,0 +1,12 @@
+---
+- name: setup public DNS records
+  vars_files:
+  - ../cluster.yml
+  hosts: localhost
+  gather_facts: true
+  tasks:
+  roles:
+  - role: dns-route53
+    when: dns_provider == 'route53'
+  - role: dns-cloudflare
+    when: dns_provider == 'cloudflare'

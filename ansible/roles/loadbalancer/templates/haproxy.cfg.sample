@@ -1,0 +1,102 @@
+#---------------------------------------------------------------------
+global
+    # to have these messages end up in /var/log/haproxy.log you will
+    # need to:
+    #
+    # 1) configure syslog to accept network log events.  This is done
+    #    by adding the '-r' option to the SYSLOGD_OPTIONS in
+    #    /etc/sysconfig/syslog
+    #
+    # 2) configure local2 events to go to the /var/log/haproxy.log
+    #   file. A line like the following can be added to
+    #   /etc/sysconfig/syslog
+    #
+    #    local2.*                       /var/log/haproxy.log
+    #
+    log         127.0.0.1 local2
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+    # utilize system-wide crypto-policies
+    ssl-default-bind-ciphers PROFILE=SYSTEM
+    ssl-default-server-ciphers PROFILE=SYSTEM
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+frontend api
+    bind *:6443
+    mode tcp
+    option tcplog
+    default_backend api
+backend api
+    balance source
+    mode tcp
+    server bootstrap 192.168.222.30:6443 check
+    server master-0 192.168.222.31:6443 check
+    server master-1 192.168.222.32:6443 check
+    server master-2 192.168.222.33:6443 check
+
+frontend machine-config-server
+    bind *:22623
+    mode tcp
+    option tcplog
+    default_backend machine-config-server
+backend machine-config-server
+    balance source
+    mode tcp
+    server bootstrap 192.168.222.30:22623 check
+    server master-0 192.168.222.31:22623 check
+    server master-1 192.168.222.32:22623 check
+    server master-2 192.168.222.33:22623 check
+
+frontend ingress-https
+    bind *:443
+    mode tcp
+    option tcplog
+    default_backend ingress-https
+backend ingress-https
+    balance source
+    mode tcp
+    server      worker-0 192.168.222.34:443 check
+    server      worker-1 192.168.222.35:443 check
+    server      worker-2 192.168.222.36:443 check
+
+frontend ingress-http
+    bind *:80
+    mode tcp
+    option tcplog
+    default_backend ingress-http
+backend ingress-http
+    balance source
+    mode tcp
+    server      worker-0 192.168.222.34:80 check
+    server      worker-1 192.168.222.35:80 check
+    server      worker-2 192.168.222.36:80 check

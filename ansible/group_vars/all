@@ -1,0 +1,63 @@
+# sudo user for the apiserver instance
+user: root
+
+# forward domain for the cluster
+fwd_domain: rh.etisalat.lab
+
+# cluster name
+cluster_name: foobar
+
+# reverse domain for the cluster
+rev_domain: 222.168.192.in-addr.arpa
+
+# wildcard domain for the cluster
+wild_domain: apps.rh.etisalat.lab
+
+# forwarder to access the internet for your prviate DNS server
+forward_dns: 8.8.8.8
+
+# update the /etc/hosts file for cli and console resolution
+update_hosts: true
+
+# host hw info
+host_master_mem: 8192
+host_master_cores: 1
+host_worker_mem: 8192
+host_worker_cores: 1
+host_bootstrap_ip: 192.168.222.30
+host_master_0_ip: 192.168.222.31
+host_master_1_ip: 192.168.222.32
+host_master_2_ip: 192.168.222.33
+host_worker_0_ip: 192.168.222.34
+host_worker_1_ip: 192.168.222.35
+host_worker_2_ip: 192.168.222.36
+
+
+# Terraform binary url
+terraform_url: "https://releases.hashicorp.com/terraform/0.12.6/terraform_0.12.6_linux_amd64.zip"
+
+# terraform workdir
+terraform_workdir: /root/terraform
+
+# reference to coreos qcow file
+coreos_image_location: /root/rhcoreos-qemu.qcow2
+coreos_version: 42.80.20190801.0
+
+# name of the libvirt storage pool
+libvirt_storage_pool: default
+
+
+####
+ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.1.9.tar.gz"
+
+####oc client
+ocpclient_url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.1.9.tar.gz'
+
+# subnet address for the openshift cluster
+subnet: 192.168.222
+
+# apiserver
+api: ninja
+
+# cidr for the openshift cluster subnet
+cidr: /24

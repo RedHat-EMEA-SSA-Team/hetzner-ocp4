@@ -1,0 +1,12 @@
+zone "{{cluster_name}}.{{public_domain}}" {
+    type master;
+    file "/etc/named/zones/db.{{cluster_name}}.{{public_domain}}";
+};
+zone "{{ rev_domain }}" {
+    type master;
+    file "/etc/named/zones/db.{{ rev_domain }}";
+    };
+zone "apps.{{cluster_name}}.{{public_domain}}" {
+    type master;
+    file "/etc/named/zones/db.apps.{{cluster_name}}.{{public_domain}}";
+    };

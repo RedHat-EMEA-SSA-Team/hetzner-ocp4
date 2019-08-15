@@ -1,0 +1,9 @@
+[Unit]
+Description=Ignition Webserver
+
+[Service]
+WorkingDirectory=/var/www/html
+ExecStart=/usr/bin/python -m SimpleHTTPServer
+
+[Install]
+WantedBy=multi-user.target

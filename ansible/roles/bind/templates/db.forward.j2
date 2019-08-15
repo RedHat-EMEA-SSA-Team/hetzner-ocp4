@@ -1,0 +1,30 @@
+$ORIGIN .
+$TTL 60
+{{cluster_name}}.{{public_domain}}. 60   IN    SOA    api.{{cluster_name}}.{{public_domain}}. admin.{{cluster_name}}.{{public_domain}}. (
+                                            7           ; Serial
+                                            86400       ; Refresh
+                                            7200        ; Retry
+                                            2419200     ; Expire
+                                            1    )      ; Negative Cache TTL
+                               ; name servers - NS records
+                               NS    api.{{cluster_name}}.{{public_domain}}.
+                                A    {{ subnet }}.1
+;
+$ORIGIN {{cluster_name}}.{{public_domain}}.
+$TTL 1
+; {{ subnet }}.0/{{ cidr }} - A records
+api.{{cluster_name}}.{{public_domain}}.          IN    A    {{ subnet }}.1
+api-int.{{cluster_name}}.{{public_domain}}.      IN    A    {{ subnet }}.1
+bootstrap.{{cluster_name}}.{{public_domain}}.    IN    A    {{ host_bootstrap_ip }}
+master-0.{{cluster_name}}.{{public_domain}}.     IN    A    {{ host_master_0_ip }}
+master-1.{{cluster_name}}.{{public_domain}}.     IN    A    {{ host_master_1_ip }}
+master-2.{{cluster_name}}.{{public_domain}}.     IN    A    {{ host_master_2_ip }}
+worker-0.{{cluster_name}}.{{public_domain}}.     IN    A    {{ host_worker_0_ip }}
+worker-1.{{cluster_name}}.{{public_domain}}.     IN    A    {{ host_worker_1_ip }}
+worker-2.{{cluster_name}}.{{public_domain}}.     IN    A    {{ host_worker_2_ip }}
+_etcd-server-ssl._tcp.{{cluster_name}}.{{public_domain}}.  86400   IN   SRV 0 10 2380 etcd-0.{{cluster_name}}.{{public_domain}}.
+_etcd-server-ssl._tcp.{{cluster_name}}.{{public_domain}}.  86400   IN   SRV 0 10 2380 etcd-1.{{cluster_name}}.{{public_domain}}.
+_etcd-server-ssl._tcp.{{cluster_name}}.{{public_domain}}.  86400   IN   SRV 0 10 2380 etcd-2.{{cluster_name}}.{{public_domain}}.
+etcd-0.{{cluster_name}}.{{public_domain}}.       IN   CNAME master-0.{{cluster_name}}.{{public_domain}}.
+etcd-1.{{cluster_name}}.{{public_domain}}.       IN   CNAME master-1.{{cluster_name}}.{{public_domain}}.
+etcd-2.{{cluster_name}}.{{public_domain}}.       IN   CNAME master-2.{{cluster_name}}.{{public_domain}}.

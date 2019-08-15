@@ -1,0 +1,31 @@
+
+data "template_file" "user_data_master" {
+  template = "${file("${var.install-dir}/master.ign")}"
+}
+data "template_file" "user_data_worker" {
+  template = "${file("${var.install-dir}/worker.ign")}"
+}
+data "template_file" "user_data_bootstrap" {
+  template = "${file("${path.module}/bootstrap-append.ign")}"
+
+}
+
+
+variable "namemaster" {
+   type = "list"
+   default = ["master-0","master-1","master-2"]
+ }
+variable "nameworker" {
+    type = "list"
+    default = ["worker-0","worker-1","worker-2"]
+}
+
+variable "ipmaster" {
+  type = "list"
+  default = ["192.168.222.31", "192.168.222.32", "192.168.222.33"]
+}
+
+variable "ipworker" {
+  type = "list"
+  default = ["192.168.222.34", "192.168.222.35", "192.168.222.36"]
+}

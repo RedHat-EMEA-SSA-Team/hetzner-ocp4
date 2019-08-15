@@ -1,0 +1,29 @@
+- name: Set CloudFlare vars
+  set_fact:
+    cloudflare_account_email: "{{ lookup('env','CLOUDFLARE_ACCOUNT_EMAIL') }}"
+    cloudflare_account_api_token: "{{ lookup('env','CLOUDFLARE_ACCOUNT_API_TOKEN') }}"
+    cloudflare_zone: "{{ lookup('env','CLOUDFLARE_ZONE') }}"
+
+- name: Check CloudFlare
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - cloudflare_account_email
+    - cloudflare_account_api_token
+    - cloudflare_zone
+
+- name: create cloudflare DNS records
+  cloudflare_dns:
+    zone: "{{ cloudflare_zone }}"
+    record: "{{ item }}.{{ cluster_name }}.{{ public_domain }}"
+    ttl: 7200
+    type: A
+    value: "{{hostvars['localhost']['ansible_default_ipv4']['address']}}"
+    account_email: "{{ cloudflare_account_email }}"
+    account_api_token: "{{ cloudflare_account_api_token }}"
+  with_items:
+  - api-int
+  - api
+  - '*.apps'

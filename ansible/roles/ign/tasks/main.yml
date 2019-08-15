@@ -1,0 +1,45 @@
+---
+- name: Ensure installion directory
+  file:
+    path: "/root/{{ cluster_name }}-install"
+    state: directory
+
+- name: Create install config
+  template:
+    src: install-config.yaml.j2
+    dest: "/root/{{ cluster_name }}-install/install-config.yaml"
+
+- name: Save install-config from deletion
+  copy:
+    dest: /root/{{ cluster_name }}-install/install-config.yaml.original
+    src: /root/{{ cluster_name }}-install/install-config.yaml
+
+- name: Create ignition files
+  command: "openshift-install --dir=/root/{{ cluster_name }}-install create ignition-configs"
+
+- name: Copy bootstrap inginition to www
+  copy:
+    dest: /var/www/html/bootstrap.ign
+    src: /root/{{ cluster_name }}-install/bootstrap.ign
+
+- name: Create small ign for bootstrap
+  local_action:
+    module: template
+    src: bootstrap-append.ign.j2
+    dest: "{{ terraform_workdir }}/bootstrap-append.ign"
+
+- name: Create .kube
+  file:
+    path: /root/.kube
+    state: directory
+- name: copy the kubeconfig into .kube
+  copy:
+    src: "/root/{{ cluster_name }}-install/auth/kubeconfig"
+    dest: ~/.kube/config
+- name: Check for the oc binary
+  shell: command -v oc
+  register: oc
+  ignore_errors: true
+- name: debug
+  debug:
+     msg: "{% if oc.failed == false %} Excellent! The oc binary is installed at {{ oc.stdout }}!{% else %} No oc binary found, consider installing it locally or adding it to your path!{% endif %}"
