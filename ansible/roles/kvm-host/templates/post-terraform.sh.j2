@@ -1,5 +1,5 @@
-sleep 1600
 openshift-install --dir=/root/{{ cluster_name }}-install wait-for bootstrap-complete --log-level debug
-export KUBECONFIG={{ cluster_name }}-install/auth/kubeconfig
+virsh shutdown bootstrap
+sleep 120
 oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
-openshift-install --dir=/root/{{ cluster_name }}-install wait-for install-complete
+openshift-install --dir=/root/{{ cluster_name }}-install wait-for install-complete --log-level debug

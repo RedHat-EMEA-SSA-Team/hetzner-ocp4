@@ -166,7 +166,6 @@ image_pull_secret: |-
 |public_domain  |Root domain that will be used for your cluster.  |
 |dns_provider  |DNS provider, value can be route53 or bind. Bind references local bind on root server. If using route53 you need to store AWS key and secret as env vars. Check Setup public DNS records for more info. |
 |image_pull_secret|Token to be used to authenticate to Red Hat image registry. You can download pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
-|ssh_public_key|SSH key to be used to login to CoreOS machines|
 
 
 DNS records are constructed based on cluster_name and public_domain values. With above values DNS records should be
@@ -177,7 +176,7 @@ DNS records are constructed based on cluster_name and public_domain values. With
 
 
 ```
-[root@server ~]# vi cluster.yml
+[root@server ~]# vi hetzner-ocp4/cluster.yml
 ```
 
 ## Setup public DNS records
@@ -204,6 +203,7 @@ If you use other DNS provider feel free to contribute. :D
 ## Prepare install and install Openshift
 
 ```
+[root@server ~]# cd hetzner-ocp4
 [root@server ~]# ansible-playbook  ansible/setup.yml
 ```
 

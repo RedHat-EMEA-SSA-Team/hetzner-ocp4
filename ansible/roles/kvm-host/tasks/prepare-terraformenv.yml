@@ -30,7 +30,7 @@
   template:
     src: cluster.tf.j2
     dest: "{{ terraform_workdir }}/cluster.tf"
-  
+
 - name: Create kube.tf file
   template:
     src: kube.tf.j2
@@ -45,6 +45,7 @@
   template:
     src: post-terraform.sh.j2
     dest: "{{ terraform_workdir }}/post-terraform.sh"
+    mode: '0777'
 
 - name: Install Openshift installer
   unarchive:
