@@ -16,7 +16,6 @@
 
 - name: Install bind
   yum:
-    use_backend: yum
     name:
       - bind
       - bind-utils
