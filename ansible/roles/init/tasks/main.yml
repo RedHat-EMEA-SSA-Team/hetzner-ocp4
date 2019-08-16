@@ -1,4 +1,10 @@
-- name: download CoreOS image
+- name: Create SSH key for root
+  user:
+    name: root
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: "{{ ssh_public_key_location }}"
+- name: Download CoreOS image
   get_url:
     url: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest/rhcos-{{ coreos_version }}-qemu.qcow2"
     dest: "{{ coreos_image_location }}"

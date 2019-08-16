@@ -134,13 +134,6 @@ You are now ready to reboot your system into the newly installed OS.
 
 ## Initialize tools
 
-Create SSH key pair
-
-```
-ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
-```
-
-
 Install ansible and git
 
 ```
@@ -165,8 +158,6 @@ public_domain: ocp.ninja
 dns_provider: [route53|cloudflare]
 image_pull_secret: |-
   asdfghfdsa
-ssh_public_key: |-
-  sadfghfds
 ```
 
 | variable | describtion  |

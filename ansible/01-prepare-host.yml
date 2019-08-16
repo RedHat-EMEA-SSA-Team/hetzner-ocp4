@@ -2,4 +2,5 @@
   vars_files:
   - ../cluster.yml
   roles:
+    - init
     - kvm-host

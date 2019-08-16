@@ -2,6 +2,8 @@
 - hosts: localhost
   vars_files:
   - ../cluster.yml
+  vars:
+    ssh_public_key: "{{ lookup('file', '{{ ssh_public_key_location }}.pub') }}"
   gather_facts: false
   roles:
     - bind

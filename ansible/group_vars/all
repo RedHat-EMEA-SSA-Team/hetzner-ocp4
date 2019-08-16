@@ -1,5 +1,6 @@
 # sudo user for the apiserver instance
 user: root
+ssh_public_key_location: /root/.ssh/id_rsa
 
 # reverse domain for the cluster
 rev_domain: 222.168.192.in-addr.arpa
