@@ -16,6 +16,6 @@
     args:
       chdir: "{{ terraform_workdir }}"
   - name: terraform apply
-    command: terraform apply -auto-approve
+    command: terraform apply --auto-approve
     args:
       chdir: "{{ terraform_workdir }}"
