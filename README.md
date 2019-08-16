@@ -14,7 +14,7 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
 # Install Instructions
 
-NOTE: If you are running on other environment that bare metal servers from Hetzner. Jump directly to section [Initliaze tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools). These instructions are for running CentOS and 'root' machines. You might have to modify command if running on other Linux ditro.
+**NOTE: If you are running on other environment that bare metal servers from Hetzner. Jump directly to section [Initliaze tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools). These instructions are for running CentOS and 'root' machines. You might have to modify command if running on other Linux ditro.**
 
 When following these instructional steps, you will end with a setup similar to
 
