@@ -1,3 +1,4 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: setup public DNS records
   vars_files:

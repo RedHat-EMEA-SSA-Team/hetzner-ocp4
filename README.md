@@ -209,7 +209,7 @@ If you use other DNS provider feel free to contribute. :D
 
 ```
 [root@server ~]# cd hetzner-ocp4
-[root@server ~]# ansible-playbook  ansible/setup.yml
+[root@server ~]# ./ansible/setup.yml
 ```
 
 ## Follow installation progress
