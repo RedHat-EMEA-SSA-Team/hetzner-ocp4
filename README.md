@@ -13,6 +13,9 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
 
 # Install Instructions
+
+NOTE: If you are running on other environment that bare metal servers from Hetzner. Jump directly to section [Initliaze tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools). These instructions are for running CentOS and 'root' machines. You might have to modify command if running on other Linux ditro.
+
 When following these instructional steps, you will end with a setup similar to
 
 ![](images/architecture.png)
@@ -209,20 +212,10 @@ If you use other DNS provider feel free to contribute. :D
 
 ## Follow installation progress
 
-```
-[root@server ~]# openshift-install --dir=/root/YOUR-CLUSTER_NAME_HERE-install wait-for bootstrap-complete --log-level debug
-```
-
-Once bootstrap is done, you can shutdown bootstrap VM.
+First follow bootstrap process and then install process. bootstrap VM will be shutdown after bootstrap is completed.
 
 ```
-[root@server ~]# virsh shutdown bootstrap
-```
-
-Now follow Openshift install progress
-
-```
-[root@server ~]# openshift-install --dir=/root/YOUR-CLUSTER_NAME_HERE-install wait-for install-complete --log-level debug
+[root@server ~]# ../terraform/post-terraform.sh
 ```
 
 ## Post install tasks
