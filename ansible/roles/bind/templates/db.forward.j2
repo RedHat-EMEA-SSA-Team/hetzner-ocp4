@@ -12,7 +12,7 @@ $TTL 60
 ;
 $ORIGIN {{cluster_name}}.{{public_domain}}.
 $TTL 1
-; {{ subnet }}.0/{{ cidr }} - A records
+; {{ subnet }}.0//{{ cidr }} - A records
 api.{{cluster_name}}.{{public_domain}}.          IN    A    {{ subnet }}.1
 api-int.{{cluster_name}}.{{public_domain}}.      IN    A    {{ subnet }}.1
 bootstrap.{{cluster_name}}.{{public_domain}}.    IN    A    {{ host_bootstrap_ip }}

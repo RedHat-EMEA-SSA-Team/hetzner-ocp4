@@ -22,6 +22,12 @@
     dest: /var/www/html/bootstrap.ign
     src: /root/{{ cluster_name }}-install/bootstrap.ign
 
+- name: Ensure Terraform workdir
+  file:
+    path: "{{ terraform_workdir }}"
+    state: directory
+    mode: '0755'
+
 - name: Create small ign for bootstrap
   local_action:
     module: template
