@@ -3,13 +3,6 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-###we create and activate default pool on CentOS
-# resource "libvirt_pool" "default" {
-#  name = "default"
-#  type = "dir"
-#  path = "/var/lib/libvirt/images/"
-# }
-
 resource "libvirt_volume" "rhcos" {
   name   = "rhcos42.qcow2"
   pool   = "${var.storage-pool}"
@@ -73,13 +66,6 @@ resource "libvirt_domain" "master" {
   disk {
     volume_id = "${element(libvirt_volume.fatdisk-master.*.id, count.index)}"
   }
-  ###extra disks to be created when json editing works
-  # disk {
-  #   volume_id = "${element(libvirt_volume.volume-containers-master.*.id, count.index)}"
-  # }
-  # disk {
-  #   volume_id = "${element(libvirt_volume.volume-etcd-master.*.id, count.index)}"
-  # }
   graphics {
     type        = "spice"
     listen_type = "address"
@@ -150,12 +136,7 @@ resource "libvirt_domain" "worker" {
     autoport    = true
   }
   count = "${length(var.ipworker)}"
-  #depends_on = [libvirt_domain.bootstrap,libvirt_domain.master]
-  # provisioner "local-exec" {
-  # # working_dir = "../openstackupi-openshift/" # assuming its this directory
-  # interpreter = ["bash"]
-  # command = "post-terraform.sh"
-  # }
+  
 }
 
 #
