@@ -1,0 +1,26 @@
+- name: destroy OCP cluster and clean env
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+  - ../cluster.yml
+  tasks:
+  - name: Destroy VMs
+    command: terraform destroy -auto-approve
+    args:
+      chdir: "{{ terraform_workdir }}"
+  - name: Remove files created during install
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - "{{ terraform_workdir }}"
+      - "/root/{{ cluster_name }}-install"
+      - "/root/.kube"
+  - name: destroy OCP4 libvirt net
+    virt_net:
+      command: destroy
+      name: ocp4libvirt
+  - name: undefine OCP4 libvirt net
+    virt_net:
+      command: undefine
+      name: ocp4libvirt
