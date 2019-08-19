@@ -18,3 +18,4 @@
     with_items:
     - "{{ terraform_workdir }}"
     - "/root/{{ cluster_name }}-install"
+    - "/root/.kube"  
