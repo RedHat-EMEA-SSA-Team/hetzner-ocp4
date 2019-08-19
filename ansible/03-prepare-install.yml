@@ -1,3 +1,4 @@
+#!/usr/bin/env ansible-playbook
 ---
 - hosts: localhost
   vars_files:

@@ -6,16 +6,19 @@ ssh_public_key_location: /root/.ssh/id_rsa
 rev_domain: 222.168.192.in-addr.arpa
 
 # forwarder to access the internet for your prviate DNS server
-forward_dns: 8.8.8.8
+# Use hetzner DNS servers:
+#   https://wiki.hetzner.de/index.php/Hetzner_Standard_Name_Server/en
+# Because in some datacenters hetzner blocks dns traffic to foreign dns servers
+forward_dns: 213.133.98.98
 
 # update the /etc/hosts file for cli and console resolution
 update_hosts: true
 
 # host hw info
-host_master_mem: 8192
-host_master_cores: 1
+host_master_mem: 16384
+host_master_cores: 4
 host_worker_mem: 8192
-host_worker_cores: 1
+host_worker_cores: 2
 host_bootstrap_ip: 192.168.222.30
 host_master_0_ip: 192.168.222.31
 host_master_1_ip: 192.168.222.32
