@@ -1,30 +1,30 @@
 ---
 - name: Ensure installion directory
   file:
-    path: "/root/{{ cluster_name }}-install"
+    path: "{{ ign_openshift_install_dir }}"
     state: directory
 
 - name: Create install config
   template:
     src: install-config.yaml.j2
-    dest: "/root/{{ cluster_name }}-install/install-config.yaml"
+    dest: "{{ ign_openshift_install_dir }}/install-config.yaml"
 
 - name: Save install-config from deletion
   copy:
-    dest: /root/{{ cluster_name }}-install/install-config.yaml.original
-    src: /root/{{ cluster_name }}-install/install-config.yaml
+    dest: "{{ ign_openshift_install_dir }}/install-config.yaml.original"
+    src: "{{ ign_openshift_install_dir }}/install-config.yaml"
 
 - name: Create ignition files
-  command: "openshift-install --dir=/root/{{ cluster_name }}-install create ignition-configs"
+  command: "openshift-install --dir={{ ign_openshift_install_dir }} create ignition-configs"
 
 - name: Copy bootstrap inginition to www
   copy:
-    dest: /var/www/html/bootstrap.ign
-    src: /root/{{ cluster_name }}-install/bootstrap.ign
+    dest: "{{ ign_http_root }}/bootstrap.ign"
+    src: "{{ ign_openshift_install_dir }}/bootstrap.ign"
 
 - name: Ensure Terraform workdir
   file:
-    path: "{{ terraform_workdir }}"
+    path: "{{ ign_terraform_workdir }}"
     state: directory
     mode: '0755'
 
@@ -32,15 +32,15 @@
   local_action:
     module: template
     src: bootstrap-append.ign.j2
-    dest: "{{ terraform_workdir }}/bootstrap-append.ign"
+    dest: "{{ ign_terraform_workdir }}/bootstrap-append.ign"
 
 - name: Create .kube
   file:
-    path: /root/.kube
+    path: ~/.kube
     state: directory
 - name: copy the kubeconfig into .kube
   copy:
-    src: "/root/{{ cluster_name }}-install/auth/kubeconfig"
+    src: "{{ ign_openshift_install_dir }}/auth/kubeconfig"
     dest: ~/.kube/config
 - name: Check for the oc binary
   shell: command -v oc

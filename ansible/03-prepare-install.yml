@@ -9,4 +9,6 @@
   roles:
     - bind
     - loadbalancer
-    - ign
+    - role: ign
+      ign_ssh_public_key: "{{ ssh_public_key }}"
+      ign_terraform_workdir: "{{ terraform_workdir }}"
