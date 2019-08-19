@@ -63,8 +63,8 @@ Hardware data:
 
    CPU1: Intel(R) Core(TM) i7 CPU 950 @ 3.07GHz (Cores 8)
    Memory:  48300 MB
-   Disk /dev/sda: 2000 GB (=> 1863 GiB)
-   Disk /dev/sdb: 2000 GB (=> 1863 GiB)
+   Disk /dev/nvme0n1: 2000 GB (=> 1863 GiB)
+   Disk /dev/nvme0n1: 2000 GB (=> 1863 GiB)
    Total capacity 3726 GiB with 2 Disks
 
 Network data:
@@ -92,19 +92,21 @@ Create new `config.txt` file
 Copy below content to that file as an template
 
 ```
-DRIVE1 /dev/sda
-DRIVE2 /dev/sdb
+DRIVE1 /dev/nvme0n1
+DRIVE2 /dev/nvme1n1
 SWRAID 1
-SWRAIDLEVEL 1
+SWRAIDLEVEL 0
 BOOTLOADER grub
-HOSTNAME CentOS-76-64-minimal
+HOSTNAME my-cool-hostname
 PART /boot ext3     512M
 PART lvm   vg0       all
 
-LV vg0   root   /       ext4     200G
+LV vg0   root   /       ext4      50G
 LV vg0   swap   swap    swap       5G
 LV vg0   tmp    /tmp    ext4      10G
 LV vg0   home   /home   ext4      40G
+LV vg0   var    /var ext4 50G
+LV vg0   libvirt /var/lib/libvirt/images xfs all
 
 
 IMAGE /root/.oldroot/nfs/install/../images/CentOS-76-64-minimal.tar.gz
@@ -115,7 +117,7 @@ There are some things that you will probably have to changes
 * Do not allocated all vg0 space to `/ swap /tmp` and `/home`.
 * If you have a single disk remove line `DRIVE2` and lines `SWRAID*`
 * If you have more than two disks add `DRIVE3`...
-* If you don't need raid just change `SWRAID` to `0`
+* If you need raid just change `SWRAID` to `1`
 * Valid values for `SWRAIDLEVEL` are 0, 1 and 10. 1 means mirrored disks
 * Configure LV sizes so that it matches your total disk size. In this example I have 2 x 2Tb disks RAID 1 so total disk space available is 2Tb (1863 Gb)
 * If you like you can add more volume groups and logical volumes.
