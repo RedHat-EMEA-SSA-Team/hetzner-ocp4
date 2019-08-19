@@ -137,6 +137,26 @@ You are now ready to reboot your system into the newly installed OS.
 [root@server ~]# reboot now
 ```
 
+### Optional: Install hetzer server via ansible
+
+If you do not want to do the above steps by hand: use Ansible! :-)
+
+1) Create `cluster.yml` with some hetzner specific options:
+    ```
+    # Hetzner informations (for role provision-hetzner)
+    hetzner_hostname: "hostname.domain.tld"
+    hetzner_webservice_username: "xxxx"
+    hetzner_webservice_password: "xxxx"
+    hetzner_ip: "xxx.xxx.xxx.xxx"
+    hetzner_disk1: nvme0n1
+    hetzner_disk1: nvme1n1
+
+    # Optional:
+    #   hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-75-64-minimal.tar.gz"
+    #   hetzner_autosetup_file: "{{ playbook_dir }}/my-autosetup-for-openshift"
+    ```
+
+2) Run playbook: `./ansible/00-provision-hetzner.yml`
 ## Initialize tools
 
 Install ansible and git
