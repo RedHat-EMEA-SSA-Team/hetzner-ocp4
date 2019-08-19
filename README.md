@@ -253,3 +253,35 @@ Image registry needs some level storage, following command set emptyDir storage 
 ### Enable htpasswd based authentication
 
 To add htpasswd file based authentication, follow Openshift documentation. https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-htpasswd-identity-provider.html
+
+
+# Usefull commands for debuging
+
+## Check haproxy connections:
+
+Long
+```
+watch 'echo "show stat" | nc -U /var/lib/haproxy/stats | cut -d "," -f 1,2,5-11,18,24,27,30,36,50,37,56,57,62 | column -s, -t'
+```
+
+Short:
+```
+watch 'echo "show stat" | nc -U /var/lib/haproxy/stats | cut -d "," -f 1,2,18,57| column -s, -t'
+```
+
+
+## Check etcd health
+
+```
+# OCP 4.2, as root on master node
+export ETCD_VERSION=v3.3.10
+export ASSET_DIR=./assets
+source /run/etcd/environment
+source /usr/local/bin/openshift-recovery-tools
+init
+dl_etcdctl
+backup_certs
+cd /etc/kubernetes/static-pod-resources/etcd-member
+ETCDCTL_API=3 ~/assets/bin/etcdctl --cert system:etcd-peer:${ETCD_DNS_NAME}.crt --key system:etcd-peer:${ETCD_DNS_NAME}.key --cacert ca.crt endpoint health --cluster
+```
+
