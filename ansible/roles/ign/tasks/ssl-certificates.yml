@@ -19,9 +19,9 @@
             tls.crt: {{  lookup('file',ign_certificates_path + '/fullchain.crt', rstrip=false) | b64encode }}
             tls.key: {{  lookup('file',ign_certificates_path + '/cert.key', rstrip=false)  | b64encode }}
           metadata:
-            name: router-certs-default
+            name: letsencrypt-router-certs
             namespace: openshift-ingress
           type: kubernetes.io/tls
-        dest: "{{ ign_openshift_install_dir }}/openshift/99_openshift-ingress-router-certs-secret.yaml"
+        dest: "{{ ign_openshift_install_dir }}/openshift/99_openshift-ingress-letsencrypt-router-certs-secret.yaml"
 
   when: crt.stat.exists == True and key.stat.exists == True

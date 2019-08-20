@@ -2,4 +2,6 @@ openshift-install --dir=/root/{{ cluster_name }}-install wait-for bootstrap-comp
 virsh shutdown bootstrap
 sleep 120
 oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
+# ToDo: only if letsencrypt-router-certs exist
+oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "letsencrypt-router-certs" }}}'
 openshift-install --dir=/root/{{ cluster_name }}-install wait-for install-complete --log-level debug
