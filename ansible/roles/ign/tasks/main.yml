@@ -14,18 +14,9 @@
     dest: "{{ ign_openshift_install_dir }}/install-config.yaml.original"
     src: "{{ ign_openshift_install_dir }}/install-config.yaml"
 
-- name: Create manifest files
-  command: "openshift-install --dir={{ ign_openshift_install_dir }} create manifests"
-#  args:
-#    creates: "{{ ign_openshift_install_dir }}/manifests/"
-
-- name: Handle SSL certificates
-  import_tasks: ssl-certificates.yml
 
 - name: Create ignition files
   command: "openshift-install --dir={{ ign_openshift_install_dir }} create ignition-configs"
-#  args:
-#    creates: "{{ ign_openshift_install_dir }}/bootstrap.ign"
 
 - name: Copy bootstrap inginition to www
   copy:
