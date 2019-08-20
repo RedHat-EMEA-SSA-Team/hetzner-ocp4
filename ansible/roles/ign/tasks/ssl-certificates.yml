@@ -1,0 +1,27 @@
+---
+- name: Check certificates exist
+  stat:
+    path: "{{ ign_certificates_path }}/fullchain.crt"
+  register: crt
+- name: Check ssl key exist
+  stat:
+    path: "{{ ign_certificates_path }}/cert.key"
+  register: key
+
+- name: Create openshift-ingress config
+  block:
+    - name: Create openshift router certs secret
+      copy:
+        content: |
+          apiVersion: v1
+          kind: Secret
+          data:
+            tls.crt: {{  lookup('file',ign_certificates_path + '/fullchain.crt', rstrip=false) | b64encode }}
+            tls.key: {{  lookup('file',ign_certificates_path + '/cert.key', rstrip=false)  | b64encode }}
+          metadata:
+            name: router-certs-default
+            namespace: openshift-ingress
+          type: kubernetes.io/tls
+        dest: "{{ ign_openshift_install_dir }}/openshift/99_openshift-ingress-router-certs-secret.yaml"
+
+  when: crt.stat.exists == True and key.stat.exists == True
