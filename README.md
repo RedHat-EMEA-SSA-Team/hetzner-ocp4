@@ -183,6 +183,16 @@ Here is an example about cluster.yml file that contains information about cluste
 cluster_name: ocp4
 public_domain: ocp.ninja
 dns_provider: [route53|cloudflare]
+# Deppending on the dns provider:
+# CloudFlare
+cloudflare_account_email: john@example.com
+cloudflare_account_api_token: 9348234sdsd894.....
+cloudflare_zone: ocp.ninja
+# Route53
+aws_access_key: key
+aws_secret_key: secret
+aws_zone: ocp.ninja
+
 image_pull_secret: |-
   asdfghfdsa
 ```
@@ -212,20 +222,20 @@ Current tools allow use of three DNS providers; AWS Route53, Cloudflare and bind
 
 If you use other DNS provider feel free to contribute. :D
 
-### AWS Route 53
+Please configure in `cluster.yml` all necessary credentials:
 
 ```
-[root@server ~]# export AWS_ACCESS_KEY_ID=key...
-[root@server ~]# export AWS_SECRET_ACCESS_KEY=secret...
+cloudflare_account_email: john@example.com
+cloudflare_account_api_token: 9348234sdsd894.....
+cloudflare_zone: domain.tld
+```
+or
+```
+aws_access_key: key
+aws_secret_key: secret
+aws_zone: domain.tld
 ```
 
-### CloudFlare
-
-```
-[root@server ~]# export CLOUDFLARE_ACCOUNT_EMAIL=john@example.com
-[root@server ~]# export CLOUDFLARE_ACCOUNT_API_TOKEN=9348234sdsd894.....
-[root@server ~]# export CLOUDFLARE_ZONE="domain.tld"
-```
 
 ## Prepare install and install Openshift
 

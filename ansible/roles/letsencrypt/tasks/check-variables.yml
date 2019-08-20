@@ -1,0 +1,46 @@
+---
+- name: Check required variables
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_dns_provider
+    - le_public_domain
+
+- name: Check required Route53 variables
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_aws_access_key
+    - le_aws_secret_key
+    - le_aws_zone
+  when: le_dns_provider == "route53"
+
+- name: Check required CloudFlare variables
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_cloudflare_account_email
+    - le_cloudflare_account_api_token
+    - le_cloudflare_zone
+  when: le_dns_provider == "cloudflare"
+
+- name: Debug var only with -vv
+  debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_cloudflare_account_email
+    - le_cloudflare_account_api_token
+    - le_cloudflare_zone
+    - le_aws_access_key
+    - le_aws_secret_key
+    - le_public_domain
+    - le_certificates_dir
+    - le_public_domain
+    - le_acme_directory

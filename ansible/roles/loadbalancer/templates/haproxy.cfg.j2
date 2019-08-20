@@ -67,7 +67,9 @@ listen ingress-http
     server worker-0 worker-0.{{cluster_name}}.{{public_domain}}:80 check
     server worker-1 worker-1.{{cluster_name}}.{{public_domain}}:80 check
     server worker-2 worker-2.{{cluster_name}}.{{public_domain}}:80 check
-
+    server master-0 master-0.{{cluster_name}}.{{public_domain}}:80 check
+    server master-1 master-1.{{cluster_name}}.{{public_domain}}:80 check
+    server master-2 master-2.{{cluster_name}}.{{public_domain}}:80 check
 
 listen ingress-https
     bind *:443
@@ -75,6 +77,9 @@ listen ingress-https
     server worker-0 worker-0.{{cluster_name}}.{{public_domain}}:443 check
     server worker-1 worker-1.{{cluster_name}}.{{public_domain}}:443 check
     server worker-2 worker-2.{{cluster_name}}.{{public_domain}}:443 check
+    server master-0 master-0.{{cluster_name}}.{{public_domain}}:443 check
+    server master-1 master-1.{{cluster_name}}.{{public_domain}}:443 check
+    server master-2 master-2.{{cluster_name}}.{{public_domain}}:443 check
 
 listen api
     bind *:6443
