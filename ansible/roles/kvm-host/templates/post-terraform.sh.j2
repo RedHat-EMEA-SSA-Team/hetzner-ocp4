@@ -3,8 +3,9 @@ virsh shutdown bootstrap
 sleep 120
 oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
 # Install certificate
+oc create secret tls letsencrypt-api-certs    --cert={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/fullchain.crt --key={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/cert.key -n openshift-config
+oc patch apiserver cluster --type=merge -p '{"spec":{"servingCerts": {"namedCertificates":[{"names": "api.{{ cluster_name }}.{{ public_domain }}", "servingCertificate": {"name": "letsencrypt-api-certs"}}]}}}'
 oc create secret tls letsencrypt-router-certs --cert={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/fullchain.crt --key={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/cert.key -n openshift-ingress
 oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "letsencrypt-router-certs" }}}'
 
 openshift-install --dir=/root/{{ cluster_name }}-install wait-for install-complete --log-level debug
-

@@ -42,6 +42,7 @@
     - le_certificates_dir
     - le_public_domain
     - le_acme_directory
+  when: le_dns_provider == "cloudflare"
 
 - name: Debug var only with -vv for Route53
   debug:
@@ -55,3 +56,4 @@
     - le_certificates_dir
     - le_public_domain
     - le_acme_directory
+  when: le_dns_provider == "route53"
