@@ -1,0 +1,21 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  vars_files:
+  - ../cluster.yml
+  tasks:
+
+  # Use shell & cd because you can not use chdir together with removes if it is same directory
+  - name: Run terraform destroy
+    shell: "cd {{ terraform_workdir }} && terraform destroy -auto-approve"
+    args:
+      removes: "{{ terraform_workdir }}/"
+
+  - name: Cleanup directories
+    file:
+      state: absent
+      path: "{{ item }}/"
+    with_items:
+    - "{{ terraform_workdir }}"
+    - "/root/{{ cluster_name }}-install"
+    - "/root/.kube"  

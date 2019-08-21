@@ -1,0 +1,5 @@
+---
+ign_openshift_install_dir: "/root/{{ cluster_name }}-install"
+ign_certificates_path: "{{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/"
+ign_http_root: "/var/www/html/"
+ign_terraform_workdir: "/root/terraform"

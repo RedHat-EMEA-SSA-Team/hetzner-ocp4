@@ -63,8 +63,8 @@ Hardware data:
 
    CPU1: Intel(R) Core(TM) i7 CPU 950 @ 3.07GHz (Cores 8)
    Memory:  48300 MB
-   Disk /dev/sda: 2000 GB (=> 1863 GiB)
-   Disk /dev/sdb: 2000 GB (=> 1863 GiB)
+   Disk /dev/nvme0n1: 2000 GB (=> 1863 GiB)
+   Disk /dev/nvme0n1: 2000 GB (=> 1863 GiB)
    Total capacity 3726 GiB with 2 Disks
 
 Network data:
@@ -92,19 +92,21 @@ Create new `config.txt` file
 Copy below content to that file as an template
 
 ```
-DRIVE1 /dev/sda
-DRIVE2 /dev/sdb
+DRIVE1 /dev/nvme0n1
+DRIVE2 /dev/nvme1n1
 SWRAID 1
-SWRAIDLEVEL 1
+SWRAIDLEVEL 0
 BOOTLOADER grub
-HOSTNAME CentOS-76-64-minimal
+HOSTNAME my-cool-hostname
 PART /boot ext3     512M
 PART lvm   vg0       all
 
-LV vg0   root   /       ext4     200G
+LV vg0   root   /       ext4      50G
 LV vg0   swap   swap    swap       5G
 LV vg0   tmp    /tmp    ext4      10G
 LV vg0   home   /home   ext4      40G
+LV vg0   var    /var ext4 50G
+LV vg0   libvirt /var/lib/libvirt/images xfs all
 
 
 IMAGE /root/.oldroot/nfs/install/../images/CentOS-76-64-minimal.tar.gz
@@ -115,7 +117,7 @@ There are some things that you will probably have to changes
 * Do not allocated all vg0 space to `/ swap /tmp` and `/home`.
 * If you have a single disk remove line `DRIVE2` and lines `SWRAID*`
 * If you have more than two disks add `DRIVE3`...
-* If you don't need raid just change `SWRAID` to `0`
+* If you need raid just change `SWRAID` to `1`
 * Valid values for `SWRAIDLEVEL` are 0, 1 and 10. 1 means mirrored disks
 * Configure LV sizes so that it matches your total disk size. In this example I have 2 x 2Tb disks RAID 1 so total disk space available is 2Tb (1863 Gb)
 * If you like you can add more volume groups and logical volumes.
@@ -137,6 +139,26 @@ You are now ready to reboot your system into the newly installed OS.
 [root@server ~]# reboot now
 ```
 
+### Optional: Install hetzer server via ansible
+
+If you do not want to do the above steps by hand: use Ansible! :-)
+
+1) Create `cluster.yml` with some hetzner specific options:
+    ```
+    # Hetzner informations (for role provision-hetzner)
+    hetzner_hostname: "hostname.domain.tld"
+    hetzner_webservice_username: "xxxx"
+    hetzner_webservice_password: "xxxx"
+    hetzner_ip: "xxx.xxx.xxx.xxx"
+    hetzner_disk1: nvme0n1
+    hetzner_disk1: nvme1n1
+
+    # Optional:
+    #   hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-75-64-minimal.tar.gz"
+    #   hetzner_autosetup_file: "{{ playbook_dir }}/my-autosetup-for-openshift"
+    ```
+
+2) Run playbook: `./ansible/00-provision-hetzner.yml`
 ## Initialize tools
 
 Install ansible and git
@@ -161,6 +183,16 @@ Here is an example about cluster.yml file that contains information about cluste
 cluster_name: ocp4
 public_domain: ocp.ninja
 dns_provider: [route53|cloudflare]
+# Deppending on the dns provider:
+# CloudFlare
+cloudflare_account_email: john@example.com
+cloudflare_account_api_token: 9348234sdsd894.....
+cloudflare_zone: ocp.ninja
+# Route53
+aws_access_key: key
+aws_secret_key: secret
+aws_zone: ocp.ninja
+
 image_pull_secret: |-
   asdfghfdsa
 ```
@@ -190,26 +222,26 @@ Current tools allow use of three DNS providers; AWS Route53, Cloudflare and bind
 
 If you use other DNS provider feel free to contribute. :D
 
-### AWS Route 53
+Please configure in `cluster.yml` all necessary credentials:
 
 ```
-[root@server ~]# export AWS_ACCESS_KEY_ID=key...
-[root@server ~]# export AWS_SECRET_ACCESS_KEY=secret...
+cloudflare_account_email: john@example.com
+cloudflare_account_api_token: 9348234sdsd894.....
+cloudflare_zone: domain.tld
+```
+or
+```
+aws_access_key: key
+aws_secret_key: secret
+aws_zone: domain.tld
 ```
 
-### CloudFlare
-
-```
-[root@server ~]# export CLOUDFLARE_ACCOUNT_EMAIL=john@example.com
-[root@server ~]# export CLOUDFLARE_ACCOUNT_API_TOKEN=9348234sdsd894.....
-[root@server ~]# export CLOUDFLARE_ZONE="domain.tld"
-```
 
 ## Prepare install and install Openshift
 
 ```
 [root@server ~]# cd hetzner-ocp4
-[root@server ~]# ansible-playbook  ansible/setup.yml
+[root@server ~]# ./ansible/setup.yml
 ```
 
 ## Follow installation progress
@@ -233,3 +265,35 @@ Image registry needs some level storage, following command set emptyDir storage 
 ### Enable htpasswd based authentication
 
 To add htpasswd file based authentication, follow Openshift documentation. https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-htpasswd-identity-provider.html
+
+
+# Usefull commands for debuging
+
+## Check haproxy connections:
+
+Long
+```
+watch 'echo "show stat" | nc -U /var/lib/haproxy/stats | cut -d "," -f 1,2,5-11,18,24,27,30,36,50,37,56,57,62 | column -s, -t'
+```
+
+Short:
+```
+watch 'echo "show stat" | nc -U /var/lib/haproxy/stats | cut -d "," -f 1,2,18,57| column -s, -t'
+```
+
+
+## Check etcd health
+
+```
+# OCP 4.2, as root on master node
+export ETCD_VERSION=v3.3.10
+export ASSET_DIR=./assets
+source /run/etcd/environment
+source /usr/local/bin/openshift-recovery-tools
+init
+dl_etcdctl
+backup_certs
+cd /etc/kubernetes/static-pod-resources/etcd-member
+ETCDCTL_API=3 ~/assets/bin/etcdctl --cert system:etcd-peer:${ETCD_DNS_NAME}.crt --key system:etcd-peer:${ETCD_DNS_NAME}.key --cacert ca.crt endpoint health --cluster
+```
+

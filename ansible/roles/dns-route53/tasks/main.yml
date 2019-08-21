@@ -4,10 +4,11 @@
     zone: "{{ public_domain }}"
     record: "{{ item }}.{{ cluster_name }}.{{ public_domain }}"
     type: A
-    ttl: 7200
+    ttl: 120
     value: "{{hostvars['localhost']['ansible_default_ipv4']['address']}}"
     wait: yes
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
   with_items:
-  - api-int
   - api
   - '*.apps'
