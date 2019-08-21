@@ -41,6 +41,9 @@ coreos_version: 42.80.20190801.0
 # name of the libvirt storage pool
 libvirt_storage_pool: default
 
+###mutidisks###
+mutidisks: no
+
 
 #ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.1.9.tar.gz"
 ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-14-112500/openshift-install-linux-4.2.0-0.nightly-2019-08-14-112500.tar.gz"

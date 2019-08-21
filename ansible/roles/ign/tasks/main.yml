@@ -14,6 +14,10 @@
     dest: "{{ ign_openshift_install_dir }}/install-config.yaml.original"
     src: "{{ ign_openshift_install_dir }}/install-config.yaml"
 
+- name: Include task list in playbooks
+  import_tasks: multi-disks.yml
+  when: multidisks == yes
+
 
 - name: Create ignition files
   command: "openshift-install --dir={{ ign_openshift_install_dir }} create ignition-configs"
