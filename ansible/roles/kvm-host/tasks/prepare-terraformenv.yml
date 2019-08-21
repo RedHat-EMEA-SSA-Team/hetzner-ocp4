@@ -46,15 +46,3 @@
     src: post-terraform.sh.j2
     dest: "{{ terraform_workdir }}/post-terraform.sh"
     mode: '0777'
-
-- name: Install Openshift installer
-  unarchive:
-    src: "{{ ocpinstaller_url }}"
-    dest: /usr/local/bin/
-    remote_src: yes
-
-- name: Install Openshift client
-  unarchive:
-    src: "{{ ocpclient_url }}"
-    dest: /usr/local/bin/
-    remote_src: yes

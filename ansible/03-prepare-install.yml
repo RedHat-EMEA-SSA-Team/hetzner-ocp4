@@ -12,13 +12,13 @@
 
     - role: "letsencrypt"
       le_dns_provider: "{{ dns_provider }}"
-      le_public_domain: "{{ cluster_name }}.{{ public_domain }}" 
+      le_public_domain: "{{ cluster_name }}.{{ public_domain }}"
       # Only set if you really want a production letsencrypt certificate
       # without le_acme_directory it use the staging env.
       #   https://letsencrypt.org/docs/rate-limits/
       le_acme_directory: "https://acme-v02.api.letsencrypt.org/directory"
 
-      le_cloudflare_account_email: "{{ cloudflare_account_email }}"
+      le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email)}}"
       le_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
       le_cloudflare_zone: "{{ cloudflare_zone }}"
 

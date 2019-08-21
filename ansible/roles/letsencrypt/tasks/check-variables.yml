@@ -30,14 +30,25 @@
     - le_cloudflare_zone
   when: le_dns_provider == "cloudflare"
 
-- name: Debug var only with -vv
+- name: Debug var only with -vv CloudFlare
   debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
     verbosity: 2
   with_items:
-    - le_cloudflare_account_email
+    - le_letsencrypt_account_email
     - le_cloudflare_account_api_token
     - le_cloudflare_zone
+    - le_public_domain
+    - le_certificates_dir
+    - le_public_domain
+    - le_acme_directory
+
+- name: Debug var only with -vv for Route53
+  debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_letsencrypt_account_email
     - le_aws_access_key
     - le_aws_secret_key
     - le_public_domain

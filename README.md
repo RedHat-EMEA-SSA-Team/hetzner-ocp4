@@ -183,6 +183,7 @@ Here is an example about cluster.yml file that contains information about cluste
 cluster_name: ocp4
 public_domain: ocp.ninja
 dns_provider: [route53|cloudflare]
+letsencrypt_account_email: name@example.com
 # Deppending on the dns provider:
 # CloudFlare
 cloudflare_account_email: john@example.com
@@ -202,12 +203,12 @@ image_pull_secret: |-
 |cluster_name  |Name of the cluster to be installed |
 |public_domain  |Root domain that will be used for your cluster.  |
 |dns_provider  |DNS provider, value can be route53 or bind. Bind references local bind on root server. If using route53 you need to store AWS key and secret as env vars. Check Setup public DNS records for more info. |
+|letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If cloudflare_account_email is not present for CloudFlare DNS recods, letsencrypt_account_email is also used with CloudFlare DNS account email |
 |image_pull_secret|Token to be used to authenticate to Red Hat image registry. You can download pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
 
 DNS records are constructed based on cluster_name and public_domain values. With above values DNS records should be
 - api.ocp4.ocp.ninja
-- api-int.ocp4.ocp.ninja
 - \*.apps.ocp4.ocp.ninja
 
 
@@ -296,4 +297,3 @@ backup_certs
 cd /etc/kubernetes/static-pod-resources/etcd-member
 ETCDCTL_API=3 ~/assets/bin/etcdctl --cert system:etcd-peer:${ETCD_DNS_NAME}.crt --key system:etcd-peer:${ETCD_DNS_NAME}.key --cacert ca.crt endpoint health --cluster
 ```
-
