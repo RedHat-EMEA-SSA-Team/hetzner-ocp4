@@ -297,3 +297,23 @@ backup_certs
 cd /etc/kubernetes/static-pod-resources/etcd-member
 ETCDCTL_API=3 ~/assets/bin/etcdctl --cert system:etcd-peer:${ETCD_DNS_NAME}.crt --key system:etcd-peer:${ETCD_DNS_NAME}.key --cacert ca.crt endpoint health --cluster
 ```
+
+# After a reboot of your server
+You have to restart the haproxy services using 
+```
+$ systemctl start haproxy
+```
+
+And all the VM by using 
+```
+$ virsh start master-0
+$ virsh start master-1
+$ virsh start master-2
+$ virsh start worker-0
+$ virsh start worker-1
+$ virsh start worker-2
+
+$ watch oc get node
+```
+
+
