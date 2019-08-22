@@ -182,7 +182,7 @@ Here is an example about cluster.yml file that contains information about cluste
 ```
 cluster_name: ocp4
 public_domain: ocp.ninja
-dns_provider: [route53|cloudflare]
+dns_provider: [route53|cloudflare|bind]
 letsencrypt_account_email: name@example.com
 # Deppending on the dns provider:
 # CloudFlare
@@ -202,7 +202,7 @@ image_pull_secret: |-
 |---|---|
 |cluster_name  |Name of the cluster to be installed |
 |public_domain  |Root domain that will be used for your cluster.  |
-|dns_provider  |DNS provider, value can be route53 or bind. Bind references local bind on root server. If using route53 you need to store AWS key and secret as env vars. Check Setup public DNS records for more info. |
+|dns_provider  |DNS provider, value can be route53 or bind. Bind references local bind on root server. If using route53 you need to store AWS key and secret as env vars. Check Setup public DNS records for more info. Use value bind, if you dont need to create public DNS records|
 |letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If cloudflare_account_email is not present for CloudFlare DNS recods, letsencrypt_account_email is also used with CloudFlare DNS account email |
 |image_pull_secret|Token to be used to authenticate to Red Hat image registry. You can download pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
