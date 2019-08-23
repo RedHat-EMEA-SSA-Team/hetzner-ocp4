@@ -10,7 +10,12 @@
 - name: Copy ignition {{ vm_instance_name }}
   copy:
     src: "{{ vm_ignition_file }}"
-    dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.ignition"
+    dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.ign"
+
+# - name: Debug - create /tmp/{{ vm_instance_name }}.virt.xml
+#   template:
+#     src: "vm.xml.j2"
+#     dest: "/tmp/{{ vm_instance_name }}.virt.xml"
 
 - name: Define VirtualMachine {{ vm_instance_name }}
   virt:
