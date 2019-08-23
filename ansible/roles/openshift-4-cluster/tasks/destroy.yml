@@ -23,3 +23,9 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
   with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+
+- name: Clean OpenShift install directory 
+  file:
+    state: absent
+    path: "{{ openshift_install_dir }}/"
+  tags: ignition

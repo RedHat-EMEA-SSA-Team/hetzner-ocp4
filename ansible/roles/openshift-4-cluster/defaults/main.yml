@@ -1,5 +1,8 @@
 ---
 
+openshift_install_dir: "{{ playbook_dir }}/../installer-{{ cluster_name }}"
+ssh_public_key_location: /root/.ssh/id_rsa
+
 vn_subnet: "192.168.50.0"
 vn_name: "ocp4network"
 vn_internal_domain: "compute.local"

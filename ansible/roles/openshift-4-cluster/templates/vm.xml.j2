@@ -62,4 +62,8 @@
     </graphics>
     <memballoon model='virtio'/>
   </devices>
+  <qemu:commandline>
+    <qemu:arg value='-fw_cfg'/>
+    <qemu:arg value='name=opt/com.coreos/config,file=/var/lib/libvirt/images/{{ vm_instance_name }}.ignition'/>
+  </qemu:commandline>
 </domain>

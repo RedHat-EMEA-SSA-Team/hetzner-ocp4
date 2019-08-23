@@ -15,3 +15,8 @@
   file:
     path: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
     state: absent
+
+- name: Delete ignition {{ vm_instance_name }}
+  file:
+    path: "/var/lib/libvirt/images/{{ vm_instance_name }}.ignition"
+    state: absent
