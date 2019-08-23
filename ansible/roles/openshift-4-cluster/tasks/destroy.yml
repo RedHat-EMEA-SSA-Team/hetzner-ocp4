@@ -1,6 +1,4 @@
 ---
-# If you like to play: ./ansible/destroy.yml --skip-tags public_dns,letsencrypt
-
 - import_tasks: destroy-network.yml
   vars:
     vn_name: "{{ cluster_name }}"

@@ -1,6 +1,4 @@
 ---
-# If you like to play: ./ansible/create.yml --skip-tags public_dns,letsencrypt
-
 - import_tasks: create-network.yml
   vars:
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"

@@ -1,30 +1,14 @@
 #!/usr/bin/env ansible-playbook 
 ---
+# If you like to play: ./ansible/destroy.yml --skip-tags public_dns,letsencrypt
+
 - hosts: localhost
   connection: local
   gather_facts: true
   vars_files:
   - ../cluster.yml
-
   tasks:
   - name: Destroy cluster
     import_role:
       name: openshift-4-cluster
       tasks_from: destroy.yml
-
-# # https://libvirt.org/formatnetwork.html
-# # QEMU - 52:54:00... - https://gist.github.com/ashee/9241ab6281e6f4d1ef9b
-
-#   - name: Destroy Network {{ network }}
-#     virt_net:
-#       command: destroy
-#       name: "{{ network }}"
-#     ignore_errors: yes
-
-#   - name: Undefine Network {{ network }}
-#     virt_net:
-#       command: undefine
-#       name: "{{ network }}"
-
-
-# # VM: https://github.com/jdauphant/ansible-role-kvm/blob/master/templates/vm.kvm.libvirt.xml.j2
