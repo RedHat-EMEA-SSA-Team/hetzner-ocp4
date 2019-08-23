@@ -1,0 +1,135 @@
+#!/usr/bin/env ansible-playbook 
+---
+- hosts: localhost
+  connection: local
+  # gather_facts true because we need the public ip address
+  gather_facts: true
+  vars_files:
+  - ../cluster.yml
+
+  tasks:
+# https://libvirt.org/formatnetwork.html
+# QEMU - 52:54:00... - https://gist.github.com/ashee/9241ab6281e6f4d1ef9b
+
+  - name: Deploy cluster
+    import_role: 
+      name: openshift-4-cluster
+      tasks_from: create.yml
+
+#   - name: Define network {{ network }}
+#     virt_net:
+#       command: define
+#       name: "{{ network }}"
+#       xml: |
+#         <network>
+#           <name>{{ network }}</name>
+#           <forward mode='nat'/>
+#           <domain name="foo.openshift.pub"/>
+#           <dns>
+#             <txt name="example" value="example value"/>
+#             <srv service='name' protocol='tcp' domain='foo.openshift.pub' target='.' port='1024' priority='10' weight='10'/>
+#             <host ip='192.168.223.66'>
+#               <hostname>instance-root.foo.openshift.pub</hostname>
+#             </host>
+#           </dns>
+#           <ip address='192.168.223.1' netmask='255.255.255.0'>
+#             <dhcp>
+#               <range start='192.168.223.30' end='192.168.223.36'/>
+#               <host mac='52:54:00:11:42:40' name='instance-root.foo.openshift.pub' ip='192.168.223.66'/>
+#             </dhcp>
+#           </ip>
+#         </network>
+
+
+#   - name: Active network {{ network }}
+#     virt_net:
+#       state: active
+#       name: "{{network}}"
+#   - name: Autostart yes network {{ network }}
+#     virt_net:
+#       autostart: yes
+#       name: "{{network}}"
+
+# # VM: https://github.com/jdauphant/ansible-role-kvm/blob/master/templates/vm.kvm.libvirt.xml.j2
+# # /var/lib/libvirt/images/rhcos42.qcow2
+# # /var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud.qcow2
+#   - name: Write disk 
+#     command: qemu-img convert -O qcow2 -o size=10G /var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud.qcow2 /var/lib/libvirt/images/instance-root.qcow2
+#     args:
+#       creates: /var/lib/libvirt/images/instance-root.qcow2
+  
+#   - name: define VMs
+#     virt:
+#       name: instance-root
+#       command: define
+#       xml: | 
+#         <domain type='kvm'>
+#           <name>instance-root</name>
+#           <uuid>{{ lookup('lines','uuidgen') }}</uuid>
+#           <memory unit='MiB'>8096</memory>
+#           <currentMemory unit='MiB'>8096</currentMemory>
+#           <vcpu>4</vcpu>
+#           <os>
+#             <type arch='x86_64'>hvm</type>
+#             <boot dev='hd'/>
+#           </os>
+#           <clock offset='utc'/>
+#           <on_poweroff>destroy</on_poweroff>
+#           <on_reboot>restart</on_reboot>
+#           <on_crash>destroy</on_crash>
+#           <devices>
+#             <emulator>/usr/libexec/qemu-kvm</emulator>
+#             <disk type='file' device='disk'>
+#               <driver name='qemu' type='qcow2'/>
+#               <source file='/var/lib/libvirt/images/instance-root.qcow2'/>
+#               <target dev='vda' bus='virtio'/>
+#             </disk>
+#             <disk type='file' device='cdrom'>
+#               <driver name='qemu' type='raw'/>
+#               <source file='/var/lib/libvirt/images/instance-root.config.iso'/>
+#               <backingStore/>
+#               <target dev='hdd' bus='ide'/>
+#               <readonly/>
+#               <alias name='ide0-1-1'/>
+#               <address type='drive' controller='0' bus='1' target='0' unit='1'/>
+#             </disk>
+#             <controller type='ide' index='0' />
+#             <interface type='network'>
+#               <mac address='52:54:00:11:42:40'/>
+#               <source network='{{ network }}'/>
+#               <model type='virtio'/>
+#             </interface>
+#             <serial type='pty'>
+#               <target type='isa-serial' port='0'>
+#                 <model name='isa-serial'/>
+#               </target>
+#             </serial>
+#             <console type='pty'>
+#               <target type='serial' port='0'/>
+#             </console>
+#             <console type='pty'>
+#               <target type='virtio' port='1'/>
+#             </console>
+#             <channel type='pty'>
+#               <target type='virtio' name='org.qemu.guest_agent.0'/>
+#               <address type='virtio-serial' controller='0' bus='0' port='1'/>
+#             </channel>
+#             <input type='mouse' bus='ps2'/>
+#             <input type='keyboard' bus='ps2'/>
+#             <graphics type='spice' autoport='yes' listen='127.0.0.1'>
+#               <listen type='address' address='127.0.0.1'/>
+#             </graphics>
+#             <memballoon model='virtio'/>
+#           </devices>
+#         </domain>
+
+#   # # Add a new host in the dhcp pool
+#   # - virt_net:
+#   #     name: "{{ network }}"
+#   #     command: modify
+#   #     xml: "<host mac='52:54:00:3a:28:96' name='instance-root' ip='192.168.123.66'/>"
+  
+#   - name: start VMs
+#     virt: 
+#       name: instance-root
+#       state: running

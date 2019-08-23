@@ -1,0 +1,18 @@
+---
+- import_tasks: destroy-network.yml
+  vars:
+    vn_name: "{{ cluster_name }}"
+
+- include: destroy-vm.yml
+  vars:
+    vm_instance_name: "{{ cluster_name }}-bootstrap"
+
+- include: destroy-vm.yml
+  vars:
+    vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
+  with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
+
+- include: destroy-vm.yml
+  vars:
+    vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
+  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1

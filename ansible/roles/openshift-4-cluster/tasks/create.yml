@@ -1,0 +1,27 @@
+---
+- import_tasks: create-network.yml
+  vars:
+    vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+    vn_master_count: "{{ master_count }}"
+    vn_compute_count: "{{ compute_count }}"
+
+- include: create-vm.yml
+  vars:
+    vm_instance_name: "{{ cluster_name }}-bootstrap"
+    vm_network: "{{ cluster_name }}"
+    vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
+
+
+- include: create-vm.yml
+  vars:
+    vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
+    vm_network: "{{ cluster_name }}"
+    vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + item|int) }}"
+  with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
+
+- include: create-vm.yml
+  vars:
+    vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
+    vm_network: "{{ cluster_name }}"
+    vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + item|int) }}"
+  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1

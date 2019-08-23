@@ -1,0 +1,79 @@
+---
+# Debug...
+# - template:
+#     src: templates/network.xml.j2
+#     dest: network.xml     
+
+- name: Define network {{ cluster_name }}
+  virt_net:
+    command: define
+    name: "{{ cluster_name }}"
+    xml: "{{ lookup('template', 'templates/network.xml.j2') }}"
+
+- name: Active network {{ cluster_name }}
+  virt_net:
+    state: active
+    name: "{{ cluster_name }}"
+
+- name: Activate autostart network {{ cluster_name }}
+  virt_net:
+    autostart: yes
+    name: "{{ cluster_name }}"
+
+# Build lb config:
+
+- set_fact: 
+    tmp_api: "[ 'bootstrap={{ vn_subnet.split('.')[:3] | join('.')}}.2:6443' ]"
+    tmp_api_listen: "[ '{{ vn_subnet.split('.')[:3] | join('.')}}.1:6443','{{ listen_address }}:6443' ]"
+    tmp_ingress_http: "[]"
+    tmp_ingress_http_listen: "['{{ vn_subnet.split('.')[:3] | join('.')}}.1:80','{{ listen_address }}:80']"
+    tmp_ingress_https: "[]"
+    tmp_ingress_https_listen: "[ '{{ vn_subnet.split('.')[:3] | join('.')}}.1:443','{{ listen_address }}:443']"
+    tmp_machine_config_server: "[ 'bootstrap={{ vn_subnet.split('.')[:3] | join('.')}}.2:22623' ]"
+    tmp_machine_config_server_listen: "['{{ vn_subnet.split('.')[:3] | join('.')}}.1:22623']"
+  tags: lb
+
+- set_fact: 
+    tmp_api: "{{ tmp_api }} + [ 'master-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + item|int }}:6443' ]"
+    tmp_machine_config_server: "{{ tmp_machine_config_server }} + [ 'master-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + item|int }}:22623' ]"
+    tmp_ingress_http: "{{ tmp_ingress_http }} + [ 'master-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + item|int }}:80' ]"
+    tmp_ingress_https: "{{ tmp_ingress_https }} + [ 'master-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + item|int }}:443' ]"
+  with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
+  tags: lb
+
+
+- set_fact: 
+    tmp_ingress_http: "{{ tmp_ingress_http }} + [ 'compute-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + item|int }}:80' ]"
+    tmp_ingress_https: "{{ tmp_ingress_https }} + [ 'compute-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + item|int }}:443' ]"
+  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+  tags: lb
+
+# - debug:
+#     var: "{{ item }}"
+#   with_items:
+#     - tmp_api
+#     - tmp_api_listen
+#     - tmp_ingress_http
+#     - tmp_ingress_http_listen
+#     - tmp_ingress_https
+#     - tmp_ingress_https_listen
+#     - tmp_machine_config_server
+#     - tmp_machine_config_server_listen
+#     - listen_address
+#   tags: lb
+
+- name: Create OpenShift 4 load balancer
+  import_role: 
+    name: openshift-4-loadbalancer
+    tasks_from: create.yml
+  vars:
+    lb_name: "openshift-4-loadbalancer-{{ cluster_name }}"
+    lb_api: "{{ tmp_api | join(',') }}"
+    lb_api_listen: "{{ tmp_api_listen | join(',') }}"
+    lb_ingress_http: "{{ tmp_ingress_http | join(',') }}"
+    lb_ingress_http_listen: "{{ tmp_ingress_http_listen | join(',') }}"
+    lb_ingress_https: "{{ tmp_ingress_https | join(',') }}"
+    lb_ingress_https_listen: "{{ tmp_ingress_https_listen | join(',') }}"
+    lb_machine_config_server: "{{ tmp_machine_config_server | join(',') }}"
+    lb_machine_config_server_listen: "{{ tmp_machine_config_server_listen | join(',') }}"
+  tags: lb

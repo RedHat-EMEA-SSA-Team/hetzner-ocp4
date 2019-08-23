@@ -1,0 +1,65 @@
+<domain type='kvm'>
+  <name>{{ vm_instance_name }}</name>
+  <uuid>{{ lookup('lines','uuidgen') }}</uuid>
+  <metadata>
+    <kvirt:info xmlns:kvirt="kvirt">
+      <kvirt:profile>kvirt</kvirt:profile>
+      <kvirt:plan>{{ cluster_name }}</kvirt:plan>
+    </kvirt:info>
+  </metadata>
+  <memory unit='MiB'>8096</memory>
+  <currentMemory unit='MiB'>8096</currentMemory>
+  <vcpu>4</vcpu>
+  <os>
+    <type arch='x86_64'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/var/lib/libvirt/images/instance-root.config.iso'/>
+      <backingStore/>
+      <target dev='hdd' bus='ide'/>
+      <readonly/>
+      <alias name='ide0-1-1'/>
+      <address type='drive' controller='0' bus='1' target='0' unit='1'/>
+    </disk>
+    <controller type='ide' index='0' />
+    <interface type='network'>
+      <mac address='{{ vm_mac_address  }}'/>
+      <source network='{{ vm_network }}'/>
+      <model type='virtio'/>
+    </interface>
+    <serial type='pty'>
+      <target type='isa-serial' port='0'>
+        <model name='isa-serial'/>
+      </target>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <console type='pty'>
+      <target type='virtio' port='1'/>
+    </console>
+    <channel type='pty'>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+      <address type='virtio-serial' controller='0' bus='0' port='1'/>
+    </channel>
+    <input type='mouse' bus='ps2'/>
+    <input type='keyboard' bus='ps2'/>
+    <graphics type='spice' autoport='yes' listen='127.0.0.1'>
+      <listen type='address' address='127.0.0.1'/>
+    </graphics>
+    <memballoon model='virtio'/>
+  </devices>
+</domain>

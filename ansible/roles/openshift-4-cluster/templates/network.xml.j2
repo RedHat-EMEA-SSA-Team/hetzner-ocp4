@@ -1,0 +1,36 @@
+<network>
+    <name>{{ cluster_name }}</name>
+    <forward mode='nat'/>
+    <domain name="{{ vn_internal_domain }}"/>
+    <dns>
+        <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.2'>
+            <hostname>bootstrap.{{ vn_internal_domain }}</hostname>
+        </host>
+        <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.1'>
+            <hostname>api-int.{{ vn_public_domain }}</hostname>
+            <hostname>api.{{ vn_public_domain }}</hostname>
+        </host>
+        {% for id in range(0, vn_master_count | int) -%}
+        <srv service='_etcd-server-ssl' protocol='tcp' domain='{{ vn_internal_domain }}' target='etcd-{{ id }}.{{ vn_internal_domain }}' port='2380' priority='0' weight='10'/>
+        <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + id|int }}'>
+            <hostname>master-{{ id }}.{{ vn_internal_domain }}</hostname>
+            <hostname>etcd-{{ id }}.{{ vn_internal_domain }}</hostname>
+        </host>
+        {% endfor %}
+
+    </dns>
+
+    <ip address='{{ vn_subnet.split('.')[:3] | join('.')}}.1' netmask='255.255.255.0'>
+        <dhcp>
+            <range start='{{ vn_subnet.split('.')[:3] | join('.')}}.10' end='{{ vn_subnet.split('.')[:3] | join('.')}}.250'/>
+            <host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}' name='bootstrap.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.2'/>
+            {% for id in range(0, vn_master_count | int) -%}
+            <host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}' name='master-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + id }}'/>
+            {% endfor -%}
+            {% for id in range(0, vn_compute_count | int) -%}
+            <host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + vn_master_count|int + id) }}' name='compute-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + vn_master_count|int + id }}'/>
+            {% endfor %}
+
+        </dhcp>
+    </ip>
+</network>

@@ -1,0 +1,19 @@
+---
+# # VM: https://github.com/jdauphant/ansible-role-kvm/blob/master/templates/vm.kvm.libvirt.xml.j2
+# # /var/lib/libvirt/images/rhcos42.qcow2
+# # /var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud.qcow2
+- name: Create disk for {{ vm_instance_name }}
+  command: "qemu-img convert -O qcow2 -o size=10G /var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud.qcow2 /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
+  args:
+    creates: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
+
+- name: Define VirtualMachine {{ vm_instance_name }}
+  virt:
+    name: "{{ vm_instance_name }}"
+    command: define
+    xml: "{{ lookup('template', 'templates/vm.xml.j2') }}"
+
+- name: Start VirtualMachine {{ vm_instance_name }}
+  virt: 
+    name: "{{ vm_instance_name }}"
+    state: running

@@ -1,0 +1,20 @@
+---
+- name: Destroy OpenShift 4 load balancer
+  import_role: 
+    name: openshift-4-loadbalancer
+    tasks_from: destroy.yml
+  vars:
+    lb_name: "openshift-4-loadbalancer-{{ cluster_name }}"
+  tags: 
+    lb
+
+- name: Destroy Network {{ vn_name }}
+  virt_net:
+    command: destroy
+    name: "{{ vn_name }}"
+  ignore_errors: yes
+
+- name: Undefine Network {{ vn_name }}
+  virt_net:
+    command: undefine
+    name: "{{ vn_name }}"
