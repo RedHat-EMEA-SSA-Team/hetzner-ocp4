@@ -1,4 +1,19 @@
 ---
+- name: Destroy public dns entries
+  import_role:
+    name: public_dns
+    tasks_from: destroy.yml
+  vars:
+    pd_provider: "{{ dns_provider }}"
+    pd_public_ip: "{{ listen_address }}"
+    pd_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
+    pd_cloudflare_zone: "{{ cloudflare_zone }}"
+    pd_aws_access_key: "{{ aws_access_key }}"
+    pd_aws_secret_key: "{{ aws_secret_key }}"
+    pd_aws_zone: "{{ aws_zone }}"
+    pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+  tags: public_dns
+
 - name: Destroy OpenShift 4 load balancer
   import_role: 
     name: openshift-4-loadbalancer
