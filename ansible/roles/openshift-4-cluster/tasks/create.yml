@@ -1,16 +1,36 @@
 ---
+# If you like to play: ./ansible/create.yml --skip-tags public_dns,letsencrypt
+
 - import_tasks: create-network.yml
   vars:
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
     vn_master_count: "{{ master_count }}"
     vn_compute_count: "{{ compute_count }}"
 
+- import_role: 
+    name: letsencrypt
+  vars:
+    le_dns_provider: "{{ dns_provider }}"
+    le_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+    # Only set if you really want a production letsencrypt certificate
+    # without le_acme_directory it use the staging env.
+    #   https://letsencrypt.org/docs/rate-limits/
+    # le_acme_directory: "https://acme-v02.api.letsencrypt.org/directory"
+
+    le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email)}}"
+    le_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
+    le_cloudflare_zone: "{{ cloudflare_zone }}"
+
+    le_aws_access_key: "{{ aws_access_key }}"
+    le_aws_secret_key: "{{ aws_secret_key }}"
+    le_aws_zone: "{{ aws_zone }}"
+  tags: letsencrypt
+
 - include: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
     vm_network: "{{ cluster_name }}"
     vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
-
 
 - include: create-vm.yml
   vars:

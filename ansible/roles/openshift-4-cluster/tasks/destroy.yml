@@ -1,7 +1,14 @@
 ---
+# If you like to play: ./ansible/destroy.yml --skip-tags public_dns,letsencrypt
+
 - import_tasks: destroy-network.yml
   vars:
     vn_name: "{{ cluster_name }}"
+
+- name: Destroy letsencrypt
+  debug:
+    msg: "Letsencrypt certifcates stays...."
+  tags: letsencrypt
 
 - include: destroy-vm.yml
   vars:
