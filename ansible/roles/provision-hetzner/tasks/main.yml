@@ -89,6 +89,8 @@
 
 - name: Run installimage 
   command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup"
+  environment:
+    TERM: "vt100"
   ignore_errors: true
   register: result
 
@@ -96,9 +98,15 @@
     var: result
     verbosity: 1
 
-- fail: 
+- name: Check stderr from installimage
+  fail:
     msg: "Something want wrong at installimage: {{ result.stderr_lines | join('\n') }}"
   when: result.stderr_lines | length > 0 
+
+- name: Check stdout from installimage
+  fail:
+    msg: "Something want wrong at installimage: {{ result.stdout_lines | join('\n') }}"
+  when: result.stdout is search('An error occured while installing the new system!') 
 
 - name: Reboot server
   shell: sleep 2 && shutdown -r now

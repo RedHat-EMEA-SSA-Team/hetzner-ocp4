@@ -18,7 +18,6 @@
   remote_user: root
   vars_files:
   - ../cluster.yml
-
   tasks:
   - name: provision hetzner root server
     import_role:
