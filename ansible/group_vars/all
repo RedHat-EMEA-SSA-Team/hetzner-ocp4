@@ -5,10 +5,6 @@ ssh_public_key_location: /root/.ssh/id_rsa
 # update the /etc/hosts file for cli and console resolution
 update_hosts: true
 
-# reference to coreos qcow file
-coreos_image_location: /root/rhcoreos-qemu.qcow2
-coreos_version: 42.80.20190801.0
-
 # name of the libvirt storage pool
 libvirt_storage_pool: default
 
