@@ -1,0 +1,6 @@
+- name: Waiting bootstrap to complete
+  command: "openshift-install wait-for bootstrap-complete --dir {{ openshift_install_dir }} --log-level debug"
+  register: bootstrap_status
+  retries: 60
+  delay: 60
+  until: bootstrap_status.rc == 0
