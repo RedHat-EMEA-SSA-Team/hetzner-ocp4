@@ -1,6 +1,0 @@
-- include: prepare-storage.yml
-- include: kvm-packages.yml
-- include: enable-nested-v.yml
-- include: enable-remote-virsh.yml
-- name: upgrade redhat
-  yum: name=* state=latest

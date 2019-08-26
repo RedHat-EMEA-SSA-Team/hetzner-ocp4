@@ -1,4 +1,0 @@
----
-
-  - name: enable remote virsh
-    copy: src={{ playbook_dir }}/roles/kvm-host/files/50-libvirt-user-stack.pkla dest=/etc/polkit-1/localauthority/50-local.d/50-libvirt-user-stack.pkla
