@@ -28,4 +28,5 @@
   with_items:
   - api
   - '*.apps'
+  when: pd_provider == "route53" 
 
