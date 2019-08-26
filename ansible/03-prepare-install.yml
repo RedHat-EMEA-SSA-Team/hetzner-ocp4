@@ -7,8 +7,6 @@
     ssh_public_key: "{{ lookup('file', '{{ ssh_public_key_location }}.pub') }}"
   gather_facts: false
   roles:
-    - loadbalancer
-
     - role: "letsencrypt"
       le_dns_provider: "{{ dns_provider }}"
       le_public_domain: "{{ cluster_name }}.{{ public_domain }}"
