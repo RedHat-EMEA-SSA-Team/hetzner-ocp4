@@ -24,7 +24,3 @@
       le_aws_access_key: "{{ aws_access_key }}"
       le_aws_secret_key: "{{ aws_secret_key }}"
       le_aws_zone: "{{ aws_zone }}"
-
-    - role: ign
-      ign_ssh_public_key: "{{ ssh_public_key }}"
-      ign_terraform_workdir: "{{ terraform_workdir }}"
