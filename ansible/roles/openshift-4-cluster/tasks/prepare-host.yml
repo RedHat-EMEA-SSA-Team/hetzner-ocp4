@@ -1,4 +1,45 @@
 ---
+- name: Installing KVM Packages
+  yum:
+    name:
+      - "@virtualization-hypervisor"
+      - "@virtualization-client"
+      - "@virtualization-platform"
+      - "@virtualization-tools"
+      # ansible virt need lxml
+      - python-lxml
+      # ansible route53 need  python-boto
+      - python-boto
+    state: present
+
+# Update qemu to +2.4 because option fw_cfg added in 2.4 
+#  "qemu-kvm: -fw_cfg: invalid option"
+#  https://github.com/qemu/qemu/commit/81b2b81062612e
+- name: Add repos centos-release-openstack-stein
+  yum:
+    name: centos-release-openstack-stein
+    state: present
+
+- name: Disable all openstack repos except centos-qemu-ev
+  command: "yum-config-manager -q --disable centos-ceph-nautilus centos-nfs-ganesha28 centos-openstack-stein"
+
+- name: Upgrade all packages, include update qemu-kvm to >2.4
+# because we added repo centos-qemu-ev from openstack
+  yum:
+    name: '*'
+    state: latest
+
+- name: Enable and Start libvirtd
+  systemd:
+    name: libvirtd
+    state: started
+    enabled: yes
+
+- name: Verify KVM module is loaded
+  shell: "lsmod | grep -i kvm"
+  register: result
+  failed_when: "result.rc != 0"
+
 
 # ToDo: Move to cluster tasks...
 - name: Create SSH key for root
@@ -8,22 +49,29 @@
     ssh_key_bits: 2048
     ssh_key_file: "{{ ssh_public_key_location }}"
 
+# Can not use get_url because: get_url do not support --compressed
 - name: Download CoreOS image
-  get_url:
-      url: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest/rhcos-{{ coreos_version }}-qemu.qcow2"
-      dest: "{{ coreos_image_location }}"
+  command:
+    "curl --compressed -J -L -o {{ coreos_image_location }} https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest/rhcos-{{ coreos_version }}-qemu.qcow2"
+  args:
+    creates: "{{ coreos_image_location }}"
+    warn: false
 
 - name: Install Openshift installer
   unarchive:
     src: "{{ ocpinstaller_url }}"
     dest: /usr/local/bin/
     remote_src: yes
+    exclude:
+      - "README.md"
     creates: /usr/local/bin/openshift-install
 
 - name: Install Openshift client
   unarchive:
     src: "{{ ocpclient_url }}"
     dest: /usr/local/bin/
+    exclude:
+      - "README.md"
     remote_src: yes
     creates: /usr/local/bin/oc
 
