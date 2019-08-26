@@ -51,4 +51,7 @@
     vm_ignition_file: "{{ openshift_install_dir }}/worker.ign"
     vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + item|int) }}"
   with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
-- include: post-install.yml
+
+- name: Include post installation tasks
+  include: post-install.yml
+  tags: post-install
