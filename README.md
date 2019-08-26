@@ -245,15 +245,9 @@ aws_zone: domain.tld
 [root@server ~]# ./ansible/setup.yml
 ```
 
-## Follow installation progress
-
-First follow bootstrap process and then install process. bootstrap VM will be shutdown after bootstrap is completed.
-
-```
-[root@server ~]# ../terraform/post-terraform.sh
-```
-
 ## Post install tasks
+
+Work-in-progress to rewrite: https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/22
 
 ### Storage for registry
 
@@ -262,6 +256,14 @@ Image registry needs some level storage, following command set emptyDir storage 
 ```
 [root@server ~]# oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
 ```
+
+### Install letsencrypt
+
+```
+oc create secret tls letsencrypt-router-certs --cert={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/fullchain.crt --key={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/cert.key -n openshift-ingress
+oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "letsencrypt-router-certs" }}}'
+```
+
 
 ### Enable htpasswd based authentication
 

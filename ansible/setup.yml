@@ -1,5 +1,4 @@
 #!/usr/bin/env ansible-playbook
 ---
 - import_playbook: 01-prepare-host.yml
-- import_playbook: 02-prepare-publicdns.yml
-- import_playbook: 03-prepare-install.yml
+- import_playbook: 02-create-cluster.yml
