@@ -1,9 +1,0 @@
----
-
-  - name: enable nested virtualization
-    copy: src={{ playbook_dir }}/roles/kvm-host/files/kvm-intel.conf dest=/etc/modprobe.d/kvm_intel.conf
-  - name: disable the rp_filter
-    copy: src={{ playbook_dir }}/roles/kvm-host/files/98-rp-filter.conf dest=/etc/sysctl.d/98-rp-filter.conf
-  - name: add devpts mount point
-    mount: name=/dev/pts src=devpts fstype=devpts opts="gid=5,mode=620" dump=0 state=present
-    when: ansible_distribution == 'Fedora' or ansible_distribution == 'CentOS'

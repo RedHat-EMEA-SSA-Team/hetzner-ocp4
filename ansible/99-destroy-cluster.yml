@@ -1,21 +1,14 @@
-#!/usr/bin/env ansible-playbook
+#!/usr/bin/env ansible-playbook 
 ---
+# If you like to play: ./ansible/destroy.yml --skip-tags public_dns,letsencrypt
+
 - hosts: localhost
+  connection: local
+  gather_facts: true
   vars_files:
   - ../cluster.yml
   tasks:
-
-  # Use shell & cd because you can not use chdir together with removes if it is same directory
-  - name: Run terraform destroy
-    shell: "cd {{ terraform_workdir }} && terraform destroy -auto-approve"
-    args:
-      removes: "{{ terraform_workdir }}/"
-
-  - name: Cleanup directories
-    file:
-      state: absent
-      path: "{{ item }}/"
-    with_items:
-    - "{{ terraform_workdir }}"
-    - "/root/{{ cluster_name }}-install"
-    - "/root/.kube"  
+  - name: Destroy cluster
+    import_role:
+      name: openshift-4-cluster
+      tasks_from: destroy.yml

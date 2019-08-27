@@ -2,41 +2,8 @@
 user: root
 ssh_public_key_location: /root/.ssh/id_rsa
 
-# reverse domain for the cluster
-rev_domain: 222.168.192.in-addr.arpa
-
-# forwarder to access the internet for your prviate DNS server
-# Use hetzner DNS servers:
-#   https://wiki.hetzner.de/index.php/Hetzner_Standard_Name_Server/en
-# Because in some datacenters hetzner blocks dns traffic to foreign dns servers
-forward_dns: 213.133.98.98
-
 # update the /etc/hosts file for cli and console resolution
 update_hosts: true
-
-# host hw info
-host_master_mem: 16384
-host_master_cores: 4
-host_worker_mem: 8192
-host_worker_cores: 2
-host_bootstrap_ip: 192.168.222.30
-host_master_0_ip: 192.168.222.31
-host_master_1_ip: 192.168.222.32
-host_master_2_ip: 192.168.222.33
-host_worker_0_ip: 192.168.222.34
-host_worker_1_ip: 192.168.222.35
-host_worker_2_ip: 192.168.222.36
-
-
-# Terraform binary url
-terraform_url: "https://releases.hashicorp.com/terraform/0.12.6/terraform_0.12.6_linux_amd64.zip"
-
-# terraform workdir
-terraform_workdir: /root/terraform
-
-# reference to coreos qcow file
-coreos_image_location: /root/rhcoreos-qemu.qcow2
-coreos_version: 42.80.20190801.0
 
 # name of the libvirt storage pool
 libvirt_storage_pool: default

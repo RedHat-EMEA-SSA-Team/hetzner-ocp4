@@ -1,0 +1,30 @@
+[Unit]
+Description=OpenShift 4 LoadBalancer ({{ lb_name }})
+After=network.target
+
+[Service]
+Type=simple
+TimeoutStartSec=5m
+
+ExecStartPre=-/usr/bin/podman rm "{{ lb_name }}"
+ExecStartPre=/usr/bin/podman pull quay.io/redhat-emea-ssa-team/openshift-4-loadbalancer
+
+ExecStart=/usr/bin/podman run --name {{ lb_name }} --net host \
+  -e API={{ lb_api }} \
+  -e API_LISTEN={{ lb_api_listen }} \
+  -e INGRESS_HTTP={{ lb_ingress_http }} \
+  -e INGRESS_HTTP_LISTEN={{ lb_ingress_http_listen }} \
+  -e INGRESS_HTTPS={{ lb_ingress_https }} \
+  -e INGRESS_HTTPS_LISTEN={{ lb_ingress_https_listen }} \
+  -e MACHINE_CONFIG_SERVER={{ lb_machine_config_server }} \
+  -e MACHINE_CONFIG_SERVER_LISTEN={{ lb_machine_config_server_listen }} \
+  quay.io/redhat-emea-ssa-team/openshift-4-loadbalancer
+
+ExecReload=-/usr/bin/podman stop "{{ lb_name }}"
+ExecReload=-/usr/bin/podman rm "{{ lb_name }}"
+ExecStop=-/usr/bin/podman stop "{{ lb_name }}"
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
