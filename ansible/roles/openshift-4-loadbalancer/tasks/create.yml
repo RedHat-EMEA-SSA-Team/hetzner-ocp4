@@ -1,0 +1,32 @@
+---
+- name: Install haproxy
+  yum:
+    name:
+      - podman
+    state: present
+
+- name: Install OpenShift 4 Loadbalancer SystemD service
+  template:
+    src: systemd.service.j2
+    dest: "/etc/systemd/system/{{ lb_name }}.service"
+
+- name: Enable and start {{ lb_name }}.service
+  systemd:
+    name: "{{ lb_name }}.service"
+    enabled: yes
+    state: started
+
+- name: Enable and start {{ lb_name }}.service
+  systemd:
+    name: "{{ lb_name }}.service"
+    enabled: yes
+    state: started
+
+- name: Collect services facts
+  service_facts:
+  register: services_state
+
+- name: Check {{ lb_name }}.service
+  fail:
+    msg: "Load balancer service {{ lb_name }}.service is not running!!! Please check, run: systemctl status {{ lb_name }}.service"
+  when: services_state.ansible_facts.services[ lb_name  + '.service'].state != 'running'

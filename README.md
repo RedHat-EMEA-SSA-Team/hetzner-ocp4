@@ -245,23 +245,13 @@ aws_zone: domain.tld
 [root@server ~]# ./ansible/setup.yml
 ```
 
-## Follow installation progress
-
-First follow bootstrap process and then install process. bootstrap VM will be shutdown after bootstrap is completed.
+### Install letsencrypt
 
 ```
-[root@server ~]# ../terraform/post-terraform.sh
+oc create secret tls letsencrypt-router-certs --cert={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/fullchain.crt --key={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/cert.key -n openshift-ingress
+oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "letsencrypt-router-certs" }}}'
 ```
 
-## Post install tasks
-
-### Storage for registry
-
-Image registry needs some level storage, following command set emptyDir storage to registry
-
-```
-[root@server ~]# oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
-```
 
 ### Enable htpasswd based authentication
 
@@ -299,12 +289,8 @@ ETCDCTL_API=3 ~/assets/bin/etcdctl --cert system:etcd-peer:${ETCD_DNS_NAME}.crt 
 ```
 
 # After a reboot of your server
-You have to restart the haproxy services using 
-```
-$ systemctl start haproxy
-```
 
-And all the VM by using 
+You have start all the VM by using
 ```
 $ virsh start master-0
 $ virsh start master-1
@@ -315,5 +301,3 @@ $ virsh start worker-2
 
 $ watch oc get node
 ```
-
-

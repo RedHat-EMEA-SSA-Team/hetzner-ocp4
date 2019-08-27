@@ -1,0 +1,32 @@
+---
+- name: create cloudflare DNS records
+  cloudflare_dns:
+    zone: "{{ pd_cloudflare_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    # 1 is auto
+    ttl: 1
+    type: A
+    value: "{{ pd_public_ip }}"
+    account_email: "{{ cloudflare_account_email }}"
+    account_api_token: "{{ cloudflare_account_api_token }}"
+  with_items:
+  - api
+  - '*.apps'
+  when: pd_provider == "cloudflare" 
+
+- name: Create DNS record at Route53
+  route53:
+    state: present
+    zone: "{{ pd_aws_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    type: A
+    ttl: 120
+    value: "{{ pd_public_ip }}"
+    wait: yes
+    aws_access_key: "{{ pd_aws_access_key }}"
+    aws_secret_key: "{{ pd_aws_secret_key }}"
+  with_items:
+  - api
+  - '*.apps'
+  when: pd_provider == "route53" 
+

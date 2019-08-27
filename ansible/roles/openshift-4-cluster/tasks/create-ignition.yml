@@ -1,0 +1,20 @@
+---
+- name: Ensure installion directory
+  file:
+    path: "{{ openshift_install_dir }}"
+    state: directory
+
+- name: Create install config
+  template:
+    src: install-config.yaml.j2
+    dest: "{{ openshift_install_dir }}/install-config.yaml"
+
+- name: Save install-config from deletion
+  copy:
+    dest: "{{ openshift_install_dir }}/install-config.yaml.original"
+    src: "{{ openshift_install_dir }}/install-config.yaml"
+
+- name: Create ignition files
+  command: "openshift-install --dir={{ openshift_install_dir }} create ignition-configs"
+  args:
+    creates: "{{ openshift_install_dir}}/.openshift_install_state.json"
