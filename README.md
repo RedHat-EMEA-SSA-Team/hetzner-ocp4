@@ -242,7 +242,7 @@ aws_zone: domain.tld
 
 ```
 [root@server ~]# cd hetzner-ocp4
-[root@server ~]# ./ansible/setup.yml
+[root@server ~]# ansible-playbook ./ansible/setup.yml
 ```
 
 ### Install letsencrypt
