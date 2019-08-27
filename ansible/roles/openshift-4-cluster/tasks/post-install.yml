@@ -11,7 +11,8 @@
   delay: 60
   until: bootstrap_status.rc == 0
 
-- include: destroy-vm.yml
+- name: Destroy bootsrap node
+  include: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
