@@ -10,6 +10,7 @@
   vars:
     le_dns_provider: "{{ dns_provider }}"
     le_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+    le_certificates_dir: "{{ certificates_dir }}"
     # Only set if you really want a production letsencrypt certificate
     # without le_acme_directory it use the staging env.
     #   https://letsencrypt.org/docs/rate-limits/
