@@ -245,17 +245,9 @@ aws_zone: domain.tld
 [root@server ~]# ansible-playbook ./ansible/setup.yml
 ```
 
-### Install letsencrypt
-
-```
-oc create secret tls letsencrypt-router-certs --cert={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/fullchain.crt --key={{ playbook_dir }}/../certificate/{{ cluster_name }}.{{ public_domain }}/cert.key -n openshift-ingress
-oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "letsencrypt-router-certs" }}}'
-```
-
-
 ### Enable htpasswd based authentication
 
-To add htpasswd file based authentication, follow Openshift documentation. https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-htpasswd-identity-provider.html
+Check customizing your cluster....which is coming soon!
 
 
 # Usefull commands for debuging
