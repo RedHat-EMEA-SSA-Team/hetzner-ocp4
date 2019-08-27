@@ -16,10 +16,6 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
-- name: Wait 2 minutes for core Openshift components to restart
-  pause:
-    seconds: 120
-
 - name: Add emptyDir storage to registry
   command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
   register: registry_status
@@ -63,7 +59,7 @@
             namespace: openshift-ingress
           type: kubernetes.io/tls
     - name: Patch ingresscontroller/default
-      k8s: 
+      k8s:
         state: present
         kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
         merge_type: merge
@@ -73,8 +69,8 @@
           metadata:
             name: default
             namespace: openshift-ingress-operator
-          spec: 
-            defaultCertificate: 
+          spec:
+            defaultCertificate:
               name: letsencrypt-router-certs
   when: crt.stat.exists == True and key.stat.exists == True
 
@@ -99,7 +95,7 @@
             name: htpasswd
             namespace: openshift-config
           type: Opaque
-    - name: Create htpasswd identity rovider template
+    - name: Create htpasswd identity provider template
       set_fact:
         htpasswd_idp:
           htpasswd:
@@ -108,8 +104,8 @@
           mappingMethod: claim
           name: Local
           type: HTPasswd
-    - name: Push htpasswd_idp to identity_roviders
-      set_fact: 
+    - name: Push htpasswd_idp to identity_providers
+      set_fact:
         identity_roviders: "{{ identity_roviders }} + [ {{ htpasswd_idp }} ]"
   when: auth_htpasswd is defined
 
@@ -140,11 +136,11 @@
           name: RedHatSSO
           type: Google
     - name: Push htpasswd_idp to identity_roviders
-      set_fact: 
+      set_fact:
         identity_roviders: "{{ identity_roviders }} + [ {{ redhatsso_idp }} ]"
   when: auth_redhatsso is defined
 
-- name: Configure identity providers 
+- name: Configure identity providers
   k8s:
     state: present
     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
@@ -179,7 +175,7 @@
         kind: ClusterRole
         name: "{{ item.cluster_role }}"
   with_items: "{{ cluster_role_bindings }}"
-  when: cluster_role_bindings is defined 
+  when: cluster_role_bindings is defined
 
 ###########################################################################################
 # Print Cluster informations
