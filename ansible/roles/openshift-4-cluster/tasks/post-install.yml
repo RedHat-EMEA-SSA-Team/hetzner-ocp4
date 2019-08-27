@@ -15,6 +15,10 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
+- name: Wait 2 minutes for core Openshift components to restart
+  pause:
+    seconds: 120
+
 - name: Add emptyDir storage to registry
   command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
   register: registry_status
