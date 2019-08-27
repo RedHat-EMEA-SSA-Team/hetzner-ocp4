@@ -1,6 +1,6 @@
 - name: Info message
   debug:
-    msg: 
+    msg:
       - "If you like to follow the installation run 'tail -f  {{ openshift_install_dir }}/.openshift_install.log' in a second terminal."
       - "For more details, conntect to the bootstrap node: ssh -l core {{ vn_subnet.split('.')[:3] | join('.')}}.2"
 
@@ -15,6 +15,13 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
+- name: Add emptyDir storage to registry
+  command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
+  register: registry_status
+  retries: 60
+  delay: 30
+  until: registry_status.rc == 0
+
 - name: Waiting installation to complete
   command: "openshift-install wait-for install-complete --dir {{ openshift_install_dir }}"
   register: install_status
@@ -28,4 +35,3 @@
 - name: Cluster informations
   debug:
     msg: "{{ install_status.stderr_lines | map('regex_replace', 'level=info msg=\"(.*)\"', '\\1') | list }}"
-
