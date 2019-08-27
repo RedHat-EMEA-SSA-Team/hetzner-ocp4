@@ -10,6 +10,7 @@
   vars:
     le_dns_provider: "{{ dns_provider }}"
     le_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+    le_certificates_dir: "{{ certificates_dir }}"
     # Only set if you really want a production letsencrypt certificate
     # without le_acme_directory it use the staging env.
     #   https://letsencrypt.org/docs/rate-limits/
@@ -24,19 +25,22 @@
     le_aws_zone: "{{ aws_zone }}"
   tags: letsencrypt
 
-- include: create-ignition.yml
+- name: Create ignition files
+  include: create-ignition.yml
   vars:
     ssh_public_key: "{{ lookup('file', '{{ ssh_public_key_location }}.pub') }}"
   tags: ignition
 
-- include: create-vm.yml
+- name: Create bootstrap node
+  include: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
     vm_network: "{{ cluster_name }}"
     vm_ignition_file: "{{ openshift_install_dir }}/bootstrap.ign"
     vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
 
-- include: create-vm.yml
+- name: Create master nodes
+  include: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
     vm_network: "{{ cluster_name }}"
@@ -44,7 +48,8 @@
     vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + item|int) }}"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
-- include: create-vm.yml
+- name: Create compute node
+  include: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
     vm_network: "{{ cluster_name }}"

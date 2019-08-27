@@ -10,6 +10,8 @@
       - python-lxml
       # ansible route53 need  python-boto
       - python-boto
+      # ansible k8s need python2-openshift
+      - python2-openshift
     state: present
 
 # Update qemu to +2.4 because option fw_cfg added in 2.4 

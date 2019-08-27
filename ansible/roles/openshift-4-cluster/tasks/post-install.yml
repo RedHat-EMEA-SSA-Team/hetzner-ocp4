@@ -11,13 +11,10 @@
   delay: 60
   until: bootstrap_status.rc == 0
 
-- include: destroy-vm.yml
+- name: Destroy bootsrap node
+  include: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
-
-- name: Wait for core Openshift components to restart
-  pause:
-    seconds: 30
 
 - name: Add emptyDir storage to registry
   command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
@@ -33,9 +30,157 @@
   delay: 60
   until: install_status.rc == 0
 
-- name: debug
-  debug:
-    var: install_status
+###########################################################################################
+# Install letsencrypt certificates
+###########################################################################################
+- name: Check certificates exist
+  stat:
+    path: "{{ certficate_fullchain }}"
+  register: crt
+- name: Check ssl key exist
+  stat:
+    path: "{{ certficate_key }}"
+  register: key
+
+- name: Install certificates
+  block:
+    - name: Create secret with certificates
+      k8s:
+        state: present
+        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          data:
+            tls.crt: "{{  lookup('file',certficate_fullchain, rstrip=false) | b64encode }}"
+            tls.key: "{{  lookup('file',certficate_key, rstrip=false)  | b64encode }}"
+          metadata:
+            name: letsencrypt-router-certs
+            namespace: openshift-ingress
+          type: kubernetes.io/tls
+    - name: Patch ingresscontroller/default
+      k8s:
+        state: present
+        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        merge_type: merge
+        definition:
+          apiVersion: operator.openshift.io/v1
+          kind: IngressController
+          metadata:
+            name: default
+            namespace: openshift-ingress-operator
+          spec:
+            defaultCertificate:
+              name: letsencrypt-router-certs
+  when: crt.stat.exists == True and key.stat.exists == True
+
+###########################################################################################
+# Configure authentication
+###########################################################################################
+- set_fact:
+    identity_roviders: "[]"
+
+- name: Handle auth_htpasswd
+  block:
+    - name: Create htpasswd secret
+      k8s:
+        state: present
+        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        definition:
+          apiVersion: v1
+          data:
+            htpasswd: "{{ auth_htpasswd | join('\n') | b64encode }}"
+          kind: Secret
+          metadata:
+            name: htpasswd
+            namespace: openshift-config
+          type: Opaque
+    - name: Create htpasswd identity provider template
+      set_fact:
+        htpasswd_idp:
+          htpasswd:
+            fileData:
+              name: htpasswd
+          mappingMethod: claim
+          name: Local
+          type: HTPasswd
+    - name: Push htpasswd_idp to identity_providers
+      set_fact:
+        identity_roviders: "{{ identity_roviders }} + [ {{ htpasswd_idp }} ]"
+  when: auth_htpasswd is defined
+
+- name: Handle auth_redhatsso
+  block:
+    - name: Create google secret secret
+      k8s:
+        state: present
+        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        definition:
+          apiVersion: v1
+          data:
+            clientSecret: "{{ auth_redhatsso.client_secret | b64encode }}"
+          kind: Secret
+          metadata:
+            name: google-secret
+            namespace: openshift-config
+          type: Opaque
+    - name: Create htpasswd identity rovider template
+      set_fact:
+        redhatsso_idp:
+          google:
+            clientID: "{{ auth_redhatsso.client_id }}"
+            clientSecret:
+              name: google-secret
+            hostedDomain: redhat.com
+          mappingMethod: claim
+          name: RedHatSSO
+          type: Google
+    - name: Push htpasswd_idp to identity_roviders
+      set_fact:
+        identity_roviders: "{{ identity_roviders }} + [ {{ redhatsso_idp }} ]"
+  when: auth_redhatsso is defined
+
+- name: Configure identity providers
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+        apiVersion: config.openshift.io/v1
+        kind: OAuth
+        metadata:
+          name: cluster
+        spec:
+          identityProviders: "{{ identity_roviders }}"
+
+
+
+###########################################################################################
+# Configure cluster role bindings
+###########################################################################################
+
+- name: Setup cluster role bindings
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: ClusterRoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: "{{ item.name }}-{{ item.cluster_role }}"
+      subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: User
+        name: "{{ item.name }}"
+      roleRef:
+        kind: ClusterRole
+        name: "{{ item.cluster_role }}"
+  with_items: "{{ cluster_role_bindings }}"
+  when: cluster_role_bindings is defined
+
+###########################################################################################
+# Print Cluster informations
+###########################################################################################
+
 - name: Cluster informations
   debug:
     msg: "{{ install_status.stderr_lines | map('regex_replace', 'level=info msg=\"(.*)\"', '\\1') | list }}"
