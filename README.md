@@ -194,11 +194,6 @@ aws_access_key: key
 aws_secret_key: secret
 aws_zone: ocp.ninja
 
-users:
-- user1:pass1
-- user2:pass2
-cluster_admin: user1
-
 image_pull_secret: |-
   asdfghfdsa
 ```
@@ -209,8 +204,6 @@ image_pull_secret: |-
 |public_domain  |Root domain that will be used for your cluster.  |
 |dns_provider  |DNS provider, value can be route53 or bind. Bind references local bind on root server. If using route53 you need to store AWS key and secret as env vars. Check Setup public DNS records for more info. Use value bind, if you dont need to create public DNS records|
 |letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If cloudflare_account_email is not present for CloudFlare DNS recods, letsencrypt_account_email is also used with CloudFlare DNS account email |
-|users  |List of users for htpasswd based auth. Format is username:password |
-|cluster_admin  |User which will have cluster_admin rights |
 |image_pull_secret|Token to be used to authenticate to Red Hat image registry. You can download pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
 
@@ -250,18 +243,6 @@ aws_zone: domain.tld
 ```
 [root@server ~]# cd hetzner-ocp4
 [root@server ~]# ./ansible/setup.yml
-```
-
-## Post install tasks
-
-Work-in-progress to rewrite: https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/22
-
-### Storage for registry
-
-Image registry needs some level storage, following command set emptyDir storage to registry
-
-```
-[root@server ~]# oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
 ```
 
 ### Install letsencrypt
@@ -308,12 +289,8 @@ ETCDCTL_API=3 ~/assets/bin/etcdctl --cert system:etcd-peer:${ETCD_DNS_NAME}.crt 
 ```
 
 # After a reboot of your server
-You have to restart the haproxy services using
-```
-$ systemctl start haproxy
-```
 
-And all the VM by using
+You have start all the VM by using
 ```
 $ virsh start master-0
 $ virsh start master-1
