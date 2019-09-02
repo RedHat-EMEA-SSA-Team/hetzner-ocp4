@@ -9,13 +9,7 @@ update_hosts: true
 libvirt_storage_pool: default
 
 
-#ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.1.9.tar.gz"
-#ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-14-112500/openshift-install-linux-4.2.0-0.nightly-2019-08-14-112500.tar.gz"
-#ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-20-111632/openshift-install-linux-4.2.0-0.nightly-2019-08-20-111632.tar.gz"
 ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-29-062233/openshift-install-linux-4.2.0-0.nightly-2019-08-29-062233.tar.gz"
-#ocpclient_url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.1.9.tar.gz'
-#ocpclient_url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-14-112500/openshift-client-linux-4.2.0-0.nightly-2019-08-14-112500.tar.gz'
-#ocpclient_url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-20-111632/openshift-client-linux-4.2.0-0.nightly-2019-08-20-111632.tar.gz'
 ocpclient_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-29-062233/openshift-client-linux-4.2.0-0.nightly-2019-08-29-062233.tar.gz"
 # subnet address for the openshift cluster
 subnet: 192.168.222
