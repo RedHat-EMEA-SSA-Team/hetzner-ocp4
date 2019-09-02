@@ -14,7 +14,7 @@
     # Only set if you really want a production letsencrypt certificate
     # without le_acme_directory it use the staging env.
     #   https://letsencrypt.org/docs/rate-limits/
-    # le_acme_directory: "https://acme-v02.api.letsencrypt.org/directory"
+    le_acme_directory: "https://acme-v02.api.letsencrypt.org/directory"
 
     le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email)}}"
     le_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
