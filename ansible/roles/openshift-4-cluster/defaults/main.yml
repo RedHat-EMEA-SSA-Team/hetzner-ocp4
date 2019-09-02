@@ -14,7 +14,7 @@ master_count: "3"
 compute_count: "3"
 
 # reference to coreos qcow file
-coreos_version: 42.80.20190801.0
+coreos_version: 42.80.20190828.2
 coreos_image_location: /var/lib/libvirt/images/rhcos-{{ coreos_version }}-qemu.qcow2 
 
 
