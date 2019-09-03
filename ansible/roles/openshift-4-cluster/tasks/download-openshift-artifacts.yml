@@ -1,0 +1,43 @@
+---
+# Can not use get_url because: get_url do not support --compressed
+- name: Download CoreOS image
+  command:
+    "curl --compressed -J -L -o {{ coreos_image_location }} https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest/rhcos-{{ coreos_version }}-qemu.qcow2"
+  args:
+    creates: "{{ coreos_image_location }}"
+    warn: false
+
+- name: Create OpenShift artifacts directory
+  file:
+    path: "/opt/openshift-{{ item }}-{{ openshift_version }}"
+    state: directory
+    mode: u+rwx,g-rx,o-rx
+  with_items:
+  - install
+  - client 
+   
+- name: Download Openshift installer
+  unarchive:
+    src: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/{{ openshift_version }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
+    dest: "/opt/openshift-install-{{ openshift_version }}/"
+    remote_src: yes
+    creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
+
+- name: Download Openshift client
+  unarchive:
+    src: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/{{ openshift_version }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
+    dest: "/opt/openshift-client-{{ openshift_version }}/"
+    remote_src: yes
+    creates: "/opt/openshift-client-{{ openshift_version }}/oc"
+
+- name: Create a symbolic link
+  file:
+    src: "{{ item.value }}"
+    dest: "{{ item.key }}"
+    state: link
+    force: yes
+  with_dict:
+    "/usr/local/bin/oc": "/opt/openshift-client-{{ openshift_version }}/oc"
+    "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
+    "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"
+  

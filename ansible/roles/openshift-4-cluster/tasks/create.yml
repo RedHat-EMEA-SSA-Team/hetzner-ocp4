@@ -25,6 +25,10 @@
     le_aws_zone: "{{ aws_zone }}"
   tags: letsencrypt
 
+- name: Download OpenShift Artifacts
+  include: download-openshift-artifacts.yml
+  tags: download-openshift-artifacts
+
 - name: Create ignition files
   include: create-ignition.yml
   vars:

@@ -8,9 +8,6 @@ update_hosts: true
 # name of the libvirt storage pool
 libvirt_storage_pool: default
 
-
-ocpinstaller_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-29-062233/openshift-install-linux-4.2.0-0.nightly-2019-08-29-062233.tar.gz"
-ocpclient_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/4.2.0-0.nightly-2019-08-29-062233/openshift-client-linux-4.2.0-0.nightly-2019-08-29-062233.tar.gz"
 # subnet address for the openshift cluster
 subnet: 192.168.222
 
