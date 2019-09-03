@@ -7,9 +7,9 @@
       <kvirt:plan>{{ cluster_name }}</kvirt:plan>
     </kvirt:info>
   </metadata>
-  <memory unit='MiB'>16384</memory>
-  <currentMemory unit='MiB'>16384</currentMemory>
-  <vcpu>4</vcpu>
+  <memory unit='{{ vm_memory_unit }}'>{{ vm_memory_size }}</memory>
+  <currentMemory unit='{{ vm_memory_unit }}'>{{ vm_memory_size }}</currentMemory>
+  <vcpu>{{ vm_vcpu }}</vcpu>
   <os>
     <type arch="x86_64">hvm</type>
     <boot dev="hd"/>
