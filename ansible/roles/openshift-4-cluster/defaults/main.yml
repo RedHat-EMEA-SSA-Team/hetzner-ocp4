@@ -10,8 +10,21 @@ vn_public_domain: "h42.openshift.pub"
 
 listen_address: "{{ hostvars['localhost']['ansible_default_ipv4']['address'] }}"
 
-master_count: "3"
-compute_count: "3"
+master_count: 3
+master_vcpu: 4
+master_memory_size: 16384
+master_memory_unit: 'MiB'
+# qemu-img image size specified.
+#   You may use k, M, G, T, P or E suffixe
+master_root_disk_size: '120G'
+
+compute_count: 3
+compute_vcpu: 2
+compute_memory_size: 8192
+compute_memory_unit: 'MiB'
+# qemu-img image size specified.
+#   You may use k, M, G, T, P or E suffixe
+compute_root_disk_size: '120G'
 
 # Important: OpenShift version must match to RHEL CoreOS version!
 
