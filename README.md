@@ -184,7 +184,7 @@ cluster_name: ocp4
 public_domain: ocp.ninja
 dns_provider: [route53|cloudflare|bind]
 letsencrypt_account_email: name@example.com
-# Deppending on the dns provider:
+# Depending on the dns provider:
 # CloudFlare
 cloudflare_account_email: john@example.com
 cloudflare_account_api_token: 9348234sdsd894.....
@@ -250,7 +250,7 @@ aws_zone: domain.tld
 Check customizing your cluster....which is coming soon!
 
 
-# Usefull commands for debuging
+# Useful commands for debuging
 
 ## Check haproxy connections:
 
