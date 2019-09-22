@@ -42,4 +42,7 @@
     auth_kind: serviceaccount
     service_account_contents: "{{ gcp_serviceaccount_contents }}"
     state: present
+  with_items:
+  - api
+  - '*.apps'
   when: pd_provider == "gcp"
