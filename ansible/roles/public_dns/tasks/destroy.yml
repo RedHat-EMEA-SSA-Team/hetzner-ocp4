@@ -31,7 +31,7 @@
   - '*.apps'
   when: pd_provider == "route53" 
 
-- name: D>elete DNS record at GCP
+- name: Delete DNS record at GCP
   gcp_dns_resource_record_set:
     name: "{{ item }}.{{ pd_public_domain }}."
     managed_zone: "{{ gcp_managed_zone }}"
