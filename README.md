@@ -182,7 +182,7 @@ Here is an example about cluster.yml file that contains information about cluste
 ```
 cluster_name: ocp4
 public_domain: ocp.ninja
-dns_provider: [route53|cloudflare|bind]
+dns_provider: [route53|cloudflare|gcp|bind]
 letsencrypt_account_email: name@example.com
 # Depending on the dns provider:
 # CloudFlare
