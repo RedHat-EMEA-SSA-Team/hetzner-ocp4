@@ -83,6 +83,22 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "route53" and sample_com_challenge is changed
 
+- name: Create DNS record at GCP
+  gcp_dns_resource_record_set:
+    name: "{{ item.0.key }}."
+    managed_zone: "{{ gcp_managed_zone }}"
+    type: TXT 
+    ttl: 60
+    target:
+    - "{{ item.1 }}"
+    project: "{{ gcp_project }}"
+    auth_kind: serviceaccount
+    service_account_file: "{{ gcp_serviceaccount_file }}"
+    state: present
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: pd_provider == "gcp" and sample_com_challenge is changed
+
 - name: DNS record info
   debug:
     msg: "{{ item.0.key }} TXT {{ item.1 }}"
@@ -136,6 +152,22 @@
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "route53" and sample_com_challenge is changed
+
+- name: Create DNS record at GCP
+  gcp_dns_resource_record_set:
+    name: "{{ item.0.key }}."
+    managed_zone: "{{ gcp_managed_zone }}"
+    type: TXT
+    ttl: 60
+    target:
+    - "{{ item.1 }}"
+    project: "{{ gcp_project }}"
+    auth_kind: serviceaccount
+    service_account_file: "{{ gcp_serviceaccount_file }}"
+    state: absent
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: pd_provider == "gcp" and sample_com_challenge is changed
 
 
 - name: concat root ca and intermediate
