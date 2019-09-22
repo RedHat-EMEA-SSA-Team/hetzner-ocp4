@@ -34,7 +34,7 @@
 - name: D>elete DNS record at GCP
   gcp_dns_resource_record_set:
     name: "{{ item }}.{{ pd_public_domain }}."
-    managed_zone: "{{ managed_zone }}"
+    managed_zone: "{{ gcp_managed_zone }}"
     type: A
     ttl: 120
     target:
