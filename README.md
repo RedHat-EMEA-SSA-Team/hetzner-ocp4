@@ -219,7 +219,7 @@ DNS records are constructed based on cluster_name and public_domain values. With
 
 ## Setup public DNS records
 
-Current tools allow use of three DNS providers; AWS Route53, Cloudflare and bind. If you want to use Route53 or Cloudflare as your DNS provider you have to export few env variables. Check instructions below.  If you are not using public DNS, but bind just jump to next section.
+Current tools allow use of three DNS providers; AWS Route53, Cloudflare, GCP DNS and bind. If you want to use Route53, Cloudflare, GCP as your DNS provider you have to export few env variables. Check instructions below.  If you are not using public DNS, but bind just jump to next section.
 
 If you use other DNS provider feel free to contribute. :D
 
@@ -235,6 +235,14 @@ or
 aws_access_key: key
 aws_secret_key: secret
 aws_zone: domain.tld
+```
+or
+```
+gcp_project: project-name 
+gcp_managed_zone:
+  name: zone-name
+  dnsName: zone-domain 
+gcp_serviceaccount_file: ../gcp_service_account.json
 ```
 
 
