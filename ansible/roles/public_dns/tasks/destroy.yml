@@ -41,7 +41,7 @@
     - "{{ pd_public_ip }}"
     project: "{{ gcp_project }}"
     auth_kind: serviceaccount
-    service_account_contents: "{{ gcp_serviceaccount_contents }}"
+    service_account_file: "{{ gcp_serviceaccount_file }}"
     state: absent
   with_items:
   - api
