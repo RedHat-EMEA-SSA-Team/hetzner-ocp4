@@ -4,6 +4,7 @@
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
     vn_master_count: "{{ master_count }}"
     vn_compute_count: "{{ compute_count }}"
+  tags: libvirt_network
 
 - import_role:
     name: letsencrypt
@@ -38,6 +39,7 @@
   include: create-ignition.yml
   vars:
     ssh_public_key: "{{ lookup('file', '{{ ssh_public_key_location }}.pub') }}"
+  become: true
   tags: ignition
 
 - name: Create bootstrap node
@@ -51,6 +53,7 @@
     vm_memory_size: 16384
     vm_memory_unit: 'MiB'
     vm_root_disk_size: '120G'
+  tags: bootstrap_vm
 
 - name: Create master nodes
   include: create-vm.yml
@@ -64,6 +67,7 @@
     vm_memory_unit: "{{ master_memory_unit }}"
     vm_root_disk_size: "{{ master_root_disk_size }}"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
+  tags: master_vm
 
 - name: Create compute node
   include: create-vm.yml
@@ -77,6 +81,7 @@
     vm_memory_unit: "{{ compute_memory_unit }}"
     vm_root_disk_size: "{{ compute_root_disk_size }}"
   with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+  tags: compute_vm
 
 - name: Include post installation tasks
   include: post-install.yml

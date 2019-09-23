@@ -1,4 +1,6 @@
 ---
+
+# commented out these things since its already done by the edge host role
 - name: Installing KVM Packages
   yum:
     name:
@@ -13,6 +15,7 @@
       # ansible k8s need python2-openshift
       - python2-openshift
     state: present
+  tags: kvm_pkgs
 
 # Update qemu to +2.4 because option fw_cfg added in 2.4 
 #  "qemu-kvm: -fw_cfg: invalid option"
@@ -25,22 +28,22 @@
 - name: Disable all openstack repos except centos-qemu-ev
   command: "yum-config-manager -q --disable centos-ceph-nautilus centos-nfs-ganesha28 centos-openstack-stein"
 
-- name: Upgrade all packages, include update qemu-kvm to >2.4
-# because we added repo centos-qemu-ev from openstack
-  yum:
-    name: '*'
-    state: latest
-
-- name: Enable and Start libvirtd
-  systemd:
-    name: libvirtd
-    state: started
-    enabled: yes
-
-- name: Verify KVM module is loaded
-  shell: "lsmod | grep -i kvm"
-  register: result
-  failed_when: "result.rc != 0"
+#- name: Upgrade all packages, include update qemu-kvm to >2.4
+## because we added repo centos-qemu-ev from openstack
+#  yum:
+#    name: '*'
+#    state: latest
+#
+#- name: Enable and Start libvirtd
+#  systemd:
+#    name: libvirtd
+#    state: started
+#    enabled: yes
+#
+#- name: Verify KVM module is loaded
+#  shell: "lsmod | grep -i kvm"
+#  register: result
+#  failed_when: "result.rc != 0"
 
 - name: Create SSH key for root
   user:

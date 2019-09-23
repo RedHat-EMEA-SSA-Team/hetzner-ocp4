@@ -1,0 +1,95 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+
+[etcd]
+qbn-ocp3-master01.lunchnet.example openshift_public_hostname=qbn-ocp3-master01.lunchnet.example
+
+[masters]
+qbn-ocp3-master01.lunchnet.example openshift_public_hostname=qbn-ocp3-master01.lunchnet.example
+
+[nodes]
+qbn-ocp3-master01.lunchnet.example openshift_public_hostname=qbn-ocp3-master01.lunchnet.example openshift_node_group_name='node-config-master'
+qbn-ocp3-node01.lunchnet.example openshift_public_hostname=qbn-ocp3-node01.lunchnet.example openshift_node_group_name='node-config-compute'
+qbn-ocp3-node02.lunchnet.example openshift_public_hostname=qbn-ocp3-node02.lunchnet.example openshift_node_group_name='node-config-compute'
+qbn-ocp3-infra01.lunchnet.example openshift_public_hostname=qbn-ocp3-infra01.lunchnet.example openshift_node_group_name='node-config-infra'
+qbn-ocp3-infra02.lunchnet.example openshift_public_hostname=qbn-ocp3-infra02.lunchnet.example openshift_node_group_name='node-config-infra'
+
+
+[glusterfs]
+ qbn-ocp3-node01.lunchnet.example glusterfs_ip=172.24.24.108 glusterfs_zone=2  glusterfs_devices='["/dev/vdc"]'
+ qbn-ocp3-node02.lunchnet.example glusterfs_ip=172.24.24.109 glusterfs_zone=2  glusterfs_devices='["/dev/vdc"]'
+ qbn-ocp3-infra01.lunchnet.example glusterfs_ip=172.24.24.110 glusterfs_zone=1  glusterfs_devices='["/dev/vdc"]'
+ qbn-ocp3-infra02.lunchnet.example glusterfs_ip=172.24.24.111 glusterfs_zone=1  glusterfs_devices='["/dev/vdc"]'
+
+[OSEv3:vars]
+ansible_ssh_user=admin
+ansible_become=true
+debug_level=2
+openshift_deployment_type=openshift-enterprise
+openshift_release=3.11
+
+
+openshift_pkg_version=-3.11.135
+openshift_image_tag=v3.11.135
+
+oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
+oreg_auth_user=rheron@redhat.com
+oreg_auth_password=NicYQ%f7F5B9
+
+# registry
+openshift_hosted_registry_storage_kind=glusterfs
+openshift_hosted_registry_storage_volume_size=10Gi
+openshift_hosted_registry_selector="node-role.kubernetes.io/infra=true"
+
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_file= /home/admin/qubinode-installer/inventory/passwordFile
+openshift_master_default_subdomain=apps.lunchnet.example
+
+
+
+# Enable cockpit
+osm_use_cockpit=true
+
+# Set cockpit plugins
+osm_cockpit_plugins=['cockpit-kubernetes']
+
+#openshift operators
+openshift_enable_olm=true
+openshift_additional_registry_credentials=[{'host':'registry.connect.redhat.com','user':'rheron@redhat.com','password':'NicYQ%f7F5B9','test_image':'mongodb/enterprise-operator:0.3.2'}]
+
+# Container image to use for glusterfs pods
+openshift_storage_glusterfs_image="registry.redhat.io/rhgs3/rhgs-server-rhel7:v3.11"
+
+# Container image to use for glusterblock-provisioner pod
+openshift_storage_glusterfs_block_image="registry.redhat.io/rhgs3/rhgs-gluster-block-prov-rhel7:v3.11"
+
+# Container image to use for heketi pods
+openshift_storage_glusterfs_heketi_image="registry.redhat.io/rhgs3/rhgs-volmanager-rhel7:v3.11"
+
+# OCS storage cluster
+openshift_storage_glusterfs_namespace=app-storage
+openshift_storage_glusterfs_storageclass=true
+openshift_storage_glusterfs_storageclass_default=true
+openshift_storage_glusterfs_block_deploy=true
+openshift_storage_glusterfs_block_host_vol_create=true
+openshift_storage_glusterfs_block_host_vol_size=150
+openshift_storage_glusterfs_block_storageclass=true
+openshift_storage_glusterfs_block_storageclass_default=false
+
+# metrics
+openshift_metrics_install_metrics=true
+openshift_metrics_storage_kind=dynamic
+openshift_master_dynamic_provisioning_enabled=true
+
+openshift_metrics_hawkular_hostname=hawkular-metrics.{{openshift_master_default_subdomain}}
+openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_storage_volume_size=10Gi
+openshift_metrics_cassanda_pvc_storage_class_name='glusterfs-storage'
+openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra":"true"}
+
+

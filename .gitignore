@@ -1,3 +1,13 @@
 cluster.yml
 .DS_Store
 certificate/
+ansible.log
+playbooks/roles/*
+!playbooks/roles/.gitkeep
+playbooks/vars/*
+!playbooks/vars/.gitkeep
+*.swp
+ocp4
+root_id_rsa.pub
+all.yml
+rhel-server-*-x86_64-kvm.qcow2

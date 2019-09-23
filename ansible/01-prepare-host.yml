@@ -3,6 +3,7 @@
 - hosts: localhost
   vars_files:
   - ../cluster.yml
+  become: true
   tasks:
   - import_role:
       name: openshift-4-cluster
