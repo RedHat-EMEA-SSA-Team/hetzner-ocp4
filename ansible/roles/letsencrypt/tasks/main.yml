@@ -86,14 +86,14 @@
 - name: Create DNS record at GCP
   gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
-    managed_zone: "{{ gcp_managed_zone }}"
+    managed_zone: "{{ le_gcp_managed_zone }}"
     type: TXT 
     ttl: 60
     target:
     - "{{ item.1 }}"
-    project: "{{ gcp_project }}"
+    project: "{{ le_gcp_project }}"
     auth_kind: serviceaccount
-    service_account_file: "{{ gcp_serviceaccount_file }}"
+    service_account_file: "{{ le_gcp_serviceaccount_file }}"
     state: present
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
@@ -156,14 +156,14 @@
 - name: Create DNS record at GCP
   gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
-    managed_zone: "{{ gcp_managed_zone }}"
+    managed_zone: "{{ le_gcp_managed_zone }}"
     type: TXT
     ttl: 60
     target:
     - "{{ item.1 }}"
-    project: "{{ gcp_project }}"
+    project: "{{ le_gcp_project }}"
     auth_kind: serviceaccount
-    service_account_file: "{{ gcp_serviceaccount_file }}"
+    service_account_file: "{{ le_gcp_serviceaccount_file }}"
     state: absent
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"

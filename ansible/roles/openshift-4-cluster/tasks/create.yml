@@ -23,6 +23,10 @@
     le_aws_access_key: "{{ aws_access_key }}"
     le_aws_secret_key: "{{ aws_secret_key }}"
     le_aws_zone: "{{ aws_zone }}"
+
+    le_gcp_project: "{{ gcp_project }}"
+    le_gcp_serviceaccount_file: "{{ gcp_serviceaccount_file }}"
+    le_gcp_managed_zone: "{{ gcp_managed_zone }}"
   tags: letsencrypt
 
 - name: Download OpenShift Artifacts
