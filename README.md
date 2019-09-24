@@ -1,33 +1,33 @@
 # Disclaimer
-This environment has been created for the sole purpose of providing an easy to deployment and consume Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
+This environment has been created for the sole purpose of providing an easy to deploy and consume a Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
 
 This install will create a 'Minimal Viable Setup', which anyone can extend to
 their needs and purpose.
 
-Use at your own please and risk!
+Use it at your own please and risk!
 
-**NOTE: This project is using 4.2.x nightly build images, so they might not work. Also file names might change. If you encounter download problems, check that files names from ansible/group_vars/all match ones in https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest**
+**NOTE: This project uses 4.2.x nightly build images, so they might not work. Also file names might change. If you encounter download problems, check that files names from ansible/group_vars/all match ones in https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest**
 
 # Contribution
-If you want to provide additional feature, please feel free to contribute via
-pull requests or any other means.
-We are happy to track and discuss ideas, topics and requests via 'Issues'.
+If you want to provide additional features, please feel free to contribute via pull requests or any other means.
+
+We are happy to track and discuss ideas, topics and requests via [Issues](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues).
 
 
 # Install Instructions
 
-**NOTE: If you are running on other environment that bare metal servers from Hetzner. Jump directly to section [Initliaze tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools). These instructions are for running CentOS and 'root' machines. You might have to modify command if running on other Linux ditro.**
+**NOTE: If you are running on other environments than bare metal servers from Hetzner, jump directly to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools). These instructions are for running CentOS and 'root' machines. You might have to modify commands if running on another Linux distro.**
 
 When following these instructional steps, you will end with a setup similar to
 
 ![](images/architecture.png)
 
-## Installing The Root-Server
-NOTE: Our instructions are based on the Root-Server as provided by https://www.hetzner.com/ , please feel free to adapt it to the needs of your preferred hosting provider. We are happy to get pull requests for an updated documentation, which makes consuming this setup easy also for other hosting provider.
+## Installing The Root Server
+NOTE: Our instructions are based on the Root Server as provided by https://www.hetzner.com/ , please feel free to adapt it to the needs of your preferred hosting provider. We are happy to get pull requests for an updated documentation, which makes consuming this setup easy also for other hosting providers.
 
 When you get your server you get it without OS and it will be booted to rescue mode where you decide how it will be configured.
 
-When you login to machine it will be running Debian based rescure system and welcome screen will be something like this
+When you login to the machine, it will be running a Debian based rescure system and a welcome screen will be something like this
 
 NOTE: If your system is not in rescue mode anymore, you can activate it from https://robot.your-server.de/server. Select your server and "Rescue" tab. From there select Linux, 64bit and public key if there is one.
 
@@ -80,11 +80,11 @@ From these information, the following ones are import to note:
 * Memory
 * Cores
 
-Guest VM setup uses "root" vg0 volume group for guest. So leave as much as possible free space on vg0.
+The guest VM setup uses a "root" vg0 volume group for guest. So leave as much as possible free space on vg0.
 
-`installimage` tool is used to install CentOS. It takes instructions from a text file.
+The `installimage` tool is used to install CentOS. It takes instructions from a text file.
 
-Create new `config.txt` file
+Create a new `config.txt` file
 ```
 [root@server ~]# vi config.txt
 ```
@@ -113,22 +113,22 @@ IMAGE /root/.oldroot/nfs/install/../images/CentOS-76-64-minimal.tar.gz
 ```
 
 
-There are some things that you will probably have to changes
-* Do not allocated all vg0 space to `/ swap /tmp` and `/home`.
-* If you have a single disk remove line `DRIVE2` and lines `SWRAID*`
-* If you have more than two disks add `DRIVE3`...
-* If you need raid just change `SWRAID` to `1`
+There are some things that you will probably have to change
+* Do not allocate all vg0 space to `/ swap /tmp` and `/home`.
+* If you have a single disk,remove line `DRIVE2` and lines `SWRAID*`
+* If you have more than two disks, add `DRIVE3`...
+* If you need raid, just change `SWRAID` to `1`
 * Valid values for `SWRAIDLEVEL` are 0, 1 and 10. 1 means mirrored disks
-* Configure LV sizes so that it matches your total disk size. In this example I have 2 x 2Tb disks RAID 1 so total disk space available is 2Tb (1863 Gb)
-* If you like you can add more volume groups and logical volumes.
+* Configure LV sizes so it matches your total disk size. In this example I have 2 x 2Tb disks RAID 1 so total disk space available is 2Tb (1863 Gb)
+* If you like, you can add more volume groups and logical volumes.
 
-When you are happy with file content, save and exit the editor via `:wq` and start installation with the following command
+When you are happy with the file content, save and exit the editor via `:wq` and start installation with the following command
 
 ```
 [root@server ~]# installimage -a -c config.txt
 ```
 
-If there are error, you will be informed about then and you need to fix them.
+If there are errors, you will be informed about them and you need to fix them.
 At completion, the final output should be similar to
 
 ![](images/install_complete.png)
@@ -173,11 +173,11 @@ You are now ready to clone this project to your CentOS system.
 [root@server ~]# git clone https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4.git
 ```
 
-We are now ready to install `libvirt` as our , provision VMs and prepare those for OCP.
+We are now ready to install `libvirt` as our hypervisor, provision VMs and prepare those for OCP.
 
 ## Define variables for your cluster
 
-Here is an example about cluster.yml file that contains information about cluster that is going to be installed.
+Here is an example about _cluster.yml_ file that contains information about the cluster that is going to be installed.
 
 ```
 cluster_name: ocp4
@@ -208,12 +208,12 @@ image_pull_secret: |-
 |---|---|
 |cluster_name  |Name of the cluster to be installed |
 |public_domain  |Root domain that will be used for your cluster.  |
-|dns_provider  |DNS provider, value can be route53 or bind. Bind references local bind on root server. If using route53 you need to store AWS key and secret as env vars. Check Setup public DNS records for more info. Use value bind, if you dont need to create public DNS records|
-|letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If cloudflare_account_email is not present for CloudFlare DNS recods, letsencrypt_account_email is also used with CloudFlare DNS account email |
-|image_pull_secret|Token to be used to authenticate to Red Hat image registry. You can download pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
+|dns_provider  |DNS provider, value can be _route53_ or _bind_. _bind_ references local bind on the root server. When using _route53_, you need to store the AWS key and secret as env vars. Check __Setup public DNS records__ for more info. Use the value _bind_, if you dont need to create public DNS records|
+|letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
+|image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
 
-DNS records are constructed based on cluster_name and public_domain values. With above values DNS records should be
+DNS records are constructed based on _cluster_name_ and _public_domain_ values. With above values DNS records should be
 - api.ocp4.ocp.ninja
 - \*.apps.ocp4.ocp.ninja
 
@@ -225,9 +225,10 @@ DNS records are constructed based on cluster_name and public_domain values. With
 
 ## Setup public DNS records
 
-Current tools allow use of three DNS providers; AWS Route53, Cloudflare, GCP DNS and bind. If you want to use Route53, Cloudflare, GCP as your DNS provider you have to export few env variables. Check instructions below.  If you are not using public DNS, but bind just jump to next section.
+Current tools allow use of three DNS providers plus _bind_; _AWS Route53_, _Cloudflare_, _GCP DNS_, and _bind_. 
+If you want to use _Route53_, _Cloudflare_ or _GCP_ as your DNS provider, you have to export few env variables. Check the instructions below.  If you are not using public DNS, but bind, just jump to next section.
 
-If you use other DNS provider feel free to contribute. :D
+If you use another DNS provider, feel free to contribute. :D
 
 Please configure in `cluster.yml` all necessary credentials:
 
