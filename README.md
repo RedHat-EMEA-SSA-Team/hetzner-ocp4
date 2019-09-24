@@ -193,6 +193,12 @@ cloudflare_zone: ocp.ninja
 aws_access_key: key
 aws_secret_key: secret
 aws_zone: ocp.ninja
+# GCP
+gcp_project: project-name 
+gcp_managed_zone:
+  name: zone-name
+  dnsName: zone-domain 
+gcp_serviceaccount_file: ../gcp_service_account.json
 
 image_pull_secret: |-
   asdfghfdsa
