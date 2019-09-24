@@ -48,3 +48,17 @@
     generate_ssh_key: yes
     ssh_key_bits: 2048
     ssh_key_file: "{{ ssh_public_key_location }}"
+
+# Enable ip forwarding globally - fixed issue #35
+- name: Check /etc/systemd/network/10-mainif.network
+  stat:
+    path: /etc/systemd/network/10-mainif.network
+  register: stat_result
+
+- name:
+  lineinfile:
+    path: /etc/systemd/network/10-mainif.network
+    line: 'IPForward=ipv4'
+    insertafter: '^\[Network\]'
+    regexp: '^IPForward='
+  when: stat_result.stat.exists == True
