@@ -182,7 +182,7 @@ Here is an example about cluster.yml file that contains information about cluste
 ```
 cluster_name: ocp4
 public_domain: ocp.ninja
-dns_provider: [route53|cloudflare|bind]
+dns_provider: [route53|cloudflare|gcp|bind]
 letsencrypt_account_email: name@example.com
 # Depending on the dns provider:
 # CloudFlare
@@ -193,6 +193,12 @@ cloudflare_zone: ocp.ninja
 aws_access_key: key
 aws_secret_key: secret
 aws_zone: ocp.ninja
+# GCP
+gcp_project: project-name 
+gcp_managed_zone_name: 'zone-name'
+# Point at the end is important! 
+gcp_managed_zone_domain: 'example.com.'  
+gcp_serviceaccount_file: ../gcp_service_account.json
 
 image_pull_secret: |-
   asdfghfdsa
@@ -219,7 +225,7 @@ DNS records are constructed based on cluster_name and public_domain values. With
 
 ## Setup public DNS records
 
-Current tools allow use of three DNS providers; AWS Route53, Cloudflare and bind. If you want to use Route53 or Cloudflare as your DNS provider you have to export few env variables. Check instructions below.  If you are not using public DNS, but bind just jump to next section.
+Current tools allow use of three DNS providers; AWS Route53, Cloudflare, GCP DNS and bind. If you want to use Route53, Cloudflare, GCP as your DNS provider you have to export few env variables. Check instructions below.  If you are not using public DNS, but bind just jump to next section.
 
 If you use other DNS provider feel free to contribute. :D
 
@@ -235,6 +241,13 @@ or
 aws_access_key: key
 aws_secret_key: secret
 aws_zone: domain.tld
+```
+or
+```
+gcp_project: project-name 
+gcp_managed_zone_name: 'zone-name'
+gcp_managed_zone_domain: 'example.com.'
+gcp_serviceaccount_file: ../gcp_service_account.json
 ```
 
 
