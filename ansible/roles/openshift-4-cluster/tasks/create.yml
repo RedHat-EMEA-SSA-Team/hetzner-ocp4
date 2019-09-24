@@ -26,7 +26,8 @@
 
     le_gcp_project: "{{ gcp_project }}"
     le_gcp_serviceaccount_file: "{{ gcp_serviceaccount_file }}"
-    le_gcp_managed_zone: "{{ gcp_managed_zone }}"
+    le_gcp_managed_zone_name: "{{ gcp_managed_zone_name }}"
+    le_gcp_managed_zone_domain: "{{ gcp_managed_zone_domain }}"
   tags: letsencrypt
 
 - name: Download OpenShift Artifacts

@@ -86,9 +86,11 @@
 - name: Create DNS record at GCP
   gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
-    managed_zone: "{{ le_gcp_managed_zone }}"
     type: TXT 
     ttl: 60
+    managed_zone:
+        name: "{{ le_gcp_managed_zone_name }}"
+        dnsName: "{{ le_gcp_managed_zone_domain }}"
     target:
     - "{{ item.1 }}"
     project: "{{ le_gcp_project }}"
@@ -156,7 +158,9 @@
 - name: Create DNS record at GCP
   gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
-    managed_zone: "{{ le_gcp_managed_zone }}"
+    managed_zone:
+        name: "{{ le_gcp_managed_zone_name }}"
+        dnsName: "{{ le_gcp_managed_zone_domain }}"
     type: TXT
     ttl: 60
     target:

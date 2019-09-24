@@ -195,9 +195,9 @@ aws_secret_key: secret
 aws_zone: ocp.ninja
 # GCP
 gcp_project: project-name 
-gcp_managed_zone:
-  name: zone-name
-  dnsName: zone-domain 
+gcp_managed_zone_name: 'zone-name'
+# Point at the end is important! 
+gcp_managed_zone_domain: 'example.com.'  
 gcp_serviceaccount_file: ../gcp_service_account.json
 
 image_pull_secret: |-
@@ -245,9 +245,8 @@ aws_zone: domain.tld
 or
 ```
 gcp_project: project-name 
-gcp_managed_zone:
-  name: zone-name
-  dnsName: zone-domain 
+gcp_managed_zone_name: 'zone-name'
+gcp_managed_zone_domain: 'example.com.'
 gcp_serviceaccount_file: ../gcp_service_account.json
 ```
 

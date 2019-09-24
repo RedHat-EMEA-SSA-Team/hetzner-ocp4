@@ -23,7 +23,8 @@ Role Variables
 | le_aws_zone | AWS route 53 zonename || non **required if provider is  route53** |
 | le_gcp_project | GCP DNS projectname || non **required if provider is  gcp** |
 | le_gcp_serviceaccount_file | GCP DNS serviceaccount file || non **required if provider is  gcp** |
-| le_gcp_managed>_zone | GCP DNS managed zone || non **required if provider is  gcp** |
+| le_gcp_managed_zone_name | GCP DNS managed zone name || non **required if provider is  gcp** |
+| le_gcp_managed_zone_domain | GCP DNS managed zone domain || non **required if provider is  gcp** |
 | le_public_domain | Use to create SAN certificate: `DNS:*.apps.{{ le_public_domain }},DNS:api.{{ le_public_domain }}` | cluster.domain.tld | non **required** |
 | le_certificates_dir | Here the certificates are stored  | `/root/certificates` | `{{ playbook_dir }}../certificate/` |
 | le_acme_directory | ACME Directory by default it use staging env because of https://letsencrypt.org/docs/rate-limits/ | `https://acme-v02.api.letsencrypt.org/directory` | `https://acme-staging-v02.api.letsencrypt.org/directory` |

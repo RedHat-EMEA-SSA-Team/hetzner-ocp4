@@ -30,6 +30,17 @@
     - le_cloudflare_zone
   when: le_dns_provider == "cloudflare"
 
+- name: Check required GCP variables
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_gcp_project
+    - le_gcp_managed_zone_name
+    - le_gcp_managed_zone_domain
+  when: le_dns_provider == "gcp"
+
 - name: Debug var only with -vv CloudFlare
   debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
@@ -57,3 +68,18 @@
     - le_public_domain
     - le_acme_directory
   when: le_dns_provider == "route53"
+
+- name: Debug var only with -vv for GCP
+  debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_letsencrypt_account_email
+    - le_gcp_project
+    - le_gcp_managed_zone_name
+    - le_gcp_managed_zone_domain
+    - le_public_domain
+    - le_certificates_dir
+    - le_public_domain
+    - le_acme_directory
+  when: le_dns_provider == "gcp"
