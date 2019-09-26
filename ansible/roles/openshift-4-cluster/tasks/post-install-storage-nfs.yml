@@ -1,0 +1,257 @@
+---
+# Install packages
+# Configure
+# 
+# Handlers
+# 
+
+- name: Ensure NFS utilities are installed.
+  package: 
+    name: nfs-utils
+    state: present
+
+- name: Ensure rpcbind is running as configured.
+  service:
+    name: rpcbind
+    state: started
+    enabled: true
+
+- name: Ensure nfs is running.
+  service: 
+    name: nfs
+    state: started
+    enabled: yes
+
+- name: Add nfs exports to /etc/exports
+  blockinfile:
+    path: /etc/exports
+    backup: yes
+    create: yes 
+    marker: "# {mark} OpenShift cluster - {{ cluster_name }}"
+    owner: root
+    group: root
+    mode: 0644
+    block: |
+      {{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry {{ vn_subnet }}/24(rw,sync,no_root_squash)
+      {{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs {{ vn_subnet }}/24(rw,sync,no_root_squash)
+  tags: exports
+
+- name: Adjust directory permissions
+  file:
+    path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-{{ item }}"
+    state: directory
+    mode: "770"
+  with_items:
+  - "infra-registry"
+  - "user-pvs"
+
+- name: reload nfs
+  command: 'exportfs -ra'
+  tags: exports
+
+
+- name: Create infra-registry pv
+  # ToDo: quite ugly to use ignore_errors :-/
+  ignore_errors: yes
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: nfs-registry-storage
+      spec:
+        accessModes:
+        - ReadWriteMany
+        capacity:
+          storage: 100Gi
+        nfs:
+          path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry" 
+          server: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+        persistentVolumeReclaimPolicy: Recycle
+
+- name: Create registry-strage pvc
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: registry-storage
+        namespace: openshift-image-registry
+      spec:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 100Gi
+      
+- name: Add pvc registry-storage to image registry
+  command: |
+    oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --config {{ openshift_install_dir }}/auth/kubeconfig
+  register: registry_status
+  retries: 60
+  delay: 30
+  until: registry_status.rc == 0
+  tags: 
+   - storage  
+
+- name: Adjust directory permissions
+  file:
+    path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-{{ item }}"
+    state: directory
+    mode: "770"
+  with_items:
+  - "infra-registry"
+  - "user-pvs"
+
+- name: Create Namespace 
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: Namespace
+      apiVersion: v1
+      metadata:
+        name: "{{ storage_nfs_target_namespace }}"
+
+- name: Create ServiceAccount
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: ServiceAccount
+      apiVersion: v1
+      metadata:
+        name: nfs-client-provisioner
+        namespace: "{{ storage_nfs_target_namespace }}"
+
+- name: Create ClusteRole nfs-client-provisioner-runner
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: ClusterRole
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: nfs-client-provisioner-runner
+      rules:
+        - apiGroups: [""]
+          resources: ["persistentvolumes"]
+          verbs: ["get", "list", "watch", "create", "delete"]
+        - apiGroups: [""]
+          resources: ["persistentvolumeclaims"]
+          verbs: ["get", "list", "watch", "update"]
+        - apiGroups: ["storage.k8s.io"]
+          resources: ["storageclasses"]
+          verbs: ["get", "list", "watch"]
+        - apiGroups: [""]
+          resources: ["events"]
+          verbs: ["create", "update", "patch"]
+
+- name: Create ClusteRoleBinding nfs-client-provisioner-runner <-> nfs-client-provisioner
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: ClusterRoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: run-nfs-client-provisioner
+      subjects:
+        - kind: ServiceAccount
+          name: nfs-client-provisioner
+          namespace: "{{ storage_nfs_target_namespace }}"
+      roleRef:
+        kind: ClusterRole
+        name: nfs-client-provisioner-runner
+        apiGroup: rbac.authorization.k8s.io
+- name: Create Role leader-locking-nfs-client-provisioner
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: Role
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: leader-locking-nfs-client-provisioner
+        namespace: "{{ storage_nfs_target_namespace }}"
+      rules:
+        - apiGroups: [""]
+          resources: ["endpoints"]
+          verbs: ["get", "list", "watch", "create", "update", "patch"]
+
+- name: Create RoleBinding leader-locking-nfs-client-provisioner <-> nfs-client-provisioner
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: RoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: leader-locking-nfs-client-provisioner
+        namespace: "{{ storage_nfs_target_namespace }}"
+      subjects:
+        - kind: ServiceAccount
+          name: nfs-client-provisioner
+      roleRef:
+        kind: Role
+        name: leader-locking-nfs-client-provisioner
+        apiGroup: rbac.authorization.k8s.io
+
+- name: Add SCC hostmount-anyuid to nfs-client-provisioner
+  command: "oc adm policy add-scc-to-user hostmount-anyuid -n {{ storage_nfs_target_namespace }} -z nfs-client-provisioner --config {{ openshift_install_dir }}/auth/kubeconfig"
+
+- name: Deploy nfs-provisioner
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      kind: Deployment
+      apiVersion: extensions/v1beta1
+      metadata:
+        name: nfs-client-provisioner
+        namespace: "{{ storage_nfs_target_namespace }}"
+      spec:
+        replicas: 1
+        strategy:
+          type: Recreate
+        template:
+          metadata:
+            labels:
+              app: nfs-client-provisioner
+          spec:
+            serviceAccountName: nfs-client-provisioner
+            containers:
+              - name: nfs-client-provisioner
+                image: quay.io/external_storage/nfs-client-provisioner:latest
+                volumeMounts:
+                  - name: nfs-client-root
+                    mountPath: /persistentvolumes
+                env:
+                  - name: PROVISIONER_NAME
+                    value: redhat-emea-ssa-team/hetzner-ocp4
+                  - name: NFS_SERVER
+                    value: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+                  - name: NFS_PATH
+                    value: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs"
+            volumes:
+              - name: nfs-client-root
+                nfs:
+                  server: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+                  path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs"
+
+- name: Storage Class
+  k8s:
+    state: present
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: managed-nfs-storage
+      provisioner: redhat-emea-ssa-team/hetzner-ocp4
+      parameters:
+        archiveOnDelete: "false"
