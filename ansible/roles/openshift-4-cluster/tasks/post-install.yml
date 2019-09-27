@@ -16,12 +16,21 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
+
+
+- name: Provision nfs storage
+  import_tasks: post-install-storage-nfs.yml
+  when: storage_nfs == true
+  tags: storage
+  
 - name: Add emptyDir storage to registry
   command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
   register: registry_status
   retries: 60
   delay: 30
   until: registry_status.rc == 0
+  when: storage_nfs == false 
+  tags: storage  
 
 - name: Waiting installation to complete
   command: "openshift-install wait-for install-complete --dir {{ openshift_install_dir }}"

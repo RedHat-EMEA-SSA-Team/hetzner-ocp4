@@ -1,0 +1,19 @@
+---
+
+- name: Remove nfs exports to /etc/exports
+  blockinfile:
+    path: /etc/exports
+    backup: yes
+    marker: "# {mark} OpenShift cluster - {{ cluster_name }}"
+    block: ""
+  notify: reload nfs
+  tags: exports
+
+- name: Delete nfs directory
+  file:
+    path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-{{ item }}"
+    state: absent
+  with_items:
+  - "infra-registry"
+  - "user-pvs"
+
