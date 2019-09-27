@@ -177,79 +177,46 @@ We are now ready to install `libvirt` as our hypervisor, provision VMs and prepa
 
 ## Define variables for your cluster
 
-Here is an example about _cluster.yml_ file that contains information about the cluster that is going to be installed.
-
-```
-cluster_name: ocp4
-public_domain: ocp.ninja
-dns_provider: [route53|cloudflare|gcp|bind]
-letsencrypt_account_email: name@example.com
-# Depending on the dns provider:
-# CloudFlare
-cloudflare_account_email: john@example.com
-cloudflare_account_api_token: 9348234sdsd894.....
-cloudflare_zone: ocp.ninja
-# Route53
-aws_access_key: key
-aws_secret_key: secret
-aws_zone: ocp.ninja
-# GCP
-gcp_project: project-name 
-gcp_managed_zone_name: 'zone-name'
-# Point at the end is important! 
-gcp_managed_zone_domain: 'example.com.'  
-gcp_serviceaccount_file: ../gcp_service_account.json
-
-image_pull_secret: |-
-  asdfghfdsa
-```
+Here is an example about [_cluster.yml_](cluster-example.yml) file that contains information about the cluster that is going to be installed.
 
 | variable | describtion  |
 |---|---|
 |cluster_name  |Name of the cluster to be installed |
 |public_domain  |Root domain that will be used for your cluster.  |
-|dns_provider  |DNS provider, value can be _route53_ or _bind_. _bind_ references local bind on the root server. When using _route53_, you need to store the AWS key and secret as env vars. Check __Setup public DNS records__ for more info. Use the value _bind_, if you dont need to create public DNS records|
+|dns_provider  |DNS provider, value can be _route53_, _cloudflare_ or _gcp_. Check __Setup public DNS records__ for more info. |
 |letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
 |image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
 
+### Setup public DNS records
+
+Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_ or _GCP DNS_. 
+If you want to use _Route53_, _Cloudflare_ or _GCP_ as your DNS provider, you have to add a few variables. Check the instructions below. 
+
 DNS records are constructed based on _cluster_name_ and _public_domain_ values. With above values DNS records should be
-- api.ocp4.ocp.ninja
-- \*.apps.ocp4.ocp.ninja
-
-
-
-```
-[root@server ~]# vi hetzner-ocp4/cluster.yml
-```
-
-## Setup public DNS records
-
-Current tools allow use of three DNS providers plus _bind_; _AWS Route53_, _Cloudflare_, _GCP DNS_, and _bind_. 
-If you want to use _Route53_, _Cloudflare_ or _GCP_ as your DNS provider, you have to export few env variables. Check the instructions below.  If you are not using public DNS, but bind, just jump to next section.
+- api._cluster_name_._public_domain_
+- \*.apps._cluster_name_._public_domain_
 
 If you use another DNS provider, feel free to contribute. :D
 
+
 Please configure in `cluster.yml` all necessary credentials:
 
-```
-cloudflare_account_email: john@example.com
-cloudflare_account_api_token: 9348234sdsd894.....
-cloudflare_zone: domain.tld
-```
-or
-```
-aws_access_key: key
-aws_secret_key: secret
-aws_zone: domain.tld
-```
-or
-```
-gcp_project: project-name 
-gcp_managed_zone_name: 'zone-name'
-gcp_managed_zone_domain: 'example.com.'
-gcp_serviceaccount_file: ../gcp_service_account.json
-```
+| DNS provider | Variables  |
+|---|---|
+|CloudFlare|`cloudflare_account_email: john@example.com` <br> `cloudflare_account_api_token: 9348234sdsd894.....` <br>  `cloudflare_zone: domain.tld`|
+|Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
+|GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` <br/>
+|
+
+### Optional configuration
+
+|Variable | Default | Description |
+|---|---|---|
+|`storage_nfs`|false|Install NFS Storage with dynamic provisioning|
+|`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
+|`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
+|`cluster_role_bindings`|empty|Setup cluster role binding, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 
 
 ## Prepare install and install Openshift
