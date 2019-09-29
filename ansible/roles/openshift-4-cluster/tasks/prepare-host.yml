@@ -69,3 +69,9 @@
     insertafter: '^\[Network\]'
     regexp: '^IPForward='
   when: stat_result.stat.exists == True
+
+- name: download swygue.coreos-virt-install-iso
+  git:
+    repo: "{{ virt_install_iso_role_url }}"
+    dest: "roles/{{ virt_install_iso_role }}"
+  when: use_coreos_iso|bool

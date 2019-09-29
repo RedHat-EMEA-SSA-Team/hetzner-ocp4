@@ -6,11 +6,14 @@
   command: "qemu-img create -f qcow2 -b {{ coreos_image_location }} /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2 {{ vm_root_disk_size }}"
   args:
     creates: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
+  tags: always
 
 - name: Copy ignition {{ vm_instance_name }}
   copy:
     src: "{{ vm_ignition_file }}"
     dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.ign"
+  when: not use_coreos_iso|bool
+  tags: always
 
 # - name: Debug - create /tmp/{{ vm_instance_name }}.virt.xml
 #   template:
@@ -22,8 +25,18 @@
     name: "{{ vm_instance_name }}"
     command: define
     xml: "{{ lookup('template', 'templates/vm.xml.j2') }}"
+  when: not use_coreos_iso|bool
+  tags: always
+
+- name: deploying vm instance using coreos iso
+  import_role:
+    name: swygue.coreos-virt-install-iso
+    tasks_from: deploy_vm.yml
+  when: use_coreos_iso|bool
+  tags: always
 
 - name: Start VirtualMachine {{ vm_instance_name }}
   virt: 
     name: "{{ vm_instance_name }}"
     state: running
+  tags: always

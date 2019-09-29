@@ -42,6 +42,13 @@
   become: true
   tags: ignition
 
+- name: use coreos iso and podman webserver
+  import_role: 
+    name: swygue.coreos-virt-install-iso
+    tasks_from: main.yml
+  when: use_coreos_iso|bool
+  tags: coreos_iso
+
 - name: Create bootstrap node
   include: create-vm.yml
   vars:
@@ -53,6 +60,7 @@
     vm_memory_size: 16384
     vm_memory_unit: 'MiB'
     vm_root_disk_size: '120G'
+    vm_role: bootstrap
   tags: bootstrap_vm
 
 - name: Create master nodes
@@ -66,6 +74,7 @@
     vm_memory_size: "{{ master_memory_size }}"
     vm_memory_unit: "{{ master_memory_unit }}"
     vm_root_disk_size: "{{ master_root_disk_size }}"
+    vm_role: master
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
   tags: master_vm
 
@@ -80,6 +89,7 @@
     vm_memory_size: "{{ compute_memory_size }}"
     vm_memory_unit: "{{ compute_memory_unit }}"
     vm_root_disk_size: "{{ compute_root_disk_size }}"
+    vm_role: worker
   with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
   tags: compute_vm
 
