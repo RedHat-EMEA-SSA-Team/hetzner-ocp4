@@ -6,6 +6,7 @@
   args:
     creates: "{{ coreos_image_location }}"
     warn: false
+  when: not use_coreos_iso|bool
 
 - name: Create OpenShift artifacts directory
   file:
