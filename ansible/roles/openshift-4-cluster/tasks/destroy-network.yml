@@ -13,6 +13,7 @@
     pd_aws_zone: "{{ aws_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
   tags: public_dns
+  when: public_dns|bool
 
 - name: Destroy OpenShift 4 load balancer
   import_role: 
