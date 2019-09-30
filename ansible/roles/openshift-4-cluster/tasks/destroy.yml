@@ -33,3 +33,11 @@
     path: "{{ openshift_install_dir }}/"
   become: yes
   tags: ignition
+
+- name: include coreos iso install destroy tasks
+  import_role:
+    name: swygue.coreos-virt-install-iso
+    tasks_from: destroy.yml
+  when: use_coreos_iso|bool
+  tags: coreos_iso
+
