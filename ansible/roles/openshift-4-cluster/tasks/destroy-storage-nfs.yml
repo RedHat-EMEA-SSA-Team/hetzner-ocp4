@@ -7,12 +7,14 @@
     marker: "# {mark} OpenShift cluster - {{ cluster_name }}"
     block: ""
   notify: reload nfs
+  become: yes
   tags: exports
 
 - name: Delete nfs directory
   file:
     path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-{{ item }}"
     state: absent
+  become: yes
   with_items:
   - "infra-registry"
   - "user-pvs"

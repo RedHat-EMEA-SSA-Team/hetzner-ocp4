@@ -31,4 +31,5 @@
   file:
     state: absent
     path: "{{ openshift_install_dir }}/"
+  become: yes
   tags: ignition

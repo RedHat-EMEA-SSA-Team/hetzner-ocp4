@@ -21,6 +21,7 @@
     tasks_from: destroy.yml
   vars:
     lb_name: "openshift-4-loadbalancer-{{ cluster_name }}"
+  become: yes
   tags: 
     lb
 
@@ -29,8 +30,10 @@
     command: destroy
     name: "{{ vn_name }}"
   ignore_errors: yes
+  become: yes
 
 - name: Undefine Network {{ vn_name }}
   virt_net:
     command: undefine
     name: "{{ vn_name }}"
+  become: yes
