@@ -11,5 +11,22 @@
     path: "/etc/systemd/system/{{ lb_name }}.service"
     state: absent
 
+- name: checking if podman containers is running
+  shell: "podman container list -a --format {% raw %} 'table {{.Names}} {{.ID}}' {% endraw %}|awk '/openshift-4-loadbalancer/ {print $2}'"
+  register: running_containers
+  become: yes
+
+- name: stop running containers
+  shell: "podman stop {{ item }}"
+  become: yes
+  with_items: "{{ running_containers.stdout_lines }}"
+  when: running_containers.stdout != ""
+
+- name: delete {{ podman_webserver }} container
+  shell: "podman rm {{ item }}"
+  when: running_containers.stdout != ""
+  with_items: "{{ running_containers.stdout_lines }}"
+  become: yes
+
 - debug:
     msg: "Podman will stay in the Host, Play with it! ;-)"
