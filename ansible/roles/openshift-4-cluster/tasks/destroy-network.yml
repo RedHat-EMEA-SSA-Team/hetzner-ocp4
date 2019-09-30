@@ -37,3 +37,4 @@
     command: undefine
     name: "{{ vn_name }}"
   become: yes
+  ignore_errors: yes
