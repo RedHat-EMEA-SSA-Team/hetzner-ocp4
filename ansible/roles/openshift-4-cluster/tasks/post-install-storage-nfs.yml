@@ -252,6 +252,8 @@
       kind: StorageClass
       metadata:
         name: managed-nfs-storage
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "true"
       provisioner: redhat-emea-ssa-team/hetzner-ocp4
       parameters:
         archiveOnDelete: "false"
