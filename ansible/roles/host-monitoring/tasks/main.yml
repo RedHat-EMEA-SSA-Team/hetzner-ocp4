@@ -9,3 +9,5 @@
 - name: Deploy Grafana
   include_tasks:  deploy-grafana.yaml
 
+- name: Deploy haproxy exporter
+  include_tasks: deploy-haproxy-exporter.yaml

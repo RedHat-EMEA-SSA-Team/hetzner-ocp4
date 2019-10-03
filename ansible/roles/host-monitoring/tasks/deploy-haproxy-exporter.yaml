@@ -1,0 +1,10 @@
+---
+- name: Install haproxy-exporter.service
+  import_tasks: install-container-service.yml
+  vars:
+    service_name: "haproxy-exporter"
+    service_description: "Prometheus haproxy-exporter"
+    container_name: "haproxy-exporter"
+    container_image: 'quay.io/prometheus/haproxy-exporter:v0.9.0'
+    container_args: "--haproxy.scrape-uri=http://admin:aengeo4oodoidaiP@127.0.0.1:1984/?stats;csv"
+    podman_args: "--net host"
