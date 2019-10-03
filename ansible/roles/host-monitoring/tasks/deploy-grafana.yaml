@@ -1,6 +1,6 @@
 ---
 - name: Create system user
-  import_tasks: create-sytem-user.yaml
+  include_tasks: create-system-user.yaml
   vars:
     user_name: grafana
 
@@ -12,4 +12,4 @@
     container_name: "grafana"
     container_image: 'grafana/grafana'
     container_args: ""
-    podman_args: "--user {{ return_user.uid }} --net host -e 'GF_SERVER_ROOT_URL=http://homer.bohne.io' -e 'GF_SECURITY_ADMIN_PASSWORD=Ju3uc3aejeshiexi' -v /opt/grafana:/var/lib/grafana:z"
+    podman_args: "--user {{ return_user.uid }} --net host -e 'GF_SERVER_ROOT_URL=http://homer.bohne.io' -e 'GF_SECURITY_ADMIN_PASSWORD=Ju3uc3aejeshiexi' -e 'GF_INSTALL_PLUGINS=grafana-piechart-panel' -v /opt/grafana:/var/lib/grafana:z"

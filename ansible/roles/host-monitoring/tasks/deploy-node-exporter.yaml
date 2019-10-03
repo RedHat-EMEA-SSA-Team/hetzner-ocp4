@@ -1,4 +1,3 @@
-#!/usr/bin/env ansible-playbook
 ---
 - name: Install node-exporter.service
   import_tasks: install-container-service.yml

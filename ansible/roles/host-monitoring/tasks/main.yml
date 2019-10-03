@@ -1,8 +1,11 @@
 ---
 
-- name: Deploy components
-  import_tasks: "{{ items }}"
-  with_items:
-    - deploy-node-exporter.yaml
-    - deploy-prometheus.yaml
-    - deploy-grafana.yaml
+- name: Deploy node exporter.yaml
+  include_tasks: deploy-node-exporter.yaml
+
+- name: Deploy Prometheus
+  include_tasks: deploy-prometheus.yaml
+
+- name: Deploy Grafana
+  include_tasks:  deploy-grafana.yaml
+
