@@ -1,0 +1,21 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Create system user
+  import_tasks: create-sytem-user.yaml
+  vars:
+    user_name: prometheus
+
+- name: Add prometheus.yaml
+  template:
+    src: prometheus.yaml
+    dest: /opt/prometheus/prometheus.yml
+
+- name: "Install service"
+  import_tasks: install-container-service.yml
+  vars:
+    service_name: "prometheus"
+    service_description: "Prometheus"
+    container_name: "prometheus"
+    container_image: 'quay.io/prometheus/prometheus'
+    container_args: "--config.file=/prometheus/prometheus.yml"
+    podman_args: "--user {{ return_user.uid }} --net host -v /opt/prometheus:/prometheus:z "

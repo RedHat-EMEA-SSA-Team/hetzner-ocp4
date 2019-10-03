@@ -1,0 +1,33 @@
+- name: Install podman
+  yum:
+    name:
+      - podman
+    state: present
+# ToDo: add handle if changed run: systemctl daemon-reload 
+- name: Install service {{ service_name }}
+  template:
+    src: systemd-podman-template.service.j2
+    dest: "/etc/systemd/system/{{ service_name }}.service"
+
+- name: Enable and start {{ service_name }}.service
+  systemd:
+    name: "{{ service_name }}.service"
+    enabled: yes
+    state: started
+
+- name: Enable and start {{ service_name }}.service
+  systemd:
+    name: "{{ service_name }}.service"
+    enabled: yes
+    state: started
+
+- name: Collect services facts
+  service_facts:
+  register: services_state
+
+- name: Check {{ service_name }}.service
+  fail:
+    msg: 
+      - "Service {{ service_name }} is not running!!!"
+      - "Please check, run: systemctl status {{ service_name }}.service"
+  when: services_state.ansible_facts.services[ service_name + '.service'].state != 'running'

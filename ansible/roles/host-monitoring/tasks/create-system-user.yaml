@@ -1,0 +1,24 @@
+---
+- name: Create {{ user_name }} group
+  group:
+    name: "{{ user_name }}"
+    system: yes
+    state: present
+- name: Create {{ user_name }} user
+  user: 
+    name: "{{ user_name }}"
+    group: "{{ user_name }}"
+    system: yes
+    home: "/opt/{{ user_name }}"
+    shell: /usr/bin/false 
+    create_home: no
+    state: present
+  register: return_user
+
+- name: Create empty home directory
+  file: 
+    path: "/opt/{{ user_name }}"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: 'u=rwx,g=rwx,o='

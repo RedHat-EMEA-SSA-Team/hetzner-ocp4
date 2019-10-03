@@ -1,36 +1,11 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: localhost
-  gather_facts: false
-  tasks:
-  - name: Install haproxy
-    yum:
-      name:
-        - podman
-      state: present
-  
-  - name: Install 
-    template:
-      src: node-exporter.service
-      dest: "/etc/systemd/system/node-exporter.service"
-  
-  - name: Enable and start node-exporter.service
-    systemd:
-      name: "node-exporter.service"
-      enabled: yes
-      state: started
-  
-  - name: Enable and start node-exporter.service
-    systemd:
-      name: "node-exporter.service"
-      enabled: yes
-      state: started
-  
-  - name: Collect services facts
-    service_facts:
-    register: services_state
-  
-  - name: Check node-exporter.service
-    fail:
-      msg: "Load balancer service node-exporter.service is not running!!! Please check, run: systemctl status node-exporter.service"
-    when: services_state.ansible_facts.services['node-exporter.service'].state != 'running'
+- name: Install node-exporter.service
+  import_tasks: install-container-service.yml
+  vars:
+    service_name: "node-exporter"
+    service_description: "Prometheus node-exporter"
+    container_name: "node-exporter"
+    container_image: 'quay.io/prometheus/node-exporter'
+    container_args: "--path.rootfs=/host"
+    podman_args: "--net host --pid host -v '/:/host:ro,rslave'"
