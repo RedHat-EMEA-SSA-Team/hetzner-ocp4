@@ -5,7 +5,7 @@
       - "For more details, conntect to the bootstrap node: ssh -l core {{ vn_subnet.split('.')[:3] | join('.')}}.2"
 
 - name: Waiting bootstrap to complete
-  command: "openshift-install wait-for bootstrap-complete --dir {{ openshift_install_dir }} --log-level debug"
+  command: "/opt/openshift-install-{{ openshift_version }}/openshift-install wait-for bootstrap-complete --dir {{ openshift_install_dir }} --log-level debug"
   register: bootstrap_status
   retries: 60
   delay: 60
@@ -33,7 +33,7 @@
   tags: storage  
 
 - name: Waiting installation to complete
-  command: "openshift-install wait-for install-complete --dir {{ openshift_install_dir }}"
+  command: "/opt/openshift-install-{{ openshift_version }}/openshift-install wait-for install-complete --dir {{ openshift_install_dir }}"
   register: install_status
   retries: 60
   delay: 60
