@@ -3,7 +3,6 @@
     name:
       - podman
     state: present
-# ToDo: add handle if changed run: systemctl daemon-reload 
 - name: Install service {{ service_name }}
   template:
     src: systemd-podman-template.service.j2
@@ -18,8 +17,8 @@
 - name: Enable and start {{ service_name }}.service
   systemd:
     name: "{{ service_name }}.service"
-    enabled: yes
-    state: started
+    daemon_reload: yes
+    state: restarted
 
 - name: Collect services facts
   service_facts:

@@ -1,0 +1,13 @@
+#!/usr/bin/env ansible-playbook 
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+  - ../cluster.yml
+
+  tasks:
+  - name: Deploy host monitoring
+    import_role: 
+      name: host-monitoring
+      tasks_from: main.yml
