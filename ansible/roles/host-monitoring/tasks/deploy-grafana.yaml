@@ -1,0 +1,68 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    service_name: "grafana"
+    service_description: "Grafana"
+    container_name: "grafana"
+    container_image: 'grafana/grafana'
+    container_args: ""
+  tasks:
+  - name: Create grafana group
+    group:
+      name: grafana
+      system: yes
+      state: present
+  - name: Create grafana user
+    user: 
+      name: grafana
+      group: grafana
+      system: yes
+      home: /opt/grafana
+      shell: /usr/bin/false 
+      create_home: no
+      state: present
+    register: return_user
+  - name: Create empty home directory
+    file: 
+      path: /opt/grafana
+      state: directory
+      owner: grafana
+      group: grafana
+      mode: 'u=rwx,g=rwx,o='
+  - name: Install podman
+    yum:
+      name:
+        - podman
+      state: present
+# ToDo: add handle if changed run: systemctl daemon-reload 
+  - name: Install service {{ service_name }}
+    vars:
+      podman_args: "--user {{ return_user.uid }} --net host -e 'GF_SERVER_ROOT_URL=http://homer.bohne.io' -e 'GF_SECURITY_ADMIN_PASSWORD=Ju3uc3aejeshiexi' -v /opt/grafana:/var/lib/grafana:z"
+    template:
+      src: systemd-podman-template.service.j2
+      dest: "/etc/systemd/system/{{ service_name }}.service"
+  
+  - name: Enable and start {{ service_name }}.service
+    systemd:
+      name: "{{ service_name }}.service"
+      enabled: yes
+      state: started
+  
+  - name: Enable and start {{ service_name }}.service
+    systemd:
+      name: "{{ service_name }}.service"
+      enabled: yes
+      state: started
+  
+  - name: Collect services facts
+    service_facts:
+    register: services_state
+  
+  - name: Check {{ service_name }}.service
+    fail:
+      msg: 
+        - "Service {{ service_name }} is not running!!!"
+        - "Please check, run: systemctl status {{ service_name }}.service"
+    when: services_state.ansible_facts.services[ service_name + '.service'].state != 'running'

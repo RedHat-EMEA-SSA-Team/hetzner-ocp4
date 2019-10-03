@@ -1,0 +1,76 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    service_name: "prometheus"
+    service_description: "Prometheus"
+    container_name: "prometheus"
+    container_image: 'quay.io/prometheus/prometheus'
+    container_args: "--config.file=/prometheus/prometheus.yml"
+  tasks:
+  - name: Create prometheus group
+    group:
+      name: prometheus
+      system: yes
+      state: present
+  - name: Create prometheus user
+    user: 
+      name: prometheus
+      group: prometheus
+      system: yes
+      home: /opt/prometheus
+      shell: /usr/bin/false 
+      create_home: no
+      state: present
+    register: return_user
+
+  - name: Create empty home directory
+    file: 
+      path: /opt/prometheus
+      state: directory
+      owner: prometheus
+      group: prometheus
+      mode: 'u=rwx,g=rwx,o='
+#ToDo install prometheus.yaml
+#
+  - name: Add prometheus.yaml
+    template:
+      src: prometheus.yaml
+      dest: /opt/prometheus/prometheus.yml
+
+  - name: Install podman
+    yum:
+      name:
+        - podman
+      state: present
+# ToDo: add handle if changed run: systemctl daemon-reload 
+  - name: Install service {{ service_name }}
+    vars:
+      podman_args: "--user {{ return_user.uid }} --net host -v /opt/prometheus:/prometheus:z "
+    template:
+      src: systemd-podman-template.service.j2
+      dest: "/etc/systemd/system/{{ service_name }}.service"
+  
+  - name: Enable and start {{ service_name }}.service
+    systemd:
+      name: "{{ service_name }}.service"
+      enabled: yes
+      state: started
+  
+  - name: Enable and start {{ service_name }}.service
+    systemd:
+      name: "{{ service_name }}.service"
+      enabled: yes
+      state: started
+  
+  - name: Collect services facts
+    service_facts:
+    register: services_state
+  
+  - name: Check {{ service_name }}.service
+    fail:
+      msg: 
+        - "Service {{ service_name }} is not running!!!"
+        - "Please check, run: systemctl status {{ service_name }}.service"
+    when: services_state.ansible_facts.services[ service_name + '.service'].state != 'running'

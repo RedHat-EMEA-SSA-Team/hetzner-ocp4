@@ -1,0 +1,20 @@
+[Unit]
+Description={{ service_description }}
+After=network.target
+
+[Service]
+Type=simple
+TimeoutStartSec=5m
+
+ExecStartPre=-/usr/bin/podman rm "{{ container_name }}"
+ExecStartPre=/usr/bin/podman pull {{ container_image }}
+
+ExecStart=/usr/bin/podman run --name {{ container_name }} {{ podman_args }} {{ container_image }} {{ container_args }}
+ExecReload=-/usr/bin/podman stop "{{ container_name }}"
+ExecReload=-/usr/bin/podman rm "{{ container_name }}"
+ExecStop=-/usr/bin/podman stop "{{ container_name }}"
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

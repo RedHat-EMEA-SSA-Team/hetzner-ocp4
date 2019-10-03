@@ -1,0 +1,36 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Install haproxy
+    yum:
+      name:
+        - podman
+      state: present
+  
+  - name: Install 
+    template:
+      src: node-exporter.service
+      dest: "/etc/systemd/system/node-exporter.service"
+  
+  - name: Enable and start node-exporter.service
+    systemd:
+      name: "node-exporter.service"
+      enabled: yes
+      state: started
+  
+  - name: Enable and start node-exporter.service
+    systemd:
+      name: "node-exporter.service"
+      enabled: yes
+      state: started
+  
+  - name: Collect services facts
+    service_facts:
+    register: services_state
+  
+  - name: Check node-exporter.service
+    fail:
+      msg: "Load balancer service node-exporter.service is not running!!! Please check, run: systemctl status node-exporter.service"
+    when: services_state.ansible_facts.services['node-exporter.service'].state != 'running'
