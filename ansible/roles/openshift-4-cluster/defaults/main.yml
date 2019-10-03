@@ -29,7 +29,10 @@ compute_root_disk_size: '120G'
 # Important: OpenShift version must match to RHEL CoreOS version!
 
 # reference to OpenShift version
-openshift_version: 4.2.0-0.nightly-2019-09-24-194016
+openshift_version: 4.2.0-rc.0
+# dev-pre:
+# https://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview
+openshift_location: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp"
 
 # reference to coreos qcow file
 coreos_version: 42.80.20190828.2
