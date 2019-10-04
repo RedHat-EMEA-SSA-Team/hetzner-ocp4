@@ -6,16 +6,16 @@ When you login to the machine, it will be running a Debian based rescure system 
 
 NOTE: If your system is not in rescue mode anymore, you can activate it from https://robot.your-server.de/server. Select your server and "Rescue" tab. From there select Linux, 64bit and public key if there is one.
 
-![](images/set_to_rescue.png)
+![](../images/set_to_rescue.png)
 
 This will delete whatever you had on your system earlier and will bring the machine into it's rescue mode.
 Please do not forget your new root password.
 
-![](images/root_password.png)
+![](../images/root_password.png)
 
 After resetting your server, you are ready to connect to your system via ssh.
 
-![](images/reset.png)
+![](../images/reset.png)
 
 When you login to your server, the rescue system will display some hardware specifics for you:
 
@@ -106,7 +106,7 @@ When you are happy with the file content, save and exit the editor via `:wq` and
 If there are errors, you will be informed about them and you need to fix them.
 At completion, the final output should be similar to
 
-![](images/install_complete.png)
+![](../images/install_complete.png)
 
 You are now ready to reboot your system into the newly installed OS.
 
