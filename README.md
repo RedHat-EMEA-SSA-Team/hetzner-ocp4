@@ -6,8 +6,6 @@ their needs and purpose.
 
 Use it at your own please and risk!
 
-**NOTE: This project uses 4.2.x nightly build images, so they might not work. Also file names might change. If you encounter download problems, check that files names from ansible/group_vars/all match ones in https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest**
-
 # Contribution
 If you want to provide additional features, please feel free to contribute via pull requests or any other means.
 

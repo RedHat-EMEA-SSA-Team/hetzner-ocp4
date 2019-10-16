@@ -2,7 +2,7 @@
 # Can not use get_url because: get_url do not support --compressed
 - name: Download CoreOS image
   command:
-    "curl --compressed -J -L -o {{ coreos_image_location }} https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest/rhcos-{{ coreos_version }}-qemu.qcow2"
+    "curl --compressed -J -L -o {{ coreos_image_location }} {{ coreos_download_url }}"
   args:
     creates: "{{ coreos_image_location }}"
     warn: false
