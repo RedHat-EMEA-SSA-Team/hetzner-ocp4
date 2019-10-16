@@ -35,9 +35,9 @@ openshift_version: 4.2.0
 openshift_location: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp"
 
 # reference to coreos qcow file
-coreos_version: 4.2.0
-coreos_download_url: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.2/latest/rhcos-{{ coreos_version }}-x86_64-openstack.qcow2"
-coreos_image_location: /var/lib/libvirt/images/rhcos-{{ coreos_version }}-openstack.qcow2 
+coreos_version: 42.80.20191002.0
+coreos_download_url: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest/rhcos-{{ coreos_version }}-qemu.qcow2"
+coreos_image_location: /var/lib/libvirt/images/rhcos-{{ coreos_version }}.qcow2 
 
 
 certificates_dir: "{{ playbook_dir }}/../certificate"
