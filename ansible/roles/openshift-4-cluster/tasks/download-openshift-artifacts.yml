@@ -7,6 +7,18 @@
     creates: "{{ coreos_image_location }}"
     warn: false
 
+- name: Check coreos image filetype
+  stat:
+    path: "{{ coreos_image_location }}"
+  register: coreos_image
+
+- block:
+  - name: Rename image -> image.gzip
+    command: "mv {{ coreos_image_location }} {{ coreos_image_location }}.gz"
+  - name: Unzip
+    command: "gzip -d {{ coreos_image_location }}.gz"
+  when: coreos_image.stat.mimetype == "application/x-gzip" 
+
 - name: Create OpenShift artifacts directory
   file:
     path: "/opt/openshift-{{ item }}-{{ openshift_version }}"
