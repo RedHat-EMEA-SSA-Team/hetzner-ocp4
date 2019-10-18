@@ -7,7 +7,7 @@ compute:
 controlPlane:
   name: master
   platform: {}
-  replicas: 3
+  replicas: {{ master_count }} 
 metadata:
   name: {{ cluster_name }}
 networking:
