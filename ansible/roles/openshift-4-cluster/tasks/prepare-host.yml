@@ -1,5 +1,5 @@
 ---
-- name: Installing KVM Packages
+- name: Installing KVM Packages (OS Release == 7).
   yum:
     name:
       - "@virtualization-hypervisor"
@@ -13,17 +13,41 @@
       # ansible k8s need python2-openshift
       - python2-openshift
     state: present
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
+
+- name: Installing KVM Packages (OS Release != 7).
+  yum:
+    name:
+      - "@virtualization-hypervisor"
+      - "@virtualization-client"
+      - "@virtualization-platform"
+      - "@virtualization-tools"
+      # ansible virt need lxml
+      - python3-lxml
+    state: present
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version != '7'
+
+- name: Installing boto for AWX tools and openshift for python
+  pip:
+    name:
+      # ansible route53 need  python-boto
+      - boto
+      # ansible k8s need python2-openshift
+      - openshift
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version != '7'
 
 # Update qemu to +2.4 because option fw_cfg added in 2.4 
 #  "qemu-kvm: -fw_cfg: invalid option"
 #  https://github.com/qemu/qemu/commit/81b2b81062612e
-- name: Add repos centos-release-openstack-stein
+- name: Add repos centos-release-openstack-stein (OS Release == 7).
   yum:
     name: centos-release-openstack-stein
     state: present
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
 
-- name: Disable all openstack repos except centos-qemu-ev
+- name: Disable all openstack repos except centos-qemu-ev (OS Release == 7).
   command: "yum-config-manager -q --disable centos-ceph-nautilus centos-nfs-ganesha28 centos-openstack-stein"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
 
 - name: Upgrade all packages, include update qemu-kvm to >2.4
 # because we added repo centos-qemu-ev from openstack

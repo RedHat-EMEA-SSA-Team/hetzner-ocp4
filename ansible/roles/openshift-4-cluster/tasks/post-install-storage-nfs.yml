@@ -16,9 +16,17 @@
     state: started
     enabled: true
 
+- set_fact:
+    nfs_server: "nfs"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
+
+- set_fact:
+    nfs_server: "nfs-server"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version != '7'
+
 - name: Ensure nfs is running.
   service: 
-    name: nfs
+    name: "{{ nfs_server }}"
     state: started
     enabled: yes
 
