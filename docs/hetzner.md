@@ -84,7 +84,7 @@ LV vg0   var    /var ext4 50G
 LV vg0   libvirt /var/lib/libvirt/images xfs all
 
 
-IMAGE /root/.oldroot/nfs/install/../images/CentOS-76-64-minimal.tar.gz
+IMAGE /root/.oldroot/nfs/images/CentOS-80-64-minimal.tar.gz
 ```
 
 
