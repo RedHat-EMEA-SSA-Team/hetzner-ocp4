@@ -1,12 +1,13 @@
 <network>
     <name>{{ cluster_name }}</name>
-    <forward mode='nat'/>
     <domain name="{{ vn_internal_domain }}"/>
+    <forward mode='{{ network_forward_mode | default('nat') }}'/>
     <dns>
         <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.2'>
             <hostname>bootstrap.{{ vn_internal_domain }}</hostname>
         </host>
         <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.1'>
+            <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
             <hostname>api.{{ vn_public_domain }}</hostname>
         </host>

@@ -2,6 +2,7 @@
 - import_tasks: destroy-network.yml
   vars:
     vn_name: "{{ cluster_name }}"
+  tags: network
 
 - name: Destroy letsencrypt
   debug:
