@@ -1,0 +1,42 @@
+---
+# Should be stopped / destroyed
+# - include: stop-vm.yml
+#   vars:
+#     vm_instance_name: "{{ cluster_name }}-bootstrap"
+
+- set_fact:
+    vms: "[]"
+
+- set_fact: 
+    vms: "{{ vms }} + [ '{{ cluster_name }}-master-{{item}}' ]"
+  with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
+
+- set_fact:
+    vms: "{{ vms }} + [ '{{ cluster_name }}-compute-{{item}}' ]"
+  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+
+- name: "Shutdown VM"
+  virt:
+    command: shutdown
+    name: "{{ item }}"
+  ignore_errors: yes
+  with_items: "{{ vms }}"
+
+- name: "Check VM state"
+  virt:
+    name: "{{ item }}"
+    command: status
+  register: result
+  until: result.status == 'shutdown'
+  delay: 10
+  retries: "10"
+  with_items: "{{ vms }}"
+
+- name: Stop OpenShift 4 load balancer
+  import_role: 
+    name: openshift-4-loadbalancer
+    tasks_from: stop.yml
+  vars:
+    lb_name: "openshift-4-loadbalancer-{{ cluster_name }}"
+  tags: 
+    lb
