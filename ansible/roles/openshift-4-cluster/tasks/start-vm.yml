@@ -1,0 +1,6 @@
+---
+- name: Start VM {{ vm_instance_name }}
+  virt:
+    command: start
+    name: "{{ vm_instance_name }}"
+  ignore_errors: yes
