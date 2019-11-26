@@ -23,3 +23,11 @@ pullSecret:
   '{{ image_pull_secret }}'
 sshKey: |
   {{ ssh_public_key }}
+{% if install_config_additionalTrustBundle is defined %}
+additionalTrustBundle: |
+  {{ install_config_additionalTrustBundle |indent(width=2) }}
+{% endif %}
+{%- if install_config_imageContentSources is defined %}
+imageContentSources: 
+  {{ install_config_imageContentSources  | to_nice_yaml(indent=2) | indent(width=2) }}
+{% endif %}

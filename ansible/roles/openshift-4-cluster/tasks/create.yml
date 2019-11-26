@@ -4,6 +4,7 @@
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
     vn_master_count: "{{ master_count }}"
     vn_compute_count: "{{ compute_count }}"
+  tags: network
 
 - import_role:
     name: letsencrypt

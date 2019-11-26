@@ -15,6 +15,6 @@
     src: "{{ openshift_install_dir }}/install-config.yaml"
 
 - name: Create ignition files
-  command: "/opt/openshift-install-{{ openshift_version }}/openshift-install --dir={{ openshift_install_dir }} create ignition-configs"
+  command: "{{ openshift_install_command }} --dir={{ openshift_install_dir }} create ignition-configs"
   args:
     creates: "{{ openshift_install_dir}}/.openshift_install_state.json"
