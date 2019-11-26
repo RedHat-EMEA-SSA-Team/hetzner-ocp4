@@ -85,60 +85,25 @@ Please configure in `cluster.yml` all necessary credentials:
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`cluster_role_bindings`|empty|Setup cluster role binding, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
+|`openshift_install_command`|[check defaults](ansible/roles/openshift-4-cluster/defaults/main.yml)|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)|
+|`install_config_additionalTrustBundle`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
+|`install_config_imageContentSources`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
 
-
-## Prepare install and install Openshift
+## Prepare kvm-host and install OpenShift
 
 ```
 [root@server ~]# cd hetzner-ocp4
 [root@server ~]# ansible-playbook ./ansible/setup.yml
 ```
 
-### Enable htpasswd based authentication
+# Additional documentation
 
-Check customizing your cluster....which is coming soon!
+* [How to install and manage more than one OpenShift Cluster with  hetzner-ocp4](docs/multi-cluster-guide.md)
+* [How to install an air-gapped cluster with hetzner-ocp4](docs/air-gapped.md)
 
+# Useful commands
 
-# Useful commands for debuging
-
-## Check haproxy connections:
-
-Long
-```
-watch 'echo "show stat" | nc -U /var/lib/haproxy/stats | cut -d "," -f 1,2,5-11,18,24,27,30,36,50,37,56,57,62 | column -s, -t'
-```
-
-Short:
-```
-watch 'echo "show stat" | nc -U /var/lib/haproxy/stats | cut -d "," -f 1,2,18,57| column -s, -t'
-```
-
-
-## Check etcd health
-
-```
-# OCP 4.2, as root on master node
-export ETCD_VERSION=v3.3.10
-export ASSET_DIR=./assets
-source /run/etcd/environment
-source /usr/local/bin/openshift-recovery-tools
-init
-dl_etcdctl
-backup_certs
-cd /etc/kubernetes/static-pod-resources/etcd-member
-ETCDCTL_API=3 ~/assets/bin/etcdctl --cert system:etcd-peer:${ETCD_DNS_NAME}.crt --key system:etcd-peer:${ETCD_DNS_NAME}.key --cacert ca.crt endpoint health --cluster
-```
-
-# After a reboot of your server
-
-You have start all the VM by using
-```
-$ virsh start master-0
-$ virsh start master-1
-$ virsh start master-2
-$ virsh start worker-0
-$ virsh start worker-1
-$ virsh start worker-2
-
-$ watch oc get node
-```
+| Problem | Command |
+|---|---|
+|Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-demo ./watch-stats.sh```
+|Start cluster after reboot|```./ansible/04-start-cluster.yml```
