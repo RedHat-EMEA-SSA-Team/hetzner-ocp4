@@ -10,6 +10,9 @@
   <memory unit='{{ vm_memory_unit }}'>{{ vm_memory_size }}</memory>
   <currentMemory unit='{{ vm_memory_unit }}'>{{ vm_memory_size }}</currentMemory>
   <vcpu>{{ vm_vcpu }}</vcpu>
+{% if vm_special_cpu is defined and vm_special_cpu|length %}
+  {{ vm_special_cpu }}
+{% endif %}
   <os>
     <type arch="x86_64">hvm</type>
     <boot dev="hd"/>
