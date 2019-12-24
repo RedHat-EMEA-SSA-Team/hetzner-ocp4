@@ -1,0 +1,14 @@
+FROM registry.access.redhat.com/ubi8/ubi
+
+LABEL maintainer="Robert Bohne"
+
+RUN dnf update -y && rm -rf /var/cache/yum
+RUN dnf install git python3 -y \
+    && dnf clean all
+
+# Install Ansible via Pip.
+RUN pip3 install ansible
+
+# Install Ansible inventory file.
+# RUN mkdir -p /etc/ansible
+# RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts

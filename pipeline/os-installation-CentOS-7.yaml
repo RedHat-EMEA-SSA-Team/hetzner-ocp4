@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: os-installation-centos-7
+spec:
+  resources:
+  - name: workspace
+    type: git
+  tasks:
+    - name: test-centos7-installation
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+      params:
+        - name: cluster-yml-secret
+          value: cluster-yml-centos7

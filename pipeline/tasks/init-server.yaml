@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: init-server
+spec:
+  inputs:
+    resources:
+      - name: hetzner-ocp4
+        type: git
+  steps:
+    - name: init-server
+      image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-pipeline:latest
+      imagePullPolicy: Always
+      command:
+        - /usr/bin/bash
+        - -x
+        - -c
+        - |
+          cp -v /secret/cluster.yml hetzner-ocp4/
+          cd hetzner-ocp4/
+          /container-scripts/cluster-yml-to-env.sh
+          source cluster.env
+          ssh -o StrictHostKeyChecking=no -i /secret/ssh-privatekey -l root $HETZNER_IP yum install -y ansible git
+          ssh -o StrictHostKeyChecking=no -i /secret/ssh-privatekey -l root $HETZNER_IP git clone -b $(inputs.resources.hetzner-ocp4.revision) $(inputs.resources.hetzner-ocp4.url) hetzner-ocp4
+          scp -o StrictHostKeyChecking=no -i /secret/ssh-privatekey /secret/cluster.yml root@$HETZNER_IP:~/hetzner-ocp4/cluster.yml
+      volumeMounts:
+      - name: hetzner-ocp4-pipeline
+        mountPath: "/secret"
+        readOnly: true
+  volumes:
+    - name: hetzner-ocp4-pipeline
+      secret:
+        secretName: hetzner-ocp4-pipeline

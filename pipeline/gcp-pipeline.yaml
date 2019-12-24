@@ -1,0 +1,66 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: hetzner-ocp4-gcp
+spec:
+  resources:
+  - name: workspace
+    type: git
+  tasks:
+    - name: reset-server
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+    - name: init-server
+      runAfter:
+      - reset-server
+      taskRef:
+        name: init-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+    - name: prepare-host
+      runAfter:
+      - init-server
+      taskRef:
+        name: prepare-host
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+    - name: gcp-create-cluster
+      runAfter:
+      - prepare-host
+      taskRef:
+        name: generic-playbook-runner
+      params:
+        - name: playbook
+          value: 02-create-cluster.yml
+        - name: cluster-yml
+          value: gcp-cluster.yml
+        - name: sync-files
+          value: "gcp_service_account.json"
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+    - name: gcp-destroy-cluster
+      runAfter:
+      - gcp-create-cluster
+      taskRef:
+        name: generic-playbook-runner
+      params:
+        - name: playbook
+          value: 99-destroy-cluster.yml
+        - name: cluster-yml
+          value: gcp-cluster.yml
+        - name: sync-files
+          value: "gcp_service_account.json"
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
