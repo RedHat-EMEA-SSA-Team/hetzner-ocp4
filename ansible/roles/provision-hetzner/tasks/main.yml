@@ -55,7 +55,9 @@
   delegate_to: localhost
 
 - name: Remove server from local known_hosts file
-  local_action: command  /usr/bin/ssh-keygen -R {{ inventory_hostname }}
+  local_action:
+    module: command
+    cmd: "/usr/bin/ssh-keygen -R {{ inventory_hostname }}"
   ignore_errors: yes
 
 - name: Pause a bit for the hardware reset to kick in
