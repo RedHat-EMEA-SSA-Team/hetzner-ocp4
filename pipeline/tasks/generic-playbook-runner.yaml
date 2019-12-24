@@ -1,0 +1,68 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: generic-playbook-runner
+spec:
+  inputs:
+    resources:
+      - name: hetzner-ocp4
+        type: git
+    params:
+      - name: playbook
+        type: string
+      - name: cluster-yml
+        type: string
+        default: "cluster.yml"
+      - name: cluster-yml-secret
+        type: string
+        default: "hetzner-ocp4-pipeline"
+      - name: sync-files
+        type: string
+        default: ""
+      - name: playbook-args
+        type: string
+        default: ""
+  steps:
+    - name: playbook
+      image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-pipeline:latest
+      imagePullPolicy: Always
+      command:
+        - /usr/bin/bash
+        - -x
+        - -c
+        - |
+          cp -v /secret/cluster.yml hetzner-ocp4/
+          cd hetzner-ocp4/
+          /container-scripts/cluster-yml-to-env.sh
+          source cluster.env
+
+          if [ ! -z "$(inputs.params.sync-files)" ] ; then
+            PWD=$(pwd)
+            cd /secret/
+            scp \
+              -o StrictHostKeyChecking=no \
+              -i /secret/ssh-privatekey \
+              $(inputs.params.sync-files) root@$HETZNER_IP:~/
+            cd $PWD
+          fi
+
+          scp \
+            -o StrictHostKeyChecking=no \
+            -i /secret/ssh-privatekey \
+            /secret/$(inputs.params.cluster-yml) root@$HETZNER_IP:~/hetzner-ocp4/$(inputs.params.cluster-yml)
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i /secret/ssh-privatekey \
+            -l root \
+            $HETZNER_IP \
+            'cd hetzner-ocp4/ && ./ansible/$(inputs.params.playbook) -e @$(inputs.params.cluster-yml) $(inputs.params.playbook-args)'
+            
+      volumeMounts:
+      - name: hetzner-ocp4-pipeline
+        mountPath: "/secret"
+        readOnly: true
+  volumes:
+    - name: hetzner-ocp4-pipeline
+      secret:
+        secretName: $(inputs.params.cluster-yml-secret)

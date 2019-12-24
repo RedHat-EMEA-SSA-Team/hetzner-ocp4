@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: os-installation-rhel-8
+spec:
+  resources:
+  - name: workspace
+    type: git
+  tasks:
+    - name: test-rhel8-installation
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+      params:
+        - name: cluster-yml-secret
+          value: cluster-yml-rhel8

@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: reset-hetzner-server
+spec:
+  inputs:
+    resources:
+      - name: hetzner-ocp4
+        type: git
+    params:
+      - name: cluster-yml-secret
+        type: string
+        default: "hetzner-ocp4-pipeline"
+      - name: cluster-yml
+        type: string
+        default: "cluster.yml"
+  steps:
+    - name: 00-provision-hetzner
+      image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-pipeline:latest
+      imagePullPolicy: Always
+      command:
+        - /usr/bin/bash
+        - -x
+        - -c
+        - |
+          echo "Reset server";
+          cp -v /secret/cluster.yml hetzner-ocp4/
+          cd hetzner-ocp4/
+          export ANSIBLE_REMOTE_TMP=/tmp
+          ./ansible/00-provision-hetzner.yml \
+            -e @$(inputs.params.cluster-yml) \
+            --private-key=/secret/ssh-privatekey && \
+          /container-scripts/rhel-subscription.yaml \
+            -e @$(inputs.params.cluster-yml) \
+            --private-key=/secret/ssh-privatekey
+      volumeMounts:
+      - name: hetzner-ocp4-pipeline
+        mountPath: "/secret"
+        readOnly: true
+  volumes:
+    - name: hetzner-ocp4-pipeline
+      secret:
+        secretName: $(inputs.params.cluster-yml-secret)

@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: hetzner-ocp4-os-installation
+spec:
+  resources:
+  - name: workspace
+    type: git
+  tasks:
+    - name: test-centos7-installation
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+      params:
+        - name: cluster-yml-secret
+          value: cluster-yml-centos7
+    - name: test-centos8-installation
+      runAfter:
+      - test-centos7-installation
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+      params:
+        - name: cluster-yml-secret
+          value: cluster-yml-centos8
+    - name: test-rhel8-installation
+      runAfter:
+      - test-centos8-installation
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+      params:
+        - name: cluster-yml-secret
+          value: cluster-yml-rhel8

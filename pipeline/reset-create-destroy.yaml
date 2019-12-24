@@ -1,0 +1,88 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: rcd-rhel7
+spec:
+  resources:
+  - name: hetzner-ocp4
+    type: git
+  params:
+  - name: cluster-yml-secret
+    type: string
+    description: "Secret with cluster-yml, ssh-key...."
+    default: cluster-yml
+  - name: cluster-yml
+    type: string
+    description: "Filename of 'cluster.yml', default: cluster.yml of course ;-)"
+    default: cluster.yml
+  - name: playbook-args
+    type: string
+    description: "Playbook args, for example '--skip-tags letsencrypt'"
+    default: ""
+  tasks:
+    - name: installation
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: hetzner-ocp4
+      params:
+        - name: cluster-yml-secret
+          value: $(params.cluster-yml-secret)
+        - name: playbook-args
+          value: $(params.playbook-args)
+    - name: init-server
+      runAfter:
+      - installation
+      taskRef:
+        name: init-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: hetzner-ocp4
+    - name: prepare-host
+      runAfter:
+      - init-server
+      taskRef:
+        name: prepare-host
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: hetzner-ocp4
+    - name: create-cluster
+      runAfter:
+      - prepare-host
+      taskRef:
+        name: generic-playbook-runner
+      params:
+        - name: playbook
+          value: 02-create-cluster.yml
+        - name: playbook-args
+          value: $(params.playbook-args)
+        - name: cluster-yml
+          value: $(params.cluster-yml)
+        - name: cluster-yml-secret
+          value: $(params.cluster-yml-secret)
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: hetzner-ocp4
+    - name: destroy-cluster
+      runAfter:
+      - create-cluster
+      taskRef:
+        name: generic-playbook-runner
+      params:
+        - name: playbook
+          value: 99-destroy-cluster.yml
+        - name: playbook-args
+          value: $(params.playbook-args)
+        - name: cluster-yml
+          value: $(params.cluster-yml)
+        - name: cluster-yml-secret
+          value: $(params.cluster-yml-secret)
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: hetzner-ocp4
