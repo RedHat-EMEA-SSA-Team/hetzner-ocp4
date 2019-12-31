@@ -8,12 +8,6 @@
       - "@virtualization-tools"
       # ansible virt need lxml
       - python3-lxml
+      - python3-openshift
+      - python3-boto3
     state: present
-
-- name: Installing boto for AWX tools and openshift for python
-  pip:
-    name:
-      # ansible route53 need  python-boto
-      - boto
-      # ansible k8s need python2-openshift
-      - openshift
