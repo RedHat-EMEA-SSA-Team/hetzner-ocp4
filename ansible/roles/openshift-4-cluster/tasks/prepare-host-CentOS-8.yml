@@ -1,0 +1,19 @@
+---
+- name: Installing KVM Packages (OS Release != 7).
+  yum:
+    name:
+      - "@virtualization-hypervisor"
+      - "@virtualization-client"
+      - "@virtualization-platform"
+      - "@virtualization-tools"
+      # ansible virt need lxml
+      - python3-lxml
+    state: present
+
+- name: Installing boto for AWX tools and openshift for python
+  pip:
+    name:
+      # ansible route53 need  python-boto
+      - boto
+      # ansible k8s need python2-openshift
+      - openshift
