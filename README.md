@@ -20,6 +20,11 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 
 **NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)   
 
+** Supported root server operating systems: **
+- CentOS 7
+- CentOS 8
+- RHEL 8 - How to install RHEL8: https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
+
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
 

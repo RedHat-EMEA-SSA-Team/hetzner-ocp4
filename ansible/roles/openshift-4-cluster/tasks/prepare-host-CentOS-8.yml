@@ -1,5 +1,5 @@
 ---
-- name: Installing KVM Packages (OS Release != 7).
+- name: Installing KVM Packages
   yum:
     name:
       - "@virtualization-hypervisor"

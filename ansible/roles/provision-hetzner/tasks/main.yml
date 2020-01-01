@@ -84,16 +84,6 @@
     group: root
     mode: 0644
 
-#FIXME: This isn't working because of ready only FS. Using ignore_errors for installimage until fixed
-#- name: Fix Hetzner for usage of RHEL image
-#  lineinfile:
-#    path: /root/.oldroot/nfs/install/centos.sh
-#    regexp: "{{ item }}"
-#    state: absent
-#  with_items:
-#    - yum check-update
-#    - yum -y install polkit
-
 - name: Run installimage 
   command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup"
   environment:
@@ -108,12 +98,16 @@
 - name: Check stderr from installimage
   fail:
     msg: "Something want wrong at installimage: {{ result.stderr_lines | join('\n') }}"
-  when: result.stderr_lines | length > 0 
+  when:
+    - result.stderr_lines | length > 0
+    - hetzner_image_ignore_errors == false
 
 - name: Check stdout from installimage
   fail:
     msg: "Something want wrong at installimage: {{ result.stdout_lines | join('\n') }}"
-  when: result.stdout is search('An error occured while installing the new system!') 
+  when:
+    - result.stdout is search('An error occured while installing the new system!')
+    - hetzner_image_ignore_errors == false
 
 - name: Reboot server
   shell: sleep 2 && shutdown -r now
@@ -132,6 +126,16 @@
     delay: 10
     timeout: 300
   connection: local
+
+- name: Check ansible_python_interpreter
+  ping:
+  register: rc
+  ignore_errors: true
+
+- name: Set ansible_python_interpreter to /usr/libexec/platform-python (RHEL 8)
+  set_fact:
+    ansible_python_interpreter: /usr/libexec/platform-python
+  when: rc.failed == true
 
 - name: Disable password authentication
   lineinfile:

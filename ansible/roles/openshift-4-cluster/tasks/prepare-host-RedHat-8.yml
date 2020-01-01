@@ -1,0 +1,53 @@
+---
+- name: Installing KVM Packages
+  yum:
+    name:
+      - "@virtualization-hypervisor"
+      - "@virtualization-client"
+      - "@virtualization-platform"
+      - "@virtualization-tools"
+      # ansible virt need lxml
+      - python3-lxml
+      - python3-openshift
+      - python3-boto
+    state: present
+
+- name: Allow NFS traffic from VM's to Host
+  firewalld:
+    zone: libvirt
+    state: enabled
+    permanent: yes
+    service: "{{ item }}"
+  with_items:
+    - nfs
+    - mountd
+    - rpc-bind
+  notify: 'reload firewalld'
+
+- name: Allow OpenShift traffic from VM's to Host
+  firewalld:
+    zone: libvirt
+    state: enabled
+    permanent: yes
+    port: "{{ item }}"
+  with_items:
+    - 80/tcp
+    - 443/tcp
+    - 6443/tcp
+    - 22623/tcp
+  notify: 'reload firewalld'
+
+- name: Allow OpenShift traffic from public to Host
+  firewalld:
+    zone: public
+    state: enabled
+    permanent: yes
+    port: "{{ item }}"
+  with_items:
+    - 80/tcp
+    - 443/tcp
+    - 6443/tcp
+  notify: 'reload firewalld'
+
+- name: firewalld reload
+  command: firewall-cmd --reload
