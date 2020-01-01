@@ -71,6 +71,11 @@
     timeout: 300
   connection: local
 
+- name: Ping rescue system
+  ping:
+  retries: 10
+  delay: 1
+
 - name: Copy autosetup configuration file
   template:
     src: "{{ hetzner_autosetup_file }}"
