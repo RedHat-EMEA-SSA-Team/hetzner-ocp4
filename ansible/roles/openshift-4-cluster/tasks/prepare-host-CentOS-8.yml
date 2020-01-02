@@ -9,5 +9,8 @@
       # ansible virt need lxml
       - python3-lxml
       - python3-openshift
-      - python3-boto3
     state: present
+
+- name: Install boto via pip
+  pip:
+    name: boto
