@@ -35,7 +35,7 @@ When following below instructional steps, you will end with a setup similar to
 
 ## Initialize tools
 
-Install ansible and git
+Install ansible (min version 2.8) and git
 
 ```
 [root@server ~]# yum install -y ansible git
