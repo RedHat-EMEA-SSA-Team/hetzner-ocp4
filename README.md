@@ -32,6 +32,22 @@ When following below instructional steps, you will end with a setup similar to
 
 ![](images/architecture.png)
 
+## In case of Red Hat Enterprise Linux 8
+
+Subscrip your RHEL Host:
+```
+subscription-manager register
+
+subscription-manager attach --pool=...
+
+subscription-manager repos --disable=*
+
+subscription-manager repos --enable=rhel-8-for-x86_64-baseos-rpms \
+    --enable=rhel-8-for-x86_64-appstream-rpms \
+    --enable=rhel-8-for-x86_64-highavailability-rpms \
+    --enable=ansible-2.8-for-rhel-8-x86_64-rpms \
+    --enable=openstack-15-for-rhel-8-x86_64-rpms
+```
 
 ## Initialize tools
 
