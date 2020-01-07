@@ -12,6 +12,11 @@
       - python3-boto
     state: present
 
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
 - name: Allow NFS traffic from VM's to Host
   firewalld:
     zone: libvirt
