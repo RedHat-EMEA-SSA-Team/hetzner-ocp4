@@ -20,8 +20,20 @@
     autostart: yes
     name: "{{ cluster_name }}"
 
-# Build lb config:
+- name: Add network to internal network zone
+  firewalld:
+    source: "{{ vn_subnet }}/24"
+    zone: internal
+    state: enabled
+    permanent: yes
+  notify: 'reload firewalld'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
 
+- name: firewalld reload
+  command: firewall-cmd --reload
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
+
+# Build lb config:
 - set_fact: 
     tmp_api: "[ 'bootstrap={{ vn_subnet.split('.')[:3] | join('.')}}.2:6443' ]"
     tmp_api_listen: "[ '{{ vn_subnet.split('.')[:3] | join('.')}}.1:6443','{{ listen_address }}:6443' ]"

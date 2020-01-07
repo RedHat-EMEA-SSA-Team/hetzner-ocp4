@@ -33,3 +33,16 @@
   virt_net:
     command: undefine
     name: "{{ vn_name }}"
+
+- name: Remove network from internal network zone
+  firewalld:
+    source: "{{ vn_subnet }}/24"
+    zone: internal
+    state: absent
+    permanent: yes
+  notify: 'reload firewalld'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
+
+- name: firewalld reload
+  command: firewall-cmd --reload
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'

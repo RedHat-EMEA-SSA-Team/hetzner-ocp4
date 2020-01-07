@@ -32,6 +32,24 @@ When following below instructional steps, you will end with a setup similar to
 
 ![](images/architecture.png)
 
+## In case of Red Hat Enterprise Linux 7
+
+Subscrip your RHEL Host:
+```
+subscription-manager register
+
+subscription-manager attach --pool=...
+
+subscription-manager repos --disable=*
+
+subscription-manager repos \
+    --enable="rhel-7-server-rpms" \
+    --enable="rhel-7-server-extras-rpms" \
+    --enable="rhel-7-server-ansible-2.8-rpms" \
+    --enable="rhel-7-server-ose-4.2-rpms" \
+    --enable="rhel-7-server-openstack-14-rpms"
+```
+
 ## In case of Red Hat Enterprise Linux 8
 
 Subscrip your RHEL Host:
@@ -42,7 +60,8 @@ subscription-manager attach --pool=...
 
 subscription-manager repos --disable=*
 
-subscription-manager repos --enable=rhel-8-for-x86_64-baseos-rpms \
+subscription-manager repos \
+    --enable=rhel-8-for-x86_64-baseos-rpms \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
     --enable=ansible-2.8-for-rhel-8-x86_64-rpms \
