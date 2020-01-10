@@ -20,6 +20,11 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 
 **NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)   
 
+** Supported root server operating systems: **
+- CentOS 7
+- CentOS 8
+- RHEL 8 - How to install RHEL8: https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
+
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
 
@@ -27,10 +32,45 @@ When following below instructional steps, you will end with a setup similar to
 
 ![](images/architecture.png)
 
+## In case of Red Hat Enterprise Linux 7
+
+Subscrip your RHEL Host:
+```
+subscription-manager register
+
+subscription-manager attach --pool=...
+
+subscription-manager repos --disable=*
+
+subscription-manager repos \
+    --enable="rhel-7-server-rpms" \
+    --enable="rhel-7-server-extras-rpms" \
+    --enable="rhel-7-server-ansible-2.8-rpms" \
+    --enable="rhel-7-server-ose-4.2-rpms" \
+    --enable="rhel-7-server-openstack-14-rpms"
+```
+
+## In case of Red Hat Enterprise Linux 8
+
+Subscrip your RHEL Host:
+```
+subscription-manager register
+
+subscription-manager attach --pool=...
+
+subscription-manager repos --disable=*
+
+subscription-manager repos \
+    --enable=rhel-8-for-x86_64-baseos-rpms \
+    --enable=rhel-8-for-x86_64-appstream-rpms \
+    --enable=rhel-8-for-x86_64-highavailability-rpms \
+    --enable=ansible-2.8-for-rhel-8-x86_64-rpms \
+    --enable=openstack-15-for-rhel-8-x86_64-rpms
+```
 
 ## Initialize tools
 
-Install ansible and git
+Install ansible (min version 2.8) and git
 
 ```
 [root@server ~]# yum install -y ansible git

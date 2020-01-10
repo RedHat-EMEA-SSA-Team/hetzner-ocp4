@@ -49,7 +49,7 @@ Type=simple
 TimeoutStartSec=5m
 
 ExecStartPre=-/usr/bin/podman rm "mirror-registry"
-ExecStartPre=/usr/bin/podman pull docker.io/library/registry:2
+ExecStartPre=/usr/bin/podman pull quay.io/redhat-emea-ssa-team/registry:2
 ExecStart=/usr/bin/podman run --name mirror-registry --net host \
   -v /var/lib/libvirt/images/mirror-registry/data:/var/lib/registry:z \
   -v /var/lib/libvirt/images/mirror-registry/auth:/auth:z \
@@ -60,7 +60,7 @@ ExecStart=/usr/bin/podman run --name mirror-registry --net host \
   -v /var/lib/libvirt/images/mirror-registry/certs:/certs:z \
   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
   -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
-  docker.io/library/registry:2
+  quay.io/redhat-emea-ssa-team/registry:2
 
 ExecReload=-/usr/bin/podman stop "mirror-registry"
 ExecReload=-/usr/bin/podman rm "mirror-registry"

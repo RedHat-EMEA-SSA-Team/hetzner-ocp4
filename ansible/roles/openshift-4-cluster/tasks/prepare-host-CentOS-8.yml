@@ -1,0 +1,16 @@
+---
+- name: Installing KVM Packages
+  yum:
+    name:
+      - "@virtualization-hypervisor"
+      - "@virtualization-client"
+      - "@virtualization-platform"
+      - "@virtualization-tools"
+      # ansible virt need lxml
+      - python3-lxml
+      - python3-openshift
+    state: present
+
+- name: Install boto via pip
+  pip:
+    name: boto

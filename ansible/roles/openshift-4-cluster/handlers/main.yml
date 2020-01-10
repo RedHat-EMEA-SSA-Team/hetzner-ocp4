@@ -1,3 +1,6 @@
 ---
 - name: reload nfs
   command: 'exportfs -ra'
+
+- name: reload firewalld
+  command: 'firewall-cmd --reload'
