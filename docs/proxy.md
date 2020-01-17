@@ -2,14 +2,26 @@
 
 Some notes how you can setup a proxy OpenShift 4 cluster with hetzner-ocp4
 
+## Adjust cluster.yml
+
+```
+# Important: do not allow network traffic from vm network to public
+network_forward_mode: "route"
+
+# Start with openshift 4.2.13 because of some proxy issues.
+openshift_version: 4.2.13
+
+# And of course the proxy settings
+install_config_proxy:
+  httpProxy: http://192.168.50.1:8888/
+  httpsProxy: http://192.168.50.1:8888/
+  noProxy: host.compute.local,192.168.50.0/24
+```
+
 ## Create network 
 
 Create only the network, important to setup the proxy:
 
-```
-network_forward_mode: "route"
-```
-into `cluster.yml` and setup the network: 
 ```
 ./ansible/02-create-cluster.yml --tags network
 ```
@@ -57,15 +69,7 @@ systemctl start tinyproxy
 systemctl status tinyproxy
 ```
 
-## Add proxy to cluster.yml
-
-```yaml
-install_config_proxy:
-  httpProxy: http://192.168.50.1:8888 
-  httpsProxy: http://192.168.50.1:8888 
-  noProxy:  host.compute.local,192.168.50.0/24
+## Create the cluster
 ```
-
-## Use min OpenShift 4.2.13
-
-Add `openshift_version: 4.2.13` to you cluster.yml
+./ansible/02-create-cluster.yml
+```
