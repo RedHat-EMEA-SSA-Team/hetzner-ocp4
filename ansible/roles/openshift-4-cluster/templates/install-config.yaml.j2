@@ -31,3 +31,7 @@ additionalTrustBundle: |
 imageContentSources: 
   {{ install_config_imageContentSources  | to_nice_yaml(indent=2) | indent(width=2) }}
 {% endif %}
+{%- if install_config_proxy is defined %}
+proxy: 
+  {{ install_config_proxy  | to_nice_yaml(indent=2) | indent(width=2) }}
+{% endif %}
