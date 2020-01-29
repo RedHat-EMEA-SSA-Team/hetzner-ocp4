@@ -23,13 +23,13 @@
   when: storage_nfs == true
   tags: storage
   
-- name: Add emptyDir storage to registry
-  command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"storage\":{\"emptyDir\":{}}}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
+- name: Set image registry managementState from Removed to Managed
+  command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
   register: registry_status
   retries: 60
   delay: 30
   until: registry_status.rc == 0
-  when: storage_nfs == false 
+  when: storage_nfs == true
   tags: storage  
 
 - name: Waiting installation to complete
