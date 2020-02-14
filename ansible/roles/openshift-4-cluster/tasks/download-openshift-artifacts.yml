@@ -18,7 +18,17 @@
   - name: Unzip
     command: "gzip -d {{ coreos_image_location }}.gz"
   when: coreos_image.stat.mimetype == "application/x-gzip" 
+ 
+- name: CoreOS image checksum check
+  stat:
+    path: "{{ coreos_image_location }}"
+  register: checksum_coreos_image
 
+- name: Compare checksum
+  fail:
+    msg: Please check coreos image, something looks wrong!
+  when: checksum_coreos_image.stat.checksum != coreos_checksum 
+  
 - name: Create OpenShift artifacts directory
   file:
     path: "/opt/openshift-{{ item }}-{{ openshift_version }}"
