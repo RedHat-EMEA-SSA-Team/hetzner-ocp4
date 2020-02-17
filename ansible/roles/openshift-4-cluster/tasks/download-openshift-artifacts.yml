@@ -17,8 +17,8 @@
     command: "mv {{ coreos_image_location }} {{ coreos_image_location }}.gz"
   - name: Unzip
     command: "gzip -d {{ coreos_image_location }}.gz"
-  when: coreos_image.stat.mimetype == "application/x-gzip" 
- 
+  when: coreos_image.stat.mimetype == "application/x-gzip"
+
 - name: CoreOS image checksum check
   stat:
     path: "{{ coreos_image_location }}"
@@ -27,8 +27,8 @@
 - name: Compare checksum
   fail:
     msg: Please check coreos image, something looks wrong!
-  when: checksum_coreos_image.stat.checksum != coreos_checksum 
-  
+  when: checksum_coreos_image.stat.checksum != coreos_checksum
+
 - name: Create OpenShift artifacts directory
   file:
     path: "/opt/openshift-{{ item }}-{{ openshift_version }}"
@@ -36,8 +36,8 @@
     mode: u+rwx,g-rx,o-rx
   with_items:
   - install
-  - client 
-   
+  - client
+
 - name: Download Openshift installer
   unarchive:
     src: "{{ openshift_location }}/{{ openshift_version }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
@@ -52,6 +52,11 @@
     remote_src: yes
     creates: "/opt/openshift-client-{{ openshift_version }}/oc"
 
+- name: Download Helm client
+  get_url:
+    url: "{{ helm_cli_location}}"
+    dest: "/opt/openshift-client-{{ openshift_version }}/helm"
+
 - name: Create a symbolic link
   file:
     src: "{{ item.value }}"
@@ -62,4 +67,4 @@
     "/usr/local/bin/oc": "/opt/openshift-client-{{ openshift_version }}/oc"
     "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
     "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"
-  
+    "/usr/local/bin/helm": "/opt/openshift-client-{{ openshift_version }}/helm"

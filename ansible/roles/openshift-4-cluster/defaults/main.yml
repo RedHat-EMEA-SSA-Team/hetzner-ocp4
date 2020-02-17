@@ -41,7 +41,7 @@ coreos_download_url: "https://mirror.openshift.com/pub/openshift-v4/dependencies
 # How to get the checksum:
 #  ansible -m stat -a 'path=/var/lib/libvirt/images/rhcos-4.3.0.qcow2' localhost  | grep checksum
 coreos_checksum: "8cf621e0996881d759399c699d766f7a28ec000e"
-coreos_image_location: /var/lib/libvirt/images/rhcos-{{ coreos_version }}.qcow2 
+coreos_image_location: /var/lib/libvirt/images/rhcos-{{ coreos_version }}.qcow2
 
 
 certificates_dir: "{{ playbook_dir }}/../certificate"
@@ -52,9 +52,12 @@ certficate_key: "{{ certificates_dir }}/{{ cluster_name }}.{{ public_domain }}/c
 # Staging directory: "https://acme-staging-v02.api.letsencrypt.org/directory"
 letsencrypt_directory: "https://acme-v02.api.letsencrypt.org/directory"
 
+# helm
+helm_cli_locatioin: "https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64"
+
 # NFS Storage
 #  storage_nfs do not support multi cluster support, it overwrites the
-#  /etc/exports  
+#  /etc/exports
 storage_nfs: false
 storage_nfs_path_prefix: '/var/lib/libvirt/images'
 storage_nfs_target_namespace: openshift-nfs-provisioner
