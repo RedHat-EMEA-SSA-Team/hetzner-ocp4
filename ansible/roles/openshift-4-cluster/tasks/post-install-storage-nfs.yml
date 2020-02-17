@@ -218,12 +218,15 @@
     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
     definition:
       kind: Deployment
-      apiVersion: extensions/v1beta1
+      apiVersion: apps/v1
       metadata:
         name: nfs-client-provisioner
         namespace: "{{ storage_nfs_target_namespace }}"
       spec:
         replicas: 1
+        selector:
+          matchLabels:
+            app: nfs-client-provisioner
         strategy:
           type: Recreate
         template:
