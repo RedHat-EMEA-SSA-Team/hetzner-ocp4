@@ -1,0 +1,27 @@
+---
+- import_role:
+    name: letsencrypt
+  vars:
+    le_dns_provider: "{{ dns_provider }}"
+    le_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+    le_certificates_dir: "{{ certificates_dir }}"
+    # Only set if you really want a production letsencrypt certificate
+    # without le_acme_directory it use the staging env.
+    #   https://letsencrypt.org/docs/rate-limits/
+    le_acme_directory: "{{ letsencrypt_directory }}"
+
+    le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email)}}"
+
+    le_cloudflare_account_email: "{{ cloudflare_account_email }}"
+    le_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
+    le_cloudflare_zone: "{{ cloudflare_zone }}"
+
+    le_aws_access_key: "{{ aws_access_key }}"
+    le_aws_secret_key: "{{ aws_secret_key }}"
+    le_aws_zone: "{{ aws_zone }}"
+
+    le_gcp_project: "{{ gcp_project }}"
+    le_gcp_serviceaccount_file: "{{ gcp_serviceaccount_file }}"
+    le_gcp_managed_zone_name: "{{ gcp_managed_zone_name }}"
+    le_gcp_managed_zone_domain: "{{ gcp_managed_zone_domain }}"
+  tags: letsencrypt
