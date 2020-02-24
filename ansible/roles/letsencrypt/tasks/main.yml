@@ -99,7 +99,7 @@
     state: present
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
-  when: pd_provider == "gcp" and sample_com_challenge is changed
+  when: le_dns_provider == "gcp" and sample_com_challenge is changed
 
 - name: DNS record info
   debug:
@@ -171,8 +171,7 @@
     state: absent
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
-  when: pd_provider == "gcp" and sample_com_challenge is changed
-
+  when: le_dns_provider == "gcp" and sample_com_challenge is changed
 
 - name: concat root ca and intermediate
   shell: "cat {{ le_certificates_dir }}/isrgrootx1.pem {{ le_certificates_dir }}/{{ le_public_domain }}/intermediate.crt >> {{ le_certificates_dir }}/{{ le_public_domain }}/ca-bundle.pem"
