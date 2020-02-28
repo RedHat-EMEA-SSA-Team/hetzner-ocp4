@@ -4,6 +4,8 @@ This environment has been created for the sole purpose of providing an easy to d
 This install will create a 'Minimal Viable Setup', which anyone can extend to
 their needs and purpose.
 
+Recent tests shows that SSD storage on the Server might be required for any persistent deployment to work correctly.
+
 Use it at your own please and risk!
 
 # Contribution
