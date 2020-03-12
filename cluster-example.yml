@@ -6,6 +6,7 @@ letsencrypt_account_email: name@example.com
 # Depending on the dns provider:
 # CloudFlare
 cloudflare_account_email: john@example.com
+# Use the global api key! - (API-Token is not supported!) (Details in #86)
 cloudflare_account_api_token: 9348234sdsd894.....
 cloudflare_zone: example.com
 # Route53
