@@ -1,0 +1,14 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  vars_files:
+  - ../cluster.yml
+  tasks:
+  - import_role:
+      name: openshift-4-cluster
+      tasks_from: certificate-renewal.yml
+  - import_role:
+      name: openshift-4-cluster
+      tasks_from: certificate-install.yml
+
+
