@@ -60,6 +60,7 @@ ExecStart=/usr/bin/podman run --name mirror-registry --net host \
   -v /var/lib/libvirt/images/mirror-registry/certs:/certs:z \
   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
   -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+  -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
   quay.io/redhat-emea-ssa-team/registry:2
 
 ExecReload=-/usr/bin/podman stop "mirror-registry"
@@ -104,7 +105,7 @@ jq -s '{"auths": ( .[0].auths + .[1].auths ) }' mirror-registry-pullsecret.json 
 
 Mirror images:
 ```
-export OCP_RELEASE=4.2.0
+export OCP_RELEASE=4.3.5-x86_64
 export LOCAL_REGISTRY='host.compute.local:5000' 
 export LOCAL_REPOSITORY='ocp4/openshift4' 
 export PRODUCT_REPO='openshift-release-dev' 
@@ -155,6 +156,14 @@ spec:
 Extract openshift-install command
 ```
 oc adm release extract -a pullsecret.json --command=openshift-install "${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}"
+```
+
+Check openshift-install version:
+```
+# ./openshift-install version
+./openshift-install v4.3.5
+built from commit 82f9a63c06956b3700a69475fbd14521e139aa1e
+release image host.compute.local:5000/ocp4/openshift4@sha256:64320fbf95d968fc6b9863581a92d373bc75f563a13ae1c727af37450579f61a
 ```
 
 ## Update cluster.yml
@@ -211,6 +220,305 @@ image_pull_secret: |
 
 ## Sync Operatorhub
 
-It's difficult with OpenShift 4.2, [official documentation](https://docs.openshift.com/container-platform/4.2/operators/olm-restricted-networks.html)
+Not all operators support disconnected environments: [Red Hat Operators Supported in Disconnected Mode](https://access.redhat.com/articles/4740011)
+
+How to sync operators with OpenShift 4.3: [official documentation](https://docs.openshift.com/container-platform/4.3/operators/olm-restricted-networks.html)
 
 
+## Sync image for `oc debug node/`
+
+```
+oc image mirror -a ${LOCAL_SECRET_JSON} \
+  registry.redhat.io/rhel7/support-tools:latest \
+  ${LOCAL_REGISTRY}/rhel7/support-tools:latest
+
+oc debug node/compute-0 --image=${LOCAL_REGISTRY}/rhel7/support-tools:latest
+```
+
+
+## If `storage_nfs: true`
+
+1) Copy nfs-client-provisioner image
+    ```bash
+    oc image mirror -a ${LOCAL_SECRET_JSON} \
+      quay.io/external_storage/nfs-client-provisioner:latest \
+      ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:nfs-client-provisioner-latest
+    ```
+
+    or with skopoe:
+    ```
+    skopeo copy \
+      --authfile=${LOCAL_SECRET_JSON} \
+      docker://quay.io/external_storage/nfs-client-provisioner:latest \
+      docker://${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:nfs-client-provisioner-latest
+    ```
+
+2) Patch nfs provisioner deployment
+    ```bash
+      oc patch -n openshift-nfs-provisioner deployment.apps/nfs-client-provisioner \
+        --patch "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"nfs-client-provisioner\",\"image\":\"${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:nfs-client-provisioner-latest\"}]}}}}"
+    ```
+
+
+## Sample operator
+
+Documentation: [Using Samples Operator imagestreams with alternate or mirrored registries](https://docs.openshift.com/container-platform/4.3/openshift_images/samples-operator-alt-registry.html#installation-restricted-network-samples_samples-operator-alt-registry)
+
+Warning: Sync all examples takes a while!
+
+**Remember: A lot of examples need a git repo to, don't forget to sync those!**
+To get an repo overview: `oc get is -n openshift -o json | jq -r '.items[].spec.tags[].annotations.sampleRepo' | sort -u`
+
+```
+# Get a list
+# oc get is -n openshift -o json | jq -r '.items[].spec.tags[].from.name' | grep registry.redhat.io
+
+export IMAGES="registry.redhat.io/3scale-amp21/apicast-gateway:1.4-2
+registry.redhat.io/3scale-amp22/apicast-gateway:1.8
+registry.redhat.io/3scale-amp23/apicast-gateway
+registry.redhat.io/3scale-amp24/apicast-gateway
+registry.redhat.io/3scale-amp25/apicast-gateway
+registry.redhat.io/3scale-amp26/apicast-gateway
+registry.redhat.io/fuse7/fuse-apicurito:1.2
+registry.redhat.io/fuse7/fuse-apicurito:1.3
+registry.redhat.io/fuse7/fuse-apicurito:1.4
+registry.redhat.io/dotnet/dotnet-21-rhel7:2.1
+registry.redhat.io/dotnet/dotnet-22-rhel7:2.2
+registry.redhat.io/dotnet/dotnet-30-rhel7:3.0
+registry.redhat.io/dotnet/dotnet-21-runtime-rhel7:2.1
+registry.redhat.io/dotnet/dotnet-22-runtime-rhel7:2.2
+registry.redhat.io/dotnet/dotnet-30-runtime-rhel7:3.0
+registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift:12.0
+registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift:13.0
+registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift:14.0
+registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift:15.0
+registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift:16.0
+registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift-rhel8:17.0
+registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift-rhel8:latest
+registry.redhat.io/jboss-fuse-6/fis-java-openshift:1.0
+registry.redhat.io/jboss-fuse-6/fis-java-openshift:2.0
+registry.redhat.io/jboss-fuse-6/fis-karaf-openshift:1.0
+registry.redhat.io/jboss-fuse-6/fis-karaf-openshift:2.0
+registry.redhat.io/fuse7/fuse-apicurito-generator:1.2
+registry.redhat.io/fuse7/fuse-apicurito-generator:1.3
+registry.redhat.io/fuse7/fuse-apicurito-generator:1.4
+registry.redhat.io/fuse7/fuse-console:1.0
+registry.redhat.io/fuse7/fuse-console:1.1
+registry.redhat.io/fuse7/fuse-console:1.2
+registry.redhat.io/fuse7/fuse-console:1.3
+registry.redhat.io/fuse7/fuse-console:1.4
+registry.redhat.io/fuse7/fuse-eap-openshift:1.0
+registry.redhat.io/fuse7/fuse-eap-openshift:1.1
+registry.redhat.io/fuse7/fuse-eap-openshift:1.2
+registry.redhat.io/fuse7/fuse-eap-openshift:1.3
+registry.redhat.io/fuse7/fuse-eap-openshift:1.4
+registry.redhat.io/fuse7/fuse-java-openshift:1.0
+registry.redhat.io/fuse7/fuse-java-openshift:1.1
+registry.redhat.io/fuse7/fuse-java-openshift:1.2
+registry.redhat.io/fuse7/fuse-java-openshift:1.3
+registry.redhat.io/fuse7/fuse-java-openshift:1.4
+registry.redhat.io/fuse7/fuse-karaf-openshift:1.0
+registry.redhat.io/fuse7/fuse-karaf-openshift:1.1
+registry.redhat.io/fuse7/fuse-karaf-openshift:1.2
+registry.redhat.io/fuse7/fuse-karaf-openshift:1.3
+registry.redhat.io/fuse7/fuse-karaf-openshift:1.4
+registry.redhat.io/devtools/go-toolset-rhel7:1.11.5
+registry.redhat.io/rhscl/httpd-24-rhel7
+registry.redhat.io/openjdk/openjdk-11-rhel7:latest
+registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:latest
+registry.redhat.io/jboss-amq-6/amq62-openshift:1.1
+registry.redhat.io/jboss-amq-6/amq62-openshift:1.2
+registry.redhat.io/jboss-amq-6/amq62-openshift:1.3
+registry.redhat.io/jboss-amq-6/amq62-openshift:1.4
+registry.redhat.io/jboss-amq-6/amq62-openshift:1.5
+registry.redhat.io/jboss-amq-6/amq62-openshift:1.6
+registry.redhat.io/jboss-amq-6/amq62-openshift:1.7
+registry.redhat.io/jboss-amq-6/amq63-openshift:1.0
+registry.redhat.io/jboss-amq-6/amq63-openshift:1.1
+registry.redhat.io/jboss-amq-6/amq63-openshift:1.2
+registry.redhat.io/jboss-amq-6/amq63-openshift:1.3
+registry.redhat.io/jboss-amq-6/amq63-openshift:1.4
+registry.redhat.io/jboss-datagrid-6/datagrid65-client-openshift:1.0
+registry.redhat.io/jboss-datagrid-6/datagrid65-client-openshift:1.1
+registry.redhat.io/jboss-datagrid-6/datagrid65-openshift:1.2
+registry.redhat.io/jboss-datagrid-6/datagrid65-openshift:1.3
+registry.redhat.io/jboss-datagrid-6/datagrid65-openshift:1.4
+registry.redhat.io/jboss-datagrid-6/datagrid65-openshift:1.5
+registry.redhat.io/jboss-datagrid-6/datagrid65-openshift:1.6
+registry.redhat.io/jboss-datagrid-7/datagrid71-client-openshift:1.0
+registry.redhat.io/jboss-datagrid-7/datagrid71-openshift:1.0
+registry.redhat.io/jboss-datagrid-7/datagrid71-openshift:1.1
+registry.redhat.io/jboss-datagrid-7/datagrid71-openshift:1.2
+registry.redhat.io/jboss-datagrid-7/datagrid71-openshift:1.3
+registry.redhat.io/jboss-datagrid-7/datagrid72-openshift:1.0
+registry.redhat.io/jboss-datagrid-7/datagrid72-openshift:1.1
+registry.redhat.io/jboss-datagrid-7/datagrid72-openshift:1.2
+registry.redhat.io/jboss-datagrid-7/datagrid73-openshift:1.0
+registry.redhat.io/jboss-datagrid-7/datagrid73-openshift:1.1
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.0
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.1
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.2
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.3
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.4
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.5
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.6
+registry.redhat.io/jboss-datavirt-6/datavirt64-driver-openshift:1.7
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.0
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.1
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.2
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.3
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.4
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.5
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.6
+registry.redhat.io/jboss-datavirt-6/datavirt64-openshift:1.7
+registry.redhat.io/jboss-decisionserver-6/decisionserver64-openshift:1.0
+registry.redhat.io/jboss-decisionserver-6/decisionserver64-openshift:1.1
+registry.redhat.io/jboss-decisionserver-6/decisionserver64-openshift:1.2
+registry.redhat.io/jboss-decisionserver-6/decisionserver64-openshift:1.3
+registry.redhat.io/jboss-decisionserver-6/decisionserver64-openshift:1.4
+registry.redhat.io/jboss-decisionserver-6/decisionserver64-openshift:1.5
+registry.redhat.io/jboss-decisionserver-6/decisionserver64-openshift:1.6
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.1
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.2
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.3
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.4
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.5
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.6
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.7
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.8
+registry.redhat.io/jboss-eap-6/eap64-openshift:1.9
+registry.redhat.io/jboss-eap-6/eap64-openshift:latest
+registry.redhat.io/jboss-eap-7/eap70-openshift:1.3
+registry.redhat.io/jboss-eap-7/eap70-openshift:1.4
+registry.redhat.io/jboss-eap-7/eap70-openshift:1.5
+registry.redhat.io/jboss-eap-7/eap70-openshift:1.6
+registry.redhat.io/jboss-eap-7/eap70-openshift:1.7
+registry.redhat.io/jboss-eap-7/eap71-openshift:1.1
+registry.redhat.io/jboss-eap-7/eap71-openshift:1.2
+registry.redhat.io/jboss-eap-7/eap71-openshift:1.3
+registry.redhat.io/jboss-eap-7/eap71-openshift:1.4
+registry.redhat.io/jboss-eap-7/eap71-openshift:latest
+registry.redhat.io/jboss-eap-7/eap72-openshift:1.0
+registry.redhat.io/jboss-eap-7/eap72-openshift:1.1
+registry.redhat.io/jboss-eap-7/eap72-openshift:latest
+registry.redhat.io/fuse7/fuse-console:1.0
+registry.redhat.io/fuse7/fuse-eap-openshift:1.0
+registry.redhat.io/fuse7/fuse-java-openshift:1.0
+registry.redhat.io/fuse7/fuse-karaf-openshift:1.0
+registry.redhat.io/jboss-processserver-6/processserver64-openshift:1.0
+registry.redhat.io/jboss-processserver-6/processserver64-openshift:1.1
+registry.redhat.io/jboss-processserver-6/processserver64-openshift:1.2
+registry.redhat.io/jboss-processserver-6/processserver64-openshift:1.3
+registry.redhat.io/jboss-processserver-6/processserver64-openshift:1.4
+registry.redhat.io/jboss-processserver-6/processserver64-openshift:1.5
+registry.redhat.io/jboss-processserver-6/processserver64-openshift:1.6
+registry.redhat.io/jboss-webserver-3/webserver30-tomcat7-openshift:1.1
+registry.redhat.io/jboss-webserver-3/webserver30-tomcat7-openshift:1.2
+registry.redhat.io/jboss-webserver-3/webserver30-tomcat7-openshift:1.3
+registry.redhat.io/jboss-webserver-3/webserver30-tomcat8-openshift:1.1
+registry.redhat.io/jboss-webserver-3/webserver30-tomcat8-openshift:1.2
+registry.redhat.io/jboss-webserver-3/webserver30-tomcat8-openshift:1.3
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat7-openshift:1.0
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat7-openshift:1.1
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat7-openshift:1.2
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat7-openshift:1.3
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat7-openshift:1.4
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat8-openshift:1.0
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat8-openshift:1.1
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat8-openshift:1.2
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat8-openshift:1.3
+registry.redhat.io/jboss-webserver-3/webserver31-tomcat8-openshift:1.4
+registry.redhat.io/jboss-webserver-5/webserver50-tomcat9-openshift:1.0
+registry.redhat.io/jboss-webserver-5/webserver50-tomcat9-openshift:1.1
+registry.redhat.io/jboss-webserver-5/webserver50-tomcat9-openshift:1.2
+registry.redhat.io/jboss-webserver-5/webserver50-tomcat9-openshift:latest
+registry.redhat.io/rhscl/mariadb-102-rhel7:latest
+registry.redhat.io/rhoar-nodejs-tech-preview/rhoar-nodejs-10-webapp
+registry.redhat.io/rhscl/mongodb-32-rhel7:latest
+registry.redhat.io/rhscl/mongodb-34-rhel7:latest
+registry.redhat.io/rhscl/mongodb-36-rhel7:latest
+registry.redhat.io/rhscl/mysql-57-rhel7:latest
+registry.redhat.io/rhscl/mysql-80-rhel7:latest
+registry.redhat.io/rhscl/nginx-110-rhel7:latest
+registry.redhat.io/rhscl/nginx-112-rhel7:latest
+registry.redhat.io/rhoar-nodejs/nodejs-10
+registry.redhat.io/rhscl/nodejs-10-rhel7
+registry.redhat.io/rhscl/nodejs-8-rhel7:latest
+registry.redhat.io/rhoar-nodejs/nodejs-8
+registry.redhat.io/openjdk/openjdk-11-rhel7:1.0
+registry.redhat.io/rhscl/perl-524-rhel7:latest
+registry.redhat.io/rhscl/perl-526-rhel7:latest
+registry.redhat.io/rhscl/php-70-rhel7:latest
+registry.redhat.io/rhscl/php-71-rhel7:latest
+registry.redhat.io/rhscl/php-72-rhel7:latest
+registry.redhat.io/rhscl/postgresql-10-rhel7:latest
+registry.redhat.io/rhscl/postgresql-96-rhel7:latest
+registry.redhat.io/rhscl/python-27-rhel7:latest
+registry.redhat.io/rhscl/python-35-rhel7:latest
+registry.redhat.io/rhscl/python-36-rhel7:latest
+registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:1.0
+registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:1.1
+registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:1.2
+registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:1.3
+registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:1.4
+registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:1.5
+registry.redhat.io/redhat-sso-7/sso70-openshift:1.3
+registry.redhat.io/redhat-sso-7/sso70-openshift:1.4
+registry.redhat.io/redhat-sso-7/sso71-openshift:1.0
+registry.redhat.io/redhat-sso-7/sso71-openshift:1.1
+registry.redhat.io/redhat-sso-7/sso71-openshift:1.2
+registry.redhat.io/redhat-sso-7/sso71-openshift:1.3
+registry.redhat.io/redhat-sso-7/sso72-openshift:1.0
+registry.redhat.io/redhat-sso-7/sso72-openshift:1.1
+registry.redhat.io/redhat-sso-7/sso72-openshift:1.2
+registry.redhat.io/redhat-sso-7/sso72-openshift:1.3
+registry.redhat.io/redhat-sso-7/sso72-openshift:1.4
+registry.redhat.io/redhat-sso-7/sso73-openshift:1.0
+registry.redhat.io/redhat-sso-7/sso73-openshift:1.0
+registry.redhat.io/rhscl/redis-32-rhel7:latest
+registry.redhat.io/rhdm-7/rhdm74-decisioncentral-openshift:1.0
+registry.redhat.io/rhdm-7/rhdm74-decisioncentral-openshift:1.1
+registry.redhat.io/rhdm-7/rhdm74-kieserver-openshift:1.0
+registry.redhat.io/rhdm-7/rhdm74-kieserver-openshift:1.1
+registry.redhat.io/rhdm-7-tech-preview/rhdm74-optaweb-employee-rostering-openshift:1.0
+registry.redhat.io/rhdm-7-tech-preview/rhdm74-optaweb-employee-rostering-openshift:1.1
+registry.redhat.io/rhpam-7/rhpam74-businesscentral-monitoring-openshift:1.0
+registry.redhat.io/rhpam-7/rhpam74-businesscentral-monitoring-openshift:1.1
+registry.redhat.io/rhpam-7/rhpam74-businesscentral-openshift:1.0
+registry.redhat.io/rhpam-7/rhpam74-businesscentral-openshift:1.1
+registry.redhat.io/rhpam-7/rhpam74-kieserver-openshift:1.0
+registry.redhat.io/rhpam-7/rhpam74-kieserver-openshift:1.1
+registry.redhat.io/rhpam-7/rhpam74-smartrouter-openshift:1.0
+registry.redhat.io/rhpam-7/rhpam74-smartrouter-openshift:1.1
+registry.redhat.io/rhscl/ruby-23-rhel7:latest
+registry.redhat.io/rhscl/ruby-24-rhel7:latest
+registry.redhat.io/rhscl/ruby-25-rhel7:latest"
+
+
+for i in $IMAGES ; do 
+  oc image mirror -a ${LOCAL_SECRET_JSON} \
+  $i \
+  ${LOCAL_REGISTRY}/${i//registry.redhat.io\/}
+done; 
+
+oc create configmap registry-config --from-file=${LOCAL_REGISTRY/:/..}=/var/lib/libvirt/images/mirror-registry/certs/domain.crt -n openshift-config
+
+oc patch image.config.openshift.io/cluster --patch '{"spec":{"additionalTrustedCA":{"name":"registry-config"}}}' --type=merge
+
+oc patch configs.samples.operator.openshift.io/cluster \
+  -n openshift-cluster-samples-operator \
+  --patch "{\"spec\":{\"samplesRegistry\":\"${LOCAL_REGISTRY}\"}}" \
+  --type=merge
+
+```
+
+### How to skip imagestreams 
+
+```
+oc patch configs.samples.operator.openshift.io/cluster \
+  -n openshift-cluster-samples-operator \
+  --patch '{"spec":{"skippedImagestreams":["jenkins-agent-maven","jboss-datagrid72-openshift","jenkins-agent-nodejs","jenkins","nodejs"]}}'  \
+  --type=merge
+```
+
+Maybe checkout the missing imagestreams bevor: `oc describe configs.samples.operator.openshift.io/cluster`
