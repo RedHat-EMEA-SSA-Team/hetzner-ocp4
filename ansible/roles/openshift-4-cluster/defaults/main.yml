@@ -56,7 +56,7 @@ certficate_key: "{{ certificates_dir }}/{{ cluster_name }}.{{ public_domain }}/c
 letsencrypt_directory: "https://acme-v02.api.letsencrypt.org/directory"
 
 # helm
-helm_cli_locatioin: "https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64"
+helm_cli_location: "https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64"
 
 # NFS Storage
 #  storage_nfs do not support multi cluster support, it overwrites the
