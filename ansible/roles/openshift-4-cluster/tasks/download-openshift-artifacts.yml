@@ -40,14 +40,14 @@
 
 - name: Download Openshift installer
   unarchive:
-    src: "{{ openshift_location }}/{{ openshift_version }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
+    src: "{{ openshift_location }}/openshift-install-linux.tar.gz"
     dest: "/opt/openshift-install-{{ openshift_version }}/"
     remote_src: yes
     creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
 
 - name: Download Openshift client
   unarchive:
-    src: "{{ openshift_location }}/{{ openshift_version }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
+    src: "{{ openshift_location }}/openshift-client-linux.tar.gz"
     dest: "/opt/openshift-client-{{ openshift_version }}/"
     remote_src: yes
     creates: "/opt/openshift-client-{{ openshift_version }}/oc"
