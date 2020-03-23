@@ -1,5 +1,4 @@
 ---
-
 le_certificates_dir: "{{ playbook_dir }}/../certificate"
 # Default staging directory
 # Production directory: https://acme-v02.api.letsencrypt.org/directory
