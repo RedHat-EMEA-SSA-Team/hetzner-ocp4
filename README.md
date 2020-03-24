@@ -102,6 +102,8 @@ Here is an example about [_cluster.yml_](cluster-example.yml) file that contains
 |letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
 |image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
+## Pre-releases
+
 [Read this if you want to deploy pre releases](docs/ocp-pre-release.md)
 
 ### Setup public DNS records
