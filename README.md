@@ -8,6 +8,10 @@ Recent tests shows that SSD storage on the Server might be required for any pers
 
 Use it at your own please and risk!
 
+# Release notes
+
+[Release notes](docs/release-notes.md)
+
 # Contribution
 If you want to provide additional features, please feel free to contribute via pull requests or any other means.
 
