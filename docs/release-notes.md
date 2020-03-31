@@ -2,6 +2,10 @@
 
 ## xx
 
+### Added letsencrypt_disabled switch
+
+This allows you to disable letsencrypt setup. (Default is enabled letsencrypt.)
+
 ### Update air-gapped docs 
 
 Add `REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true` to air-gapped registry. That solve some skopeo copy problemes.
