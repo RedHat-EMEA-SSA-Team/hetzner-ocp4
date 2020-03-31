@@ -22,7 +22,7 @@
   import_tasks: post-install-storage-nfs.yml
   when: storage_nfs == true
   tags: storage
-  
+
 - name: Set image registry managementState from Removed to Managed
   command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}' --config {{ openshift_install_dir }}/auth/kubeconfig"
   register: registry_status
@@ -30,7 +30,7 @@
   delay: 30
   until: registry_status.rc == 0
   when: storage_nfs == true
-  tags: storage  
+  tags: storage
 
 - name: Waiting installation to complete
   command: "/opt/openshift-install-{{ openshift_version }}/openshift-install wait-for install-complete --dir {{ openshift_install_dir }}"
@@ -43,6 +43,7 @@
 # Install letsencrypt certificates
 ###########################################################################################
 - include: certificate-install.yml
+  when: letsencrypt_disabled == false
 
 ###########################################################################################
 # Configure authentication
