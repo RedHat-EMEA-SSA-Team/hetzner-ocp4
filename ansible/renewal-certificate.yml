@@ -4,11 +4,14 @@
   vars_files:
   - ../cluster.yml
   tasks:
+
   - import_role:
       name: openshift-4-cluster
       tasks_from: certificate-renewal.yml
+    when: letsencrypt_disabled == false
   - import_role:
       name: openshift-4-cluster
       tasks_from: certificate-install.yml
+    when: letsencrypt_disabled == false
 
 
