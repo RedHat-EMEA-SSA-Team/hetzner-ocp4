@@ -32,6 +32,7 @@
     le_gcp_managed_zone_name: "{{ gcp_managed_zone_name }}"
     le_gcp_managed_zone_domain: "{{ gcp_managed_zone_domain }}"
   tags: letsencrypt
+  when: letsencrypt_disabled == false
 
 - name: Download OpenShift Artifacts
   include: download-openshift-artifacts.yml

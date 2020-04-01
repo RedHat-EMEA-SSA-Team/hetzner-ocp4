@@ -1,6 +1,10 @@
 # RELEASE NOTES
 
-24.3.2020
+## 2020-04-01
+
+### Update air-gapped docs 
+
+Add `REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true` to air-gapped registry. That solve some skopeo copy problemes.
 
 ### Support for disabling automatic Let's Encrypt certificates for apps and api
 

@@ -57,6 +57,7 @@ ExecStart=/usr/bin/podman run --name mirror-registry --net host \
   -e "REGISTRY_HTTP_ADDR=192.168.50.1:5000" \
   -e "REGISTRY_AUTH_HTPASSWD_REALM=registry-realm" \
   -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
+  -e "REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=TRUE" \
   -v /var/lib/libvirt/images/mirror-registry/certs:/certs:z \
   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
   -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \

@@ -137,6 +137,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |`openshift_install_command`|[check defaults](ansible/roles/openshift-4-cluster/defaults/main.yml)|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)|
 |`install_config_additionalTrustBundle`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
 |`install_config_imageContentSources`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
+|`letsencrypt_disabled`|`false`|This allows you to disable letsencrypt setup. (Default is enabled letsencrypt.)
 
 ## Prepare kvm-host and install OpenShift
 
@@ -149,7 +150,9 @@ Please configure in `cluster.yml` all necessary credentials:
 
 * [How to install and manage more than one OpenShift Cluster with  hetzner-ocp4](docs/multi-cluster-guide.md)
 * [How to install an air-gapped cluster with hetzner-ocp4](docs/air-gapped.md)
+* [How to install an proxy cluster with hetzner-ocp4](docs/proxy.md)
 * [How to setup a container native virtualization lab (nested) with hetzner-ocp4](docs/cnv.md)
+* [How to install an OpenShift nighly or RC (any kind of pre-release)](docs/ocp-pre-release.md)
 
 # Useful commands
 
