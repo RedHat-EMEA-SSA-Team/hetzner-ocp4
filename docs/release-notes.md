@@ -1,16 +1,10 @@
 # RELEASE NOTES
 
-## xx
-
-### Added letsencrypt_disabled switch
-
-This allows you to disable letsencrypt setup. (Default is enabled letsencrypt.)
+## 2020-04-01
 
 ### Update air-gapped docs 
 
 Add `REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true` to air-gapped registry. That solve some skopeo copy problemes.
-
-## 24.3.2020
 
 ### Support for disabling automatic Let's Encrypt certificates for apps and api
 
