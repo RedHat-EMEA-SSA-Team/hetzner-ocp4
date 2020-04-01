@@ -137,7 +137,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |`openshift_install_command`|[check defaults](ansible/roles/openshift-4-cluster/defaults/main.yml)|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)|
 |`install_config_additionalTrustBundle`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
 |`install_config_imageContentSources`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
-|`letsencrypt_disable`|`false`|This allows you to disable letsencrypt setup. (Default is enabled letsencrypt.)
+|`letsencrypt_disabled`|`false`|This allows you to disable letsencrypt setup. (Default is enabled letsencrypt.)
 
 ## Prepare kvm-host and install OpenShift
 

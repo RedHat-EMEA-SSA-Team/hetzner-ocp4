@@ -57,7 +57,7 @@ certficate_key: "{{ certificates_dir }}/{{ cluster_name }}.{{ public_domain }}/c
 # Staging directory: "https://acme-staging-v02.api.letsencrypt.org/directory"
 letsencrypt_directory: "https://acme-v02.api.letsencrypt.org/directory"
 # By default letsencrypt is enabled.
-letsencrypt_disable: false
+letsencrypt_disabled: false
 # helm
 helm_cli_location: "https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64"
 
