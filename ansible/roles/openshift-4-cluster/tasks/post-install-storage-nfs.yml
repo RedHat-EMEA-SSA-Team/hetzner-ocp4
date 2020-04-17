@@ -176,7 +176,8 @@
         kind: ClusterRole
         name: nfs-client-provisioner-runner
         apiGroup: rbac.authorization.k8s.io
-- name: Create Role leader-locking-nfs-client-provisioner
+
+- name: Create Role nfs-client-provisioner
   k8s:
     state: present
     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
@@ -184,14 +185,18 @@
       kind: Role
       apiVersion: rbac.authorization.k8s.io/v1
       metadata:
-        name: leader-locking-nfs-client-provisioner
+        name: nfs-client-provisioner
         namespace: "{{ storage_nfs_target_namespace }}"
       rules:
         - apiGroups: [""]
           resources: ["endpoints"]
           verbs: ["get", "list", "watch", "create", "update", "patch"]
+        - apiGroups: ["security.openshift.io"]
+          resourceNames: ["hostmount-anyuid"]
+          resources: ["securitycontextconstraints"]
+          verbs: ["use"]
 
-- name: Create RoleBinding leader-locking-nfs-client-provisioner <-> nfs-client-provisioner
+- name: Create RoleBinding nfs-client-provisioner <-> nfs-client-provisioner
   k8s:
     state: present
     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
@@ -199,18 +204,15 @@
       kind: RoleBinding
       apiVersion: rbac.authorization.k8s.io/v1
       metadata:
-        name: leader-locking-nfs-client-provisioner
+        name: nfs-client-provisioner
         namespace: "{{ storage_nfs_target_namespace }}"
       subjects:
         - kind: ServiceAccount
           name: nfs-client-provisioner
       roleRef:
         kind: Role
-        name: leader-locking-nfs-client-provisioner
+        name: nfs-client-provisioner
         apiGroup: rbac.authorization.k8s.io
-
-- name: Add SCC hostmount-anyuid to nfs-client-provisioner
-  command: "oc adm policy add-scc-to-user hostmount-anyuid -n {{ storage_nfs_target_namespace }} -z nfs-client-provisioner --config {{ openshift_install_dir }}/auth/kubeconfig"
 
 - name: Deploy nfs-provisioner
   k8s:
