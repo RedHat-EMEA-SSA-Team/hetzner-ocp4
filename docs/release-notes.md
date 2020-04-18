@@ -1,5 +1,46 @@
 # RELEASE NOTES
 
+## 2020-04-18
+
+### Use RBAC instead of changing SCC member for NFS provisioner
+
+Instead of 
+```
+oc adm policy add-scc-to-user hostmount-anyuid \
+    -n openshift-nfs-provisioner \
+    -z nfs-client-provisioner
+```
+create a role  and a binding:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: scc-hostmount-anyuid
+  namespace: "openshift-nfs-provisioner"
+rules:
+- apiGroups:
+  - security.openshift.io 
+  resourceNames:
+  - hostmount-anyuid
+  resources:
+  - securitycontextconstraints 
+  verbs: 
+  - use
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: sa-to-scc-hostmount-anyuid
+  namespace: "openshift-nfs-provisioner"
+subjects:
+  - kind: ServiceAccount
+    name: nfs-client-provisioner
+roleRef:
+  kind: Role
+  name: scc-hostmount-anyuid
+  apiGroup: rbac.authorization.k8s.io
+```
+
 ## 2020-04-01
 
 ### Update air-gapped docs 
