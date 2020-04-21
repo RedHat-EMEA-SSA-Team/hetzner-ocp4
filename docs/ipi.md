@@ -1,4 +1,4 @@
-Hetzner OCP IPI - Libvirt provider HOWTO
+# Hetzner OCP IPI - Libvirt provider
 
 # Disclaimer
 This environment has been created for the sole purpose of providing an easy to deploy and consume a Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
@@ -150,7 +150,7 @@ systemctl reload NetworkManager
 
 There isn't a load balancer on libvirt. 
 
-## Deploying a local loadbalancer using podman
+### Deploying a local loadbalancer using podman
 
 PS: It will not update automatically in case of adding more nodes either using manual or machine sets methods.
 
