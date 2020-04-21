@@ -49,7 +49,7 @@ It's expected that you will create and destroy clusters often in the course of d
 
 ## Before you begin, install the build dependencies.
 ```
-yum install gcc-c++ libvirt-devel
+yum install gcc-c++ libvirt-devel tar git -y
 wget https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
@@ -62,10 +62,29 @@ First, enable and start firewalld, We dont want to expose libvirt to the interne
 ```
 systemctl enable --now firewalld
 ```
+
+### Enabling Advanced Virtualization Repository 
+```
+dnf module disable virt -y
+```
+#### In case of Centos 8
+```
+cat > /etc/yum.repos.d/CentOS-Virt.repo << EOF
+[Advanced_Virt]
+name=CentOS-$releasever - Advanced Virt 
+baseurl=http://mirror.centos.org/centos/\$releasever/virt/x86_64/advanced-virtualization/
+gpgcheck=0
+enabled=1
+EOF
+```
+#### In case of RHEL8
+```
+subscription-manager repos --enable advanced-virt-for-rhel-8-x86_64-rpms
+```
+### Installing Virtualization Packages
 ```
 yum groupinstall "Virtualization Host" -y
-yum install virt-install libguestfs-tools @container-tools -y
-yum install gcc-c++ libvirt-devel
+yum install virt-install libguestfs-tools swtpm swtpm-tools @container-tools -y
 systemctl enable libvirtd-tcp.socket
 ```
 
@@ -84,7 +103,7 @@ then forwarding is disabled and proceed with the rest of this section. If IP for
 
 To enable IP forwarding :
 ```
-firewall-cmd --zone=libvirt --add-masquerade --permanent
+firewall-cmd --add-masquerade --permanent
 firewall-cmd --reload
 ```
 
@@ -159,8 +178,8 @@ PS: It will not update automatically in case of adding more nodes either using m
 - 3x Workers
 
 ```
-firewall-cmd --zone=libvirt --add-service=http --permanent
-firewall-cmd --zone=libvirt --add-service=https --permanent
+firewall-cmd --add-service=http --permanent
+firewall-cmd --add-service=https --permanent
 firewall-cmd --reload
 
 /usr/bin/podman run -d --name loadbalancer --net host \
@@ -201,6 +220,7 @@ git checkout release-4.4
 ```
 sed -i 's/local_only = true/local_only = false/' /root/go/src/github.com/openshift/installer/data/data/libvirt/main.tf
 TAGS=libvirt hack/build.sh
+mkdir /root/bin
 cp -rf /root/go/src/github.com/openshift/installer/bin/openshift-install /root/bin/
 ```
 
@@ -221,7 +241,7 @@ openshift-install create install-config --dir=ocp
 Edit the install-config.yaml and increase the master and worker replicas from 1 to 3
 You can also change the underlay IP range by changing the machineNetwork cidr.
 
-### In case of using the OCP 4.4 installer
+### In case of using the OCP 4.3 installer
 ```
 export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=quay.io/openshift-release-dev/ocp-release:4.3.12-x86_64
 openshift-install create cluster --dir=ocp
