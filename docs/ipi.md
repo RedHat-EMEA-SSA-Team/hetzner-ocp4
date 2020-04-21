@@ -246,13 +246,17 @@ openshift-install destroy cluster
 
 That is the easy part, Add the following DNS records into your domain.
 
+```
 api.<clustername>.<domainname> IN A <hetzner_IP>
 *.apps.<clustername>.<domainname> IN A <hetzner_IP>
+```
 
 ### For example:
 
+```
 api.ocp.openshift.cool IN A 46.4.71.10
 *.apps.ocp.openshift.cool IN A 46.4.71.10
+```
 
 ```
 nslookup api.ocp.openshift.cool
