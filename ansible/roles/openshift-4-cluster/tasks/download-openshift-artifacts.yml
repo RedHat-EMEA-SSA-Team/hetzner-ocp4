@@ -4,7 +4,6 @@
   set_fact:
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
-    
 
 - name: Check download urls
   uri:
@@ -13,43 +12,60 @@
     status_code: 200
   with_items:
     - "{{ coreos_download_url }}"
+    - "{{ coreos_csum_url }}"
     - "{{ tmp_openshift_install_download_url }}"
     - "{{ tmp_openshift_client_download_url }}"
     - "{{ helm_cli_location }}"
 
-# Can not use get_url because: get_url do not support --compressed
-- name: Download CoreOS image
-  command:
-    "curl --compressed -J -L -o {{ coreos_image_location }} {{ coreos_download_url }}"
-  args:
-    creates: "{{ coreos_image_location }}"
-    warn: false
-
-- name: Check coreos image filetype
+- name: check if coreos image already downloaded and get checksum
   stat:
-    path: "{{ coreos_image_location }}"
-  register: coreos_image
+    checksum_algorithm: sha256
+    path: "{{ coreos_path }}/{{ coreos_file }}"
+  register: coreos_old_image
 
-- block:
-  - name: Rename image -> image.gzip
-    command: "mv {{ coreos_image_location }} {{ coreos_image_location }}.gz"
-  - name: Unzip
-    command: "gzip -d {{ coreos_image_location }}.gz"
-  when: coreos_image.stat.mimetype == "application/x-gzip"
+- name: verify existing coreos image is valid
+  lineinfile:
+    name: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
+    line: "{{ coreos_old_image.stat.checksum }}  {{ coreos_file }}"
+    state: present
+  check_mode: true
+  register: csum_check
+  failed_when: (csum_check is changed) or (csum_check is failed)
+  ignore_errors: true
+  when: coreos_old_image.stat.exists
 
-- name: CoreOS image checksum check
-  stat:
-    path: "{{ coreos_image_location }}"
-  register: checksum_coreos_image
+- name: Download fresh coreos image if previous doesn't exist
+  block:
 
-- name: Compare checksum
-  fail:
-    msg: |
-      Please check coreos image, something looks wrong!
-      File {{ coreos_image_location }} (Checksum: {{ checksum_coreos_image.stat.checksum }})
-      The checksum should be {{ coreos_checksum }}
-      Download location: {{ coreos_download_url }}
-  when: checksum_coreos_image.stat.checksum != coreos_checksum
+    - name: download coreos
+      get_url:
+        url: "{{ coreos_download_url }}"
+        dest: "{{ coreos_path }}/{{ coreos_file }}.gz"
+        checksum: "sha256:{{ coreos_csum_url }}"
+      register: coreos_download
+
+    - name: unzip the coreos
+      command: "gunzip {{ coreos_path }}/{{ coreos_file }}.gz"
+      args:
+        chdir: "{{ coreos_path }}"
+        creates: "{{ coreos_path }}/{{ coreos_file }}"
+      register: unzip
+
+    - name: calculate checksum of the new coreos image
+      stat:
+        checksum_algorithm: sha256
+        path: "{{ coreos_path }}/{{ coreos_file }}"
+      register: coreos_csum
+
+    - name: store the checksum of the file
+      copy:
+        dest: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
+        content: "{{ coreos_csum.stat.checksum }}  {{ coreos_file }}\n"
+
+  when: >
+    (not coreos_old_image.stat.exists) or
+    csum_check.changed or
+    csum_check.failed
 
 - name: Create OpenShift artifacts directory
   file:
