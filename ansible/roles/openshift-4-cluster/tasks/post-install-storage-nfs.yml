@@ -79,7 +79,7 @@
           server: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
         persistentVolumeReclaimPolicy: Recycle
 
-- name: Create registry-strage pvc
+- name: Create registry-storage pvc
   k8s:
     state: present
     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
@@ -159,7 +159,7 @@
           resources: ["events"]
           verbs: ["create", "update", "patch"]
 
-- name: Create ClusteRoleBinding nfs-client-provisioner-runner <-> nfs-client-provisioner
+- name: Create ClusterRoleBinding nfs-client-provisioner-runner <-> nfs-client-provisioner
   k8s:
     state: present
     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"

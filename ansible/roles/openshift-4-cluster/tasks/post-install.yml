@@ -95,7 +95,7 @@
             name: google-secret
             namespace: openshift-config
           type: Opaque
-    - name: Create htpasswd identity rovider template
+    - name: Create google identity provider template
       set_fact:
         redhatsso_idp:
           google:
