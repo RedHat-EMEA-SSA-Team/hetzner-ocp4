@@ -1,5 +1,16 @@
 # RELEASE NOTES
 
+## 2020-06-18
+
+### Use GitHub as a possible IdP
+
+You can now use GitHub as an IdP. In order to configure GitHub you have to add a new [OAuth App](https://github.com/settings/developers).
+
+As a redirectUrl please set
+`https://<your_public_domain>/oauth2callback/GitHub`
+
+Be sure to only add one of of `organizations` or `teams` since the `teams` option already includes the information about the specific organizations.
+
 ## 2020-04-18
 
 ### Use RBAC instead of changing SCC member for NFS provisioner
