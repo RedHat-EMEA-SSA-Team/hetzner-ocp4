@@ -30,7 +30,7 @@ auth_redhatsso:
   client_secret: "xxxxxxx"
 
 cluster_role_bindings:
-  - cluster_role: sudoers
+  - cluster_role: sudoer
     name: login@redhat.com
   - cluster_role: cluster-admin
     name: admin
