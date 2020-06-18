@@ -140,6 +140,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |`storage_nfs`|false|Install NFS Storage with dynamic provisioning|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
+|`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`cluster_role_bindings`|empty|Setup cluster role binding, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`openshift_install_command`|[check defaults](ansible/roles/openshift-4-cluster/defaults/main.yml)|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)|
 |`install_config_additionalTrustBundle`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)

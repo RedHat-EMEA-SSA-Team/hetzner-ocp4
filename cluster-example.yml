@@ -31,6 +31,15 @@ auth_redhatsso:
   client_id: "xxxxx.apps.googleusercontent.com"
   client_secret: "xxxxxxx"
 
+auth_github:
+  client_id: "yourverysecretclientid"
+  client_secret: "xxxxxxx"
+  # Please be sure to define *either* (but at least *one*) of auth_github.organizations OR auth_github.teams
+  organizations:
+    - "sa-mw-dach"
+  # teams:
+  #  - "@sa-mw-dach/hetzner-users"
+
 cluster_role_bindings:
   - cluster_role: sudoer
     name: login@redhat.com

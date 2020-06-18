@@ -44,11 +44,17 @@
 ###########################################################################################
 - include: certificate-install.yml
   when: letsencrypt_disabled == false
+  tags:
+    - postinstall
+    - certificates
 
 ###########################################################################################
 # Configure authentication
 ###########################################################################################
-- set_fact:
+- tags:
+    - postinstall
+    - idp
+  set_fact:
     identity_roviders: "[]"
 
 - name: Handle auth_htpasswd
@@ -79,6 +85,9 @@
       set_fact:
         identity_roviders: "{{ identity_roviders }} + [ {{ htpasswd_idp }} ]"
   when: auth_htpasswd is defined
+  tags:
+    - postinstall
+    - idp
 
 - name: Handle auth_redhatsso
   block:
@@ -106,10 +115,56 @@
           mappingMethod: claim
           name: RedHatSSO
           type: Google
-    - name: Push htpasswd_idp to identity_roviders
+    - name: Push redhatsso_idp to identity_roviders
       set_fact:
         identity_roviders: "{{ identity_roviders }} + [ {{ redhatsso_idp }} ]"
   when: auth_redhatsso is defined
+  tags:
+    - postinstall
+    - idp
+
+- name: Handle auth_github
+  block:
+    - name: Check if either organizations or teams is defined
+      fail:
+        msg: "At least one of auth_github.organizations or auth_github.teams must be defined (only one is allowed)"
+      when: (auth_github.organizations is undefined) and (auth_github.teams is undefined)
+    - name: Check if only one of organizations or teams is defined
+      fail:
+        msg: "Only one of auth_github.organizations or auth_github.teams must be defined (at least one must be defined)"
+      when: (auth_github.organizations is defined) and (auth_github.teams is defined)
+    - name: Create GitHub secret
+      k8s:
+        state: present
+        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        definition:
+          apiVersion: v1
+          data:
+            clientSecret: "{{ auth_github.client_secret | b64encode }}"
+          kind: Secret
+          metadata:
+            name: github-secret
+            namespace: openshift-config
+          type: Opaque
+    - name: Create GitHub identity provider template
+      set_fact:
+        github_idp:
+          github:
+            clientID: "{{ auth_github.client_id }}"
+            clientSecret:
+              name: github-secret
+            organizations: "{{ auth_github.organizations | default('[]') }}"
+            teams: "{{ auth_github.teams | default('[]') }}"
+          mappingMethod: claim
+          name: GitHub
+          type: GitHub
+    - name: Push github_idp to identity_roviders
+      set_fact:
+        identity_roviders: "{{ identity_roviders }} + [ {{ github_idp }} ]"
+  when: auth_github is defined
+  tags:
+    - postinstall
+    - idp
 
 - name: Configure identity providers
   k8s:
@@ -122,6 +177,9 @@
           name: cluster
         spec:
           identityProviders: "{{ identity_roviders }}"
+  tags:
+    - postinstall
+    - idp
 
 
 
@@ -147,6 +205,9 @@
         name: "{{ item.cluster_role }}"
   with_items: "{{ cluster_role_bindings }}"
   when: cluster_role_bindings is defined
+  tags:
+    - postinstall
+    - rolebindings
 
 ###########################################################################################
 # Print Cluster informations
@@ -155,3 +216,6 @@
 - name: Cluster informations
   debug:
     msg: "{{ install_status.stderr_lines | map('regex_replace', 'level=info msg=\"(.*)\"', '\\1') | list }}"
+  tags:
+    - postinstall
+    - lastmessage
