@@ -1,6 +1,8 @@
 ---
 cluster_name: ocp4
 public_domain: example.com
+# set custom public ip for DNS entries. Defaults to: hostvars['localhost']['ansible_default_ipv4']['address']
+# public_ip: 92.100.42.2
 dns_provider: [route53|cloudflare|gcp]
 letsencrypt_account_email: name@example.com
 # Depending on the dns provider:
