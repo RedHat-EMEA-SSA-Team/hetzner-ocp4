@@ -1,2 +1,2 @@
 ---
-pd_public_ip: "{{ hostvars['localhost']['ansible_default_ipv4']['address'] }}"
+pd_public_ip: "{{ public_ip | default(hostvars['localhost']['ansible_default_ipv4']['address']) }}"
