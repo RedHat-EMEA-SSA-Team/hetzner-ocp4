@@ -13,6 +13,8 @@
   - api
   - '*.apps'
   when: pd_provider == "cloudflare" 
+  tags:
+    - public_dns
 
 - name: Create DNS record at Route53
   route53:
@@ -28,7 +30,9 @@
   with_items:
   - api
   - '*.apps'
-  when: pd_provider == "route53" 
+  when: pd_provider == "route53"
+  tags:
+    - public_dns
 
 - name: Create DNS record at GCP 
   gcp_dns_resource_record_set:
@@ -48,3 +52,5 @@
   - api
   - '*.apps'
   when: pd_provider == "gcp"
+  tags:
+    - public_dns
