@@ -4,19 +4,17 @@
       - "If you like to follow the installation run 'tail -f  {{ openshift_install_dir }}/.openshift_install.log' in a second terminal."
       - "For more details, connect to the bootstrap node: ssh -l core {{ vn_subnet.split('.')[:3] | join('.')}}.2"
 
-- name: Waiting bootstrap to complete
+- name: Waiting for bootstrap to complete
   command: "/opt/openshift-install-{{ openshift_version }}/openshift-install wait-for bootstrap-complete --dir {{ openshift_install_dir }} --log-level debug"
   register: bootstrap_status
   retries: 60
   delay: 60
   until: bootstrap_status.rc == 0
 
-- name: Destroy bootsrap node
+- name: Destroy bootstrap node
   include: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
-
-
 
 - name: Provision nfs storage
   import_tasks: post-install-storage-nfs.yml
