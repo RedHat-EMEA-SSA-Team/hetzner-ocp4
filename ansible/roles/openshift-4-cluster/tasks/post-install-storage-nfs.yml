@@ -19,13 +19,13 @@
 - set_fact:
     nfs_server: "nfs"
   when: 
-    - ansible_os_family == "RedHat" 
+    - (ansible_os_family == "RedHat") or (ansible_os_family == "CentOS") 
     - ansible_distribution_major_version is version('7','<=')
 
 - set_fact:
     nfs_server: "nfs-server"
   when: 
-    - ansible_os_family == "RedHat" 
+    - (ansible_os_family == "RedHat") or (ansible_os_family == "CentOS") 
     - ansible_distribution_major_version is version ('8','>=')
 
 - name: Ensure nfs is running.
