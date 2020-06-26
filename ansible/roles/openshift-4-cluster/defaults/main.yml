@@ -68,3 +68,6 @@ helm_cli_location: "https://mirror.openshift.com/pub/openshift-v4/clients/helm/l
 storage_nfs: false
 storage_nfs_path_prefix: '/var/lib/libvirt/images'
 storage_nfs_target_namespace: openshift-nfs-provisioner
+
+infra_registry_pv_size: "100Gi"
+registry_storage_pvc_size: "100Gi"
