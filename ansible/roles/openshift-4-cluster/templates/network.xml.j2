@@ -10,6 +10,9 @@
             <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
             <hostname>api.{{ vn_public_domain }}</hostname>
+            {% if dns_provider == 'none' %}
+            <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
+            {% endif %}
         </host>
         {% for id in range(0, vn_master_count | int) -%}
         <srv service='etcd-server-ssl' protocol='tcp' domain='{{ vn_public_domain }}' target='etcd-{{ id }}.{{ vn_public_domain }}' port='2380' priority='0' weight='10'/>

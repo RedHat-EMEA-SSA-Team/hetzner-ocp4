@@ -1,5 +1,43 @@
 # RELEASE NOTES
 
+## 2020-07-03
+
+### Use GitHub as a possible IdP
+
+You can now use GitHub as an IdP. In order to configure GitHub you have to add a new [OAuth App](https://github.com/settings/developers).
+
+As a redirectUrl please set
+`https://<your_public_domain>/oauth2callback/GitHub`
+
+Be sure to only add one of of `organizations` or `teams` since the `teams` option already includes the information about the specific organizations.
+
+### Add `dns_provider: none`
+
+With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster. 
+
+### Add `public_ip` option
+
+Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv4']['address']`.
+
+
+### Update Centos8
+
+* Configure firewalld 
+* Fixed host prep (Add missing packages & documentation)
+
+### Bugfixes
+
+* Fix #100 - Compute nodes doesn't join at intallation
+* Fix #101 by automating coreos crc
+* Fix typos
+* Fix(permissions): make all binaries are executable
+* fix(sudoer): fix sudoers in cluster-example.yml
+
+### Added some docs:
+
+* [Hetzner & IPI](docs/ipi.md)
+* [Disk management (add disk to vm, wipe node)](docs/disk-management.md)
+
 ## 2020-04-18
 
 ### Use RBAC instead of changing SCC member for NFS provisioner

@@ -96,7 +96,7 @@
     tasks_from: create.yml
   vars:
     pd_provider: "{{ dns_provider }}"
-    pd_public_ip: "{{ listen_address }}"
+    pd_public_ip: "{{ public_ip | default(listen_address) }}"
     pd_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
     pd_cloudflare_zone: "{{ cloudflare_zone }}"
     pd_aws_access_key: "{{ aws_access_key }}"
@@ -104,4 +104,13 @@
     pd_aws_zone: "{{ aws_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
   tags: public_dns
+  when: dns_provider != 'none'
 
+- name: Add api.{{ cluster_name }}.{{ public_domain }} to /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
+    block: |
+      {{ public_ip | default(listen_address) }} api.{{ cluster_name }}.{{ public_domain }}
+  tags: public_dns
+  when: dns_provider == 'none'

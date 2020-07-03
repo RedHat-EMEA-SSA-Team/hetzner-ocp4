@@ -27,7 +27,6 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 **NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)   
 
 ** Supported root server operating systems: **
-- CentOS 7
 - CentOS 8
 - RHEL 8 - How to install RHEL8: https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
 
@@ -74,6 +73,13 @@ subscription-manager repos \
     --enable=openstack-15-for-rhel-8-x86_64-rpms
 ```
 
+## In case of Centos 8
+
+Enable ansible repo:
+```
+yum install -y centos-release-ansible-29.noarch
+```
+
 ## Initialize tools
 
 Install ansible (min version 2.8) and git
@@ -98,7 +104,8 @@ Here is an example about [_cluster.yml_](cluster-example.yml) file that contains
 |---|---|
 |cluster_name  |Name of the cluster to be installed |
 |public_domain  |Root domain that will be used for your cluster.  |
-|dns_provider  |DNS provider, value can be _route53_, _cloudflare_ or _gcp_. Check __Setup public DNS records__ for more info. |
+|public_ip  |Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv4']['address']`. |
+|dns_provider  |DNS provider, value can be _route53_, _cloudflare_,_gcp_ or _none_. Check __Setup public DNS records__ for more info. |
 |letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
 |image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
@@ -108,7 +115,7 @@ Here is an example about [_cluster.yml_](cluster-example.yml) file that contains
 
 ### Setup public DNS records
 
-Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_ or _GCP DNS_.
+Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_, _GCP DNS_ or _none_.
 If you want to use _Route53_, _Cloudflare_ or _GCP_ as your DNS provider, you have to add a few variables. Check the instructions below.
 
 DNS records are constructed based on _cluster_name_ and _public_domain_ values. With above values DNS records should be
@@ -117,6 +124,7 @@ DNS records are constructed based on _cluster_name_ and _public_domain_ values. 
 
 If you use another DNS provider, feel free to contribute. :D
 
+With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster. 
 
 Please configure in `cluster.yml` all necessary credentials:
 
@@ -125,6 +133,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |CloudFlare|`cloudflare_account_email: john@example.com` <br> Use the global api key here! (API-Token is not supported!) (Details in #86) <br>`cloudflare_account_api_token: 9348234sdsd894.....` <br>  `cloudflare_zone: domain.tld`|
 |Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
 |GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
+|none|With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.|
 
 ### Optional configuration
 
@@ -133,6 +142,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |`storage_nfs`|false|Install NFS Storage with dynamic provisioning|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
+|`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`cluster_role_bindings`|empty|Setup cluster role binding, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`openshift_install_command`|[check defaults](ansible/roles/openshift-4-cluster/defaults/main.yml)|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)|
 |`install_config_additionalTrustBundle`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)

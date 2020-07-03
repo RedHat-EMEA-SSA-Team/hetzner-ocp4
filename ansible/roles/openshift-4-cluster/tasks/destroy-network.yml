@@ -13,6 +13,15 @@
     pd_aws_zone: "{{ aws_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
   tags: public_dns
+  when: dns_provider != 'none'
+
+- name: Remove api.{{ cluster_name }}.{{ public_domain }} to /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
+    block: ""
+  tags: public_dns
+  when: dns_provider == 'none'
 
 - name: Destroy OpenShift 4 load balancer
   import_role: 
