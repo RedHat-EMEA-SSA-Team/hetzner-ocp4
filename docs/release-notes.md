@@ -27,6 +27,7 @@ Override for public ip entries. defaults to `hostvars['localhost']['ansible_defa
 
 ### Bugfixes
 
+* Fix #100 - Compute nodes doesn't join at intallation
 * Fix #101 by automating coreos crc
 * Fix typos
 * Fix(permissions): make all binaries are executable
