@@ -6,6 +6,11 @@
     vn_compute_count: "{{ compute_count }}"
   tags: network
 
+- name: Disable letsencrypt if dns_provider is none
+  set_fact:
+    letsencrypt_disabled: true
+  when: dns_provider != 'none'
+
 - import_role:
     name: letsencrypt
   vars:

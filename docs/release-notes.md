@@ -11,6 +11,10 @@ As a redirectUrl please set
 
 Be sure to only add one of of `organizations` or `teams` since the `teams` option already includes the information about the specific organizations.
 
+### Add `dns_provider: none`
+
+With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster. 
+
 ### Add `public_ip` option
 
 Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv4']['address']`.

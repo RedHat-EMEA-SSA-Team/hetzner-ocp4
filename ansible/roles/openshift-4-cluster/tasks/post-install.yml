@@ -213,9 +213,20 @@
 # Print Cluster informations
 ###########################################################################################
 
+- name: DNS info if dns_provider == 'none'
+  debug:
+    msg:
+      - "Please don't forget to create DNS"
+      - " - api.{{ cluster_name }}.{{ public_domain }} => {{ public_ip | default(listen_address) }}"
+      - " - *.apps.{{ cluster_name }}.{{ public_domain }} => {{ public_ip | default(listen_address) }}"
+  when: dns_provider == 'none'
+  tags:
+  - lastmessage
+
 - name: Cluster informations
   debug:
     msg: "{{ install_status.stderr_lines | map('regex_replace', 'level=info msg=\"(.*)\"', '\\1') | list }}"
   tags:
     - postinstall
     - lastmessage
+
