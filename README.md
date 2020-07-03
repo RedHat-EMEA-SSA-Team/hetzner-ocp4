@@ -74,6 +74,13 @@ subscription-manager repos \
     --enable=openstack-15-for-rhel-8-x86_64-rpms
 ```
 
+## In case of Centos 8
+
+Enable ansible repo:
+```
+yum install -y centos-release-ansible-29.noarch
+```
+
 ## Initialize tools
 
 Install ansible (min version 2.8) and git
