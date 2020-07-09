@@ -16,12 +16,6 @@
     enabled: yes
     state: started
 
-- name: Enable and start {{ lb_name }}.service
-  systemd:
-    name: "{{ lb_name }}.service"
-    enabled: yes
-    state: started
-
 - name: Collect services facts
   service_facts:
   register: services_state
