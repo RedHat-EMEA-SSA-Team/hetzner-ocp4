@@ -38,36 +38,37 @@
           spec:
             defaultCertificate:
               name: letsencrypt-router-certs
-
-    - name: Create secret with certificates for openshift api
-      k8s:
-        state: present
-        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
-        definition:
-          apiVersion: v1
-          kind: Secret
-          data:
-            tls.crt: "{{  lookup('file',certficate_fullchain, rstrip=false) | b64encode }}"
-            tls.key: "{{  lookup('file',certficate_key, rstrip=false)  | b64encode }}"
-          metadata:
-            name: letsencrypt-certs
-            namespace: openshift-config
-          type: kubernetes.io/tls
-    - name: Patch api server config
-      k8s:
-        state: present
-        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
-        merge_type: merge
-        definition:
-          apiVersion: config.openshift.io/v1
-          kind: APIServer
-          metadata:
-            name: cluster
-          spec:
-            servingCerts:
-              namedCertificates:
-              - names:
-                - "api.{{ cluster_name }}.{{ public_domain }}"
-                servingCertificate:
-                  name: letsencrypt-certs
+    # Hot fix, remove of openshift api cert installation because of 
+    #          https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/117
+    # - name: Create secret with certificates for openshift api
+    #   k8s:
+    #     state: present
+    #     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    #     definition:
+    #       apiVersion: v1
+    #       kind: Secret
+    #       data:
+    #         tls.crt: "{{  lookup('file',certficate_fullchain, rstrip=false) | b64encode }}"
+    #         tls.key: "{{  lookup('file',certficate_key, rstrip=false)  | b64encode }}"
+    #       metadata:
+    #         name: letsencrypt-certs
+    #         namespace: openshift-config
+    #       type: kubernetes.io/tls
+    # - name: Patch api server config
+    #   k8s:
+    #     state: present
+    #     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    #     merge_type: merge
+    #     definition:
+    #       apiVersion: config.openshift.io/v1
+    #       kind: APIServer
+    #       metadata:
+    #         name: cluster
+    #       spec:
+    #         servingCerts:
+    #           namedCertificates:
+    #           - names:
+    #             - "api.{{ cluster_name }}.{{ public_domain }}"
+    #             servingCertificate:
+    #               name: letsencrypt-certs
   when: crt.stat.exists == True and key.stat.exists == True
