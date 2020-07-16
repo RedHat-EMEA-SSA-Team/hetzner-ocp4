@@ -65,7 +65,7 @@
     - postinstall
     - idp
   set_fact:
-    identity_roviders: "[]"
+    identity_providers: "[]"
 
 - name: Handle auth_htpasswd
   block:
@@ -93,7 +93,7 @@
           type: HTPasswd
     - name: Push htpasswd_idp to identity_providers
       set_fact:
-        identity_roviders: "{{ identity_roviders }} + [ {{ htpasswd_idp }} ]"
+        identity_providers: "{{ identity_providers }} + [ {{ htpasswd_idp }} ]"
   when: auth_htpasswd is defined
   tags:
     - postinstall
@@ -125,9 +125,9 @@
           mappingMethod: claim
           name: RedHatSSO
           type: Google
-    - name: Push redhatsso_idp to identity_roviders
+    - name: Push redhatsso_idp to identity_providers
       set_fact:
-        identity_roviders: "{{ identity_roviders }} + [ {{ redhatsso_idp }} ]"
+        identity_providers: "{{ identity_providers }} + [ {{ redhatsso_idp }} ]"
   when: auth_redhatsso is defined
   tags:
     - postinstall
@@ -168,9 +168,9 @@
           mappingMethod: claim
           name: GitHub
           type: GitHub
-    - name: Push github_idp to identity_roviders
+    - name: Push github_idp to identity_providers
       set_fact:
-        identity_roviders: "{{ identity_roviders }} + [ {{ github_idp }} ]"
+        identity_providers: "{{ identity_providers }} + [ {{ github_idp }} ]"
   when: auth_github is defined
   tags:
     - postinstall
@@ -186,7 +186,7 @@
         metadata:
           name: cluster
         spec:
-          identityProviders: "{{ identity_roviders }}"
+          identityProviders: "{{ identity_providers }}"
   tags:
     - postinstall
     - idp
