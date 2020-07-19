@@ -26,6 +26,8 @@ compute_memory_unit: 'MiB'
 #   You may use k, M, G, T, P or E suffixe
 compute_root_disk_size: '120G'
 
+vm_autostart: false
+
 # Important: OpenShift version must match to RHEL CoreOS version!
 
 # reference to OpenShift version
