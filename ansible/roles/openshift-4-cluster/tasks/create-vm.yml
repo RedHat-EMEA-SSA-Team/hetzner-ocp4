@@ -27,4 +27,4 @@
   virt: 
     name: "{{ vm_instance_name }}"
     state: running
-    autostart: {{ vm_autostart }}
+    autostart: "{{ vm_autostart }}"
