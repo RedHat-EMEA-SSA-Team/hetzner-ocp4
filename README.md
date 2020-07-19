@@ -140,6 +140,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |Variable | Default | Description |
 |---|---|---|
 |`storage_nfs`|false|Install NFS Storage with dynamic provisioning|
+|`vm_autostart`|false|Create cluster VMs with `autostart` enabled|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
