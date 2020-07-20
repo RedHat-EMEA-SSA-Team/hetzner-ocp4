@@ -55,14 +55,14 @@
 - include: certificate-install.yml
   when: letsencrypt_disabled == false
   tags:
-    - postinstall
+    - post-install
     - certificates
 
 ###########################################################################################
 # Configure authentication
 ###########################################################################################
 - tags:
-    - postinstall
+    - post-install
     - idp
   set_fact:
     identity_providers: "[]"
@@ -96,7 +96,7 @@
         identity_providers: "{{ identity_providers }} + [ {{ htpasswd_idp }} ]"
   when: auth_htpasswd is defined
   tags:
-    - postinstall
+    - post-install
     - idp
 
 - name: Handle auth_redhatsso
@@ -130,7 +130,7 @@
         identity_providers: "{{ identity_providers }} + [ {{ redhatsso_idp }} ]"
   when: auth_redhatsso is defined
   tags:
-    - postinstall
+    - post-install
     - idp
 
 - name: Handle auth_github
@@ -173,7 +173,7 @@
         identity_providers: "{{ identity_providers }} + [ {{ github_idp }} ]"
   when: auth_github is defined
   tags:
-    - postinstall
+    - post-install
     - idp
 
 - name: Configure identity providers
@@ -188,7 +188,7 @@
         spec:
           identityProviders: "{{ identity_providers }}"
   tags:
-    - postinstall
+    - post-install
     - idp
 
 
@@ -216,7 +216,7 @@
   with_items: "{{ cluster_role_bindings }}"
   when: cluster_role_bindings is defined
   tags:
-    - postinstall
+    - post-install
     - rolebindings
 
 ###########################################################################################
@@ -237,6 +237,6 @@
   debug:
     msg: "{{ install_status.stderr_lines | map('regex_replace', 'level=info msg=\"(.*)\"', '\\1') | list }}"
   tags:
-    - postinstall
+    - post-install
     - lastmessage
 
