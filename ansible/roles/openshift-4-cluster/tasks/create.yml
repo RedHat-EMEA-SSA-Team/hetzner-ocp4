@@ -9,7 +9,7 @@
 - name: Disable letsencrypt if dns_provider is none
   set_fact:
     letsencrypt_disabled: true
-  when: dns_provider != 'none'
+  when: dns_provider == 'none'
 
 - import_role:
     name: letsencrypt
