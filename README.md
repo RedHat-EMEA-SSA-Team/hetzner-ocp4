@@ -165,6 +165,7 @@ Please configure in `cluster.yml` all necessary credentials:
 * [How to setup a container native virtualization lab (nested) with hetzner-ocp4](docs/cnv.md)
 * [How to install an OpenShift nighly or RC (any kind of pre-release)](docs/ocp-pre-release.md)
 * [Disk management (add disk to vm, wipe node)](docs/disk-management.md)
+* [How to passthrough nvme or gpu (pci-passthrough](docs/pci-passthrough.md)
 
 # Useful commands
 
