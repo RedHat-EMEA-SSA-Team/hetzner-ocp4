@@ -1,4 +1,22 @@
 # RELEASE NOTES
+## xxx
+
+### Bump OpenShift Version to 4.5.2
+
+### feat(autostart): add autostart option for VMs
+
+Added option `vm_autostart` default (false).
+
+### Added docs/pci-passthrough.md
+
+### Big fixes
+
+ - fix(typo): correctly name identity_providers
+ - Cleanup post install tag name use post-install instead of postinstall
+ - Use --kubeconfig instead of --config
+ - Fixed #116 - LE certificate is not configured after fresh installation.
+ - 
+
 
 ## 2020-07-03
 
