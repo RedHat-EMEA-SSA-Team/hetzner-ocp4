@@ -13,7 +13,11 @@
 
 - name: Install boto via pip
   pip:
-    name: boto
+    name: 
+      # ansible route53 need  python-boto 
+      - boto
+      # ansible k8s need python2-openshift  
+      - openshift
 
 - name: Allow NFS traffic from VM's to Host
   firewalld:
