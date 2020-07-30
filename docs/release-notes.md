@@ -1,5 +1,6 @@
 # RELEASE NOTES
-## xxx
+
+## 2020-07-30
 
 ### Bump OpenShift Version to 4.5.2
 
@@ -18,6 +19,7 @@ Added option `vm_autostart` default (false).
  - Add daemon_reload to systemctl service installation
  - Update ansible repo for RHEL
  - Update docs/air-gapped.md
+ - Add draft tekton pipeline to test hetzner-ocp4
 
 ## 2020-07-03
 
@@ -32,7 +34,7 @@ Be sure to only add one of of `organizations` or `teams` since the `teams` optio
 
 ### Add `dns_provider: none`
 
-With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster. 
+With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.
 
 ### Add `public_ip` option
 
@@ -41,7 +43,7 @@ Override for public ip entries. defaults to `hostvars['localhost']['ansible_defa
 
 ### Update Centos8
 
-* Configure firewalld 
+* Configure firewalld
 * Fixed host prep (Add missing packages & documentation)
 
 ### Bugfixes
@@ -61,7 +63,7 @@ Override for public ip entries. defaults to `hostvars['localhost']['ansible_defa
 
 ### Use RBAC instead of changing SCC member for NFS provisioner
 
-Instead of 
+Instead of
 ```
 oc adm policy add-scc-to-user hostmount-anyuid \
     -n openshift-nfs-provisioner \
@@ -76,12 +78,12 @@ metadata:
   namespace: "openshift-nfs-provisioner"
 rules:
 - apiGroups:
-  - security.openshift.io 
+  - security.openshift.io
   resourceNames:
   - hostmount-anyuid
   resources:
-  - securitycontextconstraints 
-  verbs: 
+  - securitycontextconstraints
+  verbs:
   - use
 ---
 kind: RoleBinding
@@ -100,7 +102,7 @@ roleRef:
 
 ## 2020-04-01
 
-### Update air-gapped docs 
+### Update air-gapped docs
 
 Add `REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true` to air-gapped registry. That solve some skopeo copy problemes.
 
