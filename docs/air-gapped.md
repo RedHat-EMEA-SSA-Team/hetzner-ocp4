@@ -83,6 +83,12 @@ systemctl start mirror-registry.service
 systemctl status mirror-registry.service
 ```
 
+Configure firewall for Centos or RHEL
+```
+firewall-cmd --zone=libvirt --permanent --add-port=5000/tcp
+firewall-cmd --reload
+```
+
 Check registry
 ```
 $ curl -u admin:r3dh4t\!1 https://host.compute.local:5000/v2/_catalog
