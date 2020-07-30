@@ -69,7 +69,7 @@ subscription-manager repos \
     --enable=rhel-8-for-x86_64-baseos-rpms \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
-    --enable=ansible-2.8-for-rhel-8-x86_64-rpms \
+    --enable=ansible-2.9-for-rhel-8-x86_64-rpms \
     --enable=openstack-15-for-rhel-8-x86_64-rpms
 ```
 
