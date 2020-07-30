@@ -15,8 +15,9 @@ Added option `vm_autostart` default (false).
  - Cleanup post install tag name use post-install instead of postinstall
  - Use --kubeconfig instead of --config
  - Fixed #116 - LE certificate is not configured after fresh installation.
- - 
-
+ - Add daemon_reload to systemctl service installation
+ - Update ansible repo for RHEL
+ - Update docs/air-gapped.md
 
 ## 2020-07-03
 
