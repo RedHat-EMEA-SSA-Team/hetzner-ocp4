@@ -13,6 +13,7 @@
 - name: Enable and start {{ lb_name }}.service
   systemd:
     name: "{{ lb_name }}.service"
+    daemon_reload: yes
     enabled: yes
     state: started
 
