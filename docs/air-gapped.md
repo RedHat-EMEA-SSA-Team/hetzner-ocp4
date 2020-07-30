@@ -40,6 +40,7 @@ htpasswd -bBc /var/lib/libvirt/images/mirror-registry/auth/htpasswd admin r3dh4t
 Create internal registry service: `/etc/systemd/system/mirror-registry.service`  
 **Change REGISTRY_HTTP_ADDR in case you use different network**
 ```
+cat - > /etc/systemd/system/mirror-registry.service <<EOF
 [Unit]
 Description=Mirror registry (mirror-registry)
 After=network.target
@@ -72,6 +73,7 @@ RestartSec=30
 
 [Install]
 WantedBy=multi-user.target
+EOF
 ```
 
 Enable and start mirror registry
@@ -104,19 +106,34 @@ Merge  mirror-registry-pullsecret.json & redhat-pullsecret.json
 jq -s '{"auths": ( .[0].auths + .[1].auths ) }' mirror-registry-pullsecret.json redhat-pullsecret.json > pullsecret.json
 ```
 
+Install oc client
+```
+./ansible/02-create-cluster.yml --tags download-openshift-artifacts
+```
+
 Mirror images:
 ```
-export OCP_RELEASE=4.3.5-x86_64
+export OCP_RELEASE=$(oc version -o json  --client | jq -r '.releaseClientVersion')
 export LOCAL_REGISTRY='host.compute.local:5000' 
 export LOCAL_REPOSITORY='ocp4/openshift4' 
 export PRODUCT_REPO='openshift-release-dev' 
 export LOCAL_SECRET_JSON='pullsecret.json' 
 export RELEASE_NAME="ocp-release" 
+export ARCHITECTURE=x86_64
+# export REMOVABLE_MEDIA_PATH=<path> 
+
+# Try run:
 
 oc adm -a ${LOCAL_SECRET_JSON} release mirror \
-     --from=quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE} \
+     --from=quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
      --to=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY} \
-     --to-release-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}
+     --to-release-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE} --dry-run
+
+oc adm -a ${LOCAL_SECRET_JSON} release mirror \
+     --from=quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
+     --to=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY} \
+     --to-release-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE}
+
 ```
 
 Save the output:
@@ -156,15 +173,15 @@ spec:
 
 Extract openshift-install command
 ```
-oc adm release extract -a pullsecret.json --command=openshift-install "${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}"
+oc adm release extract -a pullsecret.json --command=openshift-install "${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE}"
 ```
 
 Check openshift-install version:
 ```
 # ./openshift-install version
-./openshift-install v4.3.5
-built from commit 82f9a63c06956b3700a69475fbd14521e139aa1e
-release image host.compute.local:5000/ocp4/openshift4@sha256:64320fbf95d968fc6b9863581a92d373bc75f563a13ae1c727af37450579f61a
+./openshift-install 4.5.2
+built from commit 6336a4b3d696dd898eed192e4188edbac99e8c27
+release image host.compute.local:5000/ocp4/openshift4@sha256:8f923b7b8efdeac619eb0e7697106c1d17dd3d262c49d8742b38600417cf7d1d
 ```
 
 ## Update cluster.yml
