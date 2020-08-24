@@ -11,7 +11,8 @@
   copy:
     src: "{{ vm_ignition_file }}"
     dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.ign"
-
+    mode: '0644'
+  
 # - name: Debug - create /tmp/{{ vm_instance_name }}.virt.xml
 #   template:
 #     src: "vm.xml.j2"
