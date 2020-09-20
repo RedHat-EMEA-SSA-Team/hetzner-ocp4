@@ -1,0 +1,8 @@
+---
+- name: GPU Post install
+  debug:
+    msg: "Run cluster entitlement against {{ kubeconfig }}"
+
+- name: "Include entitlement-from-rhel-node.yaml"
+  include: "entitlement-from-rhel-node.yaml"
+  when: ansible_distribution  == "RedHat"

@@ -30,6 +30,10 @@
 
 - name: Build k8s variables
   import_tasks: build-k8s-vars.yml
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
 
 - name: Provision nfs storage
   import_tasks: post-install-storage-nfs.yml
@@ -241,6 +245,18 @@
   tags:
     - post-install
     - rolebindings
+
+###########################################################################################
+# Handle post-install-add-ons
+###########################################################################################
+
+- name: Include post-install-add-ons
+  include: post-install-add-ons.yml
+  when: add_ons_enabled
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
 
 ###########################################################################################
 # Print Cluster informations
