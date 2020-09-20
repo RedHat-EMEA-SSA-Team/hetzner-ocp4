@@ -159,7 +159,8 @@ Please configure in `cluster.yml` all necessary credentials:
 
 # Additional documentation
 
-* [How to install and manage more than one OpenShift Cluster with  hetzner-ocp4](docs/multi-cluster-guide.md)
+* [How to use add-ons (post_install_add_ons)](docs/add-ons.md)
+* [How to install and manage more than one OpenShift Cluster with hetzner-ocp4](docs/multi-cluster-guide.md)
 * [How to install an air-gapped cluster with hetzner-ocp4](docs/air-gapped.md)
 * [How to install an proxy cluster with hetzner-ocp4](docs/proxy.md)
 * [How to setup a container native virtualization lab (nested) with hetzner-ocp4](docs/cnv.md)

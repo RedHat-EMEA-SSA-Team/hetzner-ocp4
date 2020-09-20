@@ -78,3 +78,5 @@ sdn_plugin_name: OVNKubernetes
 
 # Master node schedulable
 masters_schedulable: true
+
+add_ons_enabled: false

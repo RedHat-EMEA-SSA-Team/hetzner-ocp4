@@ -1,4 +1,23 @@
 ---
+
+- name: Check add-ons.yml
+  stat:
+    path: "{{ playbook_dir }}/../add-ons.yml"
+  register: add_ons_yml
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
+
+- name: Enable add-ons
+  set_fact:
+    add_ons_enabled: true
+  when: add_ons_yml.stat.exists
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
+
 - import_tasks: create-network.yml
   vars:
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"

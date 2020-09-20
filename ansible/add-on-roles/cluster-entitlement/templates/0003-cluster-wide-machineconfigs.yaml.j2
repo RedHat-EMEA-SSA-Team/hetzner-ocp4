@@ -1,0 +1,55 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+  labels:
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 50-{{ role }}-rhsm-conf
+spec:
+  config:
+    ignition:
+      version: 2.2.0
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,IyBSZWQgSGF0IFN1YnNjcmlwdGlvbiBNYW5hZ2VyIENvbmZpZ3VyYXRpb24gRmlsZToKCiMgVW5pZmllZCBFbnRpdGxlbWVudCBQbGF0Zm9ybSBDb25maWd1cmF0aW9uCltzZXJ2ZXJdCiMgU2VydmVyIGhvc3RuYW1lOgpob3N0bmFtZSA9IHN1YnNjcmlwdGlvbi5yaHNtLnJlZGhhdC5jb20KCiMgU2VydmVyIHByZWZpeDoKcHJlZml4ID0gL3N1YnNjcmlwdGlvbgoKIyBTZXJ2ZXIgcG9ydDoKcG9ydCA9IDQ0MwoKIyBTZXQgdG8gMSB0byBkaXNhYmxlIGNlcnRpZmljYXRlIHZhbGlkYXRpb246Cmluc2VjdXJlID0gMAoKIyBTZXQgdGhlIGRlcHRoIG9mIGNlcnRzIHdoaWNoIHNob3VsZCBiZSBjaGVja2VkCiMgd2hlbiB2YWxpZGF0aW5nIGEgY2VydGlmaWNhdGUKc3NsX3ZlcmlmeV9kZXB0aCA9IDMKCiMgYW4gaHR0cCBwcm94eSBzZXJ2ZXIgdG8gdXNlCnByb3h5X2hvc3RuYW1lID0KCiMgVGhlIHNjaGVtZSB0byB1c2UgZm9yIHRoZSBwcm94eSB3aGVuIHVwZGF0aW5nIHJlcG8gZGVmaW5pdGlvbnMsIGlmIG5lZWRlZAojIGUuZy4gaHR0cCBvciBodHRwcwpwcm94eV9zY2hlbWUgPSBodHRwCgojIHBvcnQgZm9yIGh0dHAgcHJveHkgc2VydmVyCnByb3h5X3BvcnQgPQoKIyB1c2VyIG5hbWUgZm9yIGF1dGhlbnRpY2F0aW5nIHRvIGFuIGh0dHAgcHJveHksIGlmIG5lZWRlZApwcm94eV91c2VyID0KCiMgcGFzc3dvcmQgZm9yIGJhc2ljIGh0dHAgcHJveHkgYXV0aCwgaWYgbmVlZGVkCnByb3h5X3Bhc3N3b3JkID0KCiMgaG9zdC9kb21haW4gc3VmZml4IGJsYWNrbGlzdCBmb3IgcHJveHksIGlmIG5lZWRlZApub19wcm94eSA9CgpbcmhzbV0KIyBDb250ZW50IGJhc2UgVVJMOgpiYXNldXJsID0gaHR0cHM6Ly9jZG4ucmVkaGF0LmNvbQoKIyBSZXBvc2l0b3J5IG1ldGFkYXRhIEdQRyBrZXkgVVJMOgpyZXBvbWRfZ3BnX3VybCA9CgojIFNlcnZlciBDQSBjZXJ0aWZpY2F0ZSBsb2NhdGlvbjoKY2FfY2VydF9kaXIgPSAvZXRjL3Joc20vY2EvCgojIERlZmF1bHQgQ0EgY2VydCB0byB1c2Ugd2hlbiBnZW5lcmF0aW5nIHl1bSByZXBvIGNvbmZpZ3M6CnJlcG9fY2FfY2VydCA9ICUoY2FfY2VydF9kaXIpc3JlZGhhdC11ZXAucGVtCgojIFdoZXJlIHRoZSBjZXJ0aWZpY2F0ZXMgc2hvdWxkIGJlIHN0b3JlZApwcm9kdWN0Q2VydERpciA9IC9ldGMvcGtpL3Byb2R1Y3QKZW50aXRsZW1lbnRDZXJ0RGlyID0gL2V0Yy9wa2kvZW50aXRsZW1lbnQKY29uc3VtZXJDZXJ0RGlyID0gL2V0Yy9wa2kvY29uc3VtZXIKCiMgTWFuYWdlIGdlbmVyYXRpb24gb2YgeXVtIHJlcG9zaXRvcmllcyBmb3Igc3Vic2NyaWJlZCBjb250ZW50OgptYW5hZ2VfcmVwb3MgPSAxCgojIFJlZnJlc2ggcmVwbyBmaWxlcyB3aXRoIHNlcnZlciBvdmVycmlkZXMgb24gZXZlcnkgeXVtIGNvbW1hbmQKZnVsbF9yZWZyZXNoX29uX3l1bSA9IDAKCiMgSWYgc2V0IHRvIHplcm8sIHRoZSBjbGllbnQgd2lsbCBub3QgcmVwb3J0IHRoZSBwYWNrYWdlIHByb2ZpbGUgdG8KIyB0aGUgc3Vic2NyaXB0aW9uIG1hbmFnZW1lbnQgc2VydmljZS4KcmVwb3J0X3BhY2thZ2VfcHJvZmlsZSA9IDEKCiMgVGhlIGRpcmVjdG9yeSB0byBzZWFyY2ggZm9yIHN1YnNjcmlwdGlvbiBtYW5hZ2VyIHBsdWdpbnMKcGx1Z2luRGlyID0gL3Vzci9zaGFyZS9yaHNtLXBsdWdpbnMKCiMgVGhlIGRpcmVjdG9yeSB0byBzZWFyY2ggZm9yIHBsdWdpbiBjb25maWd1cmF0aW9uIGZpbGVzCnBsdWdpbkNvbmZEaXIgPSAvZXRjL3Joc20vcGx1Z2luY29uZi5kCgojIE1hbmFnZSBhdXRvbWF0aWMgZW5hYmxpbmcgb2YgeXVtL2RuZiBwbHVnaW5zIChwcm9kdWN0LWlkLCBzdWJzY3JpcHRpb24tbWFuYWdlcikKYXV0b19lbmFibGVfeXVtX3BsdWdpbnMgPSAxCgojIFJ1biB0aGUgcGFja2FnZSBwcm9maWxlIG9uIGVhY2ggeXVtL2RuZiB0cmFuc2FjdGlvbgpwYWNrYWdlX3Byb2ZpbGVfb25fdHJhbnMgPSAwCgojIElub3RpZnkgaXMgdXNlZCBmb3IgbW9uaXRvcmluZyBjaGFuZ2VzIGluIGRpcmVjdG9yaWVzIHdpdGggY2VydGlmaWNhdGVzLgojIEN1cnJlbnRseSBvbmx5IHRoZSAvZXRjL3BraS9jb25zdW1lciBkaXJlY3RvcnkgaXMgbW9uaXRvcmVkIGJ5IHRoZQojIHJoc20uc2VydmljZS4gV2hlbiB0aGlzIGRpcmVjdG9yeSBpcyBtb3VudGVkIHVzaW5nIGEgbmV0d29yayBmaWxlIHN5c3RlbQojIHdpdGhvdXQgaW5vdGlmeSBub3RpZmljYXRpb24gc3VwcG9ydCAoZS5nLiBORlMpLCB0aGVuIGRpc2FibGluZyBpbm90aWZ5CiMgaXMgc3Ryb25nbHkgcmVjb21tZW5kZWQuIFdoZW4gaW5vdGlmeSBpcyBkaXNhYmxlZCwgcGVyaW9kaWNhbCBkaXJlY3RvcnkKIyBwb2xsaW5nIGlzIHVzZWQgaW5zdGVhZC4KaW5vdGlmeSA9IDEKCltyaHNtY2VydGRdCiMgSW50ZXJ2YWwgdG8gcnVuIGNlcnQgY2hlY2sgKGluIG1pbnV0ZXMpOgpjZXJ0Q2hlY2tJbnRlcnZhbCA9IDI0MAojIEludGVydmFsIHRvIHJ1biBhdXRvLWF0dGFjaCAoaW4gbWludXRlcyk6CmF1dG9BdHRhY2hJbnRlcnZhbCA9IDE0NDAKIyBJZiBzZXQgdG8gemVybywgdGhlIGNoZWNrcyBkb25lIGJ5IHRoZSByaHNtY2VydGQgZGFlbW9uIHdpbGwgbm90IGJlIHNwbGF5ZWQgKHJhbmRvbWx5IG9mZnNldCkKc3BsYXkgPSAxCiMgSWYgc2V0IHRvIDEsIHJoc21jZXJ0ZCB3aWxsIG5vdCBleGVjdXRlLgpkaXNhYmxlID0gMAoKW2xvZ2dpbmddCmRlZmF1bHRfbG9nX2xldmVsID0gSU5GTwojIHN1YnNjcmlwdGlvbl9tYW5hZ2VyID0gREVCVUcKIyBzdWJzY3JpcHRpb25fbWFuYWdlci5tYW5hZ2VyY2xpID0gREVCVUcKIyByaHNtID0gREVCVUcKIyByaHNtLmNvbm5lY3Rpb24gPSBERUJVRwojIHJoc20tYXBwID0gREVCVUcKIyByaHNtLWFwcC5yaHNtZCA9IERFQlVHCg==
+        filesystem: root
+        mode: 0644
+        path: /etc/rhsm/rhsm.conf
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 50-{{ role }}-entitlement-pem
+spec:
+  config:
+    ignition:
+      version: 2.2.0
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,{{ entitlement_base64 }}
+        filesystem: root
+        mode: 0644
+        path: /etc/pki/entitlement/entitlement.pem
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 50-{{ role }}-entitlement-key-pem
+spec:
+  config:
+    ignition:
+      version: 2.2.0
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,{{ entitlement_key_base64 }}
+        filesystem: root
+        mode: 0644
+        path: /etc/pki/entitlement/entitlement-key.pem
+

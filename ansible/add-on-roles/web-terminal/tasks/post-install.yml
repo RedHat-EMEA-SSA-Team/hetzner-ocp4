@@ -1,0 +1,21 @@
+---
+
+- name: Apply web-terminal subscription
+  k8s:
+    state: present
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: web-terminal
+        namespace: openshift-operators
+      spec:
+        channel: alpha
+        name: web-terminal
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
