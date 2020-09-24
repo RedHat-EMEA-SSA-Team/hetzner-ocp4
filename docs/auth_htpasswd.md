@@ -26,4 +26,4 @@ auth_htpasswd:
 ```
 *Note: Don't forget the two spaces before - (minus).
 
-![](http://spvgg-hoehenkirchen-hockey.de/wp-content/uploads/2020/09/auth_passwd.png)
+![](../images/auth_passwd.png)
