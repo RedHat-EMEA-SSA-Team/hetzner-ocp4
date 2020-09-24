@@ -141,8 +141,8 @@ Please configure in `cluster.yml` all necessary credentials:
 |---|---|---|
 |`storage_nfs`|false|Install NFS Storage with dynamic provisioning|
 |`vm_autostart`|false|Create cluster VMs with `autostart` enabled|
-|`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
-|`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
+|`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example - check also docs |
+|`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example and replace with hashed passwords - check also docs|
 |`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`cluster_role_bindings`|empty|Setup cluster role binding, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`openshift_install_command`|[check defaults](ansible/roles/openshift-4-cluster/defaults/main.yml)|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)|
@@ -166,6 +166,8 @@ Please configure in `cluster.yml` all necessary credentials:
 * [How to install an OpenShift nighly or RC (any kind of pre-release)](docs/ocp-pre-release.md)
 * [Disk management (add disk to vm, wipe node)](docs/disk-management.md)
 * [How to passthrough nvme or gpu (pci-passthrough](docs/pci-passthrough.md)
+* [How to configure Red Hat SSO via Google](https://examples.openshift.pub/authentication/redhat-sso/)
+* [How to replace htpasswd hashed passwords](docs/auth_htpasswd.md)
 
 # Useful commands
 
