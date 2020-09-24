@@ -7,6 +7,7 @@ README.md
 
 ### Added
 docs/auth_passwd.md
+
 images/auth_passwd.png
 
 ## 2020-07-30
