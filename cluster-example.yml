@@ -16,14 +16,16 @@ aws_access_key: key
 aws_secret_key: secret
 aws_zone: example.com
 # GCP
-gcp_project: project-name 
+gcp_project: project-name
 gcp_managed_zone_name: 'zone-name'
 gcp_managed_zone_domain: 'example.com.'
-gcp_serviceaccount_file: ../gcp_service_account.json 
+gcp_serviceaccount_file: ../gcp_service_account.json
 
+# Created with: htpasswd -nb admin openshift
+# Example password is openshift
 auth_htpasswd:
-  - admin:$apr1$81BkJ4dI$XGcaDat/h529tjbf4SNH//
-  - local:$apr1$81BkJ4dI$XGcaDat/h529tjbf4SNH//
+  - admin:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
+  - local:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
 
 storage_nfs: true # Default is false
 
