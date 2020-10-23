@@ -1,5 +1,15 @@
 # RELEASE NOTES
 
+## 2020-09-24
+
+### Update
+README.md
+
+### Added
+docs/auth_passwd.md
+
+images/auth_passwd.png
+
 ## 2020-07-30
 
 ### Bump OpenShift Version to 4.5.2
