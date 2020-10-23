@@ -16,7 +16,7 @@ networking:
     hostSubnetLength: 9
   machineCIDR: 10.0.0.0/16
   serviceCIDR: 172.30.0.0/16
-  type: OpenShiftSDN
+  type: {{ sdn_plugin_name }}
 platform:
   none: {}
 pullSecret:

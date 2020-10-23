@@ -13,3 +13,6 @@ subnet: 192.168.222
 
 # cidr for the openshift cluster subnet
 cidr: /24
+
+# sdn plugin
+sdn_plugin_name: OVNKubernetes
