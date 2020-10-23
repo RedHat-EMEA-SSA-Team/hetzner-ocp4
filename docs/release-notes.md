@@ -1,5 +1,13 @@
 # RELEASE NOTES
 
+## 2020-10
+
+### Dump OpenShift version to 4.6
+
+### SDN plugin defaults to OVNKubernetes
+
+cluster.yaml support sdn_plugin_name variable. Valid values are OVNKubernetes and OpenShiftSDN
+
 ## 2020-07-30
 
 ### Bump OpenShift Version to 4.5.2
