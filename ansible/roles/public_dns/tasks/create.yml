@@ -54,3 +54,24 @@
   when: pd_provider == "gcp"
   tags:
     - public_dns
+
+- name: Create DNS record at Azure 
+  azure_rm_dnsrecordset:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    time_to_live: 120
+    resource_group: "{{ azure_resource_group }}"
+    relative_name: "{{ item }}.{{ cluster_name }}"
+    zone_name: "{{ public_domain }}"
+    record_type: A
+    records:
+    - entry: "{{ pd_public_ip }}"
+    state: present
+  with_items:
+  - api
+  - '*.apps'
+  when: pd_provider == "azure"
+  tags:
+    - public_dns

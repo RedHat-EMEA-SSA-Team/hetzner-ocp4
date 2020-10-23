@@ -42,6 +42,19 @@
     - le_gcp_managed_zone_domain
   when: le_dns_provider == "gcp"
 
+- name: Check required Azure variables
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_azure_client_id
+    - le_azure_secret
+    - le_azure_subscription_id
+    - le_azure_tenant
+    - le_azure_resource_group
+  when: le_dns_provider == "azure"
+
 - name: Debug var only with -vv CloudFlare
   debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
@@ -84,3 +97,20 @@
     - le_public_domain
     - le_acme_directory
   when: le_dns_provider == "gcp"
+
+- name: Debug var only with -vv for Azure
+  debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_letsencrypt_account_email
+    - le_azure_client_id
+    - le_azure_secret
+    - le_azure_subscription_id
+    - le_azure_tenant
+    - le_azure_resource_group
+    - le_public_domain
+    - le_certificates_dir
+    - le_public_domain
+    - le_acme_directory
+  when: le_dns_provider == "azure"
