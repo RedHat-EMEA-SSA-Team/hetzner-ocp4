@@ -101,6 +101,24 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "gcp" and sample_com_challenge is changed
 
+- name: Create DNS record at Azure
+  azure_rm_dnsrecordset:
+    client_id: "{{ le_azure_client_id }}"
+    secret: "{{ le_azure_secret }}"
+    subscription_id: "{{ le_azure_subscription_id }}"
+    tenant: "{{ le_azure_tenant }}"
+    time_to_live: 60
+    resource_group: "{{ le_azure_resource_group }}"
+    relative_name: "{{ item.0.key }}"
+    zone_name: "{{ public_domain }}"
+    record_type: TXT
+    records:
+    - entry: "{{ item.1 }}"
+    state: present
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "azure" and sample_com_challenge is changed
+
 - name: DNS record info
   debug:
     msg: "{{ item.0.key }} TXT {{ item.1 }}"
