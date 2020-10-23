@@ -36,6 +36,13 @@
     le_gcp_serviceaccount_file: "{{ gcp_serviceaccount_file }}"
     le_gcp_managed_zone_name: "{{ gcp_managed_zone_name }}"
     le_gcp_managed_zone_domain: "{{ gcp_managed_zone_domain }}"
+
+    le_azure_client_id: "{{ azure_client_id }}"
+    le_azure_secret: "{{ azure_secret }}"
+    le_azure_subscription_id: "{{ azure_subscription_id }}"
+    le_azure_tenant: "{{ azure_tenant }}"
+    le_azure_resource_group:  "{{ azure_resource_group }}"
+    
   tags: letsencrypt
   when: letsencrypt_disabled == false
 

@@ -3,7 +3,7 @@ cluster_name: ocp4
 public_domain: example.com
 # set custom public ip for DNS entries. Defaults to: hostvars['localhost']['ansible_default_ipv4']['address']
 # public_ip: 92.100.42.2
-dns_provider: [route53|cloudflare|gcp]
+dns_provider: [route53|cloudflare|gcp|azure]
 letsencrypt_account_email: name@example.com
 # Depending on the dns provider:
 # CloudFlare
@@ -19,7 +19,13 @@ aws_zone: example.com
 gcp_project: project-name 
 gcp_managed_zone_name: 'zone-name'
 gcp_managed_zone_domain: 'example.com.'
-gcp_serviceaccount_file: ../gcp_service_account.json 
+gcp_serviceaccount_file: ../gcp_service_account.json
+# Azure
+azure_client_id: client_id
+azure_secret: key
+azure_subscription_id: subscription_id
+azure_tenant: tenant_id
+azure_resource_group: dns_zone_resource_group
 
 auth_htpasswd:
   - admin:$apr1$81BkJ4dI$XGcaDat/h529tjbf4SNH//
