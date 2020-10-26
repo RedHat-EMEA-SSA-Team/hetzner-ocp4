@@ -1,0 +1,105 @@
+---
+
+- name: Build openshift download urls
+  set_fact:
+    tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
+    tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
+
+- name: Check download urls
+  uri:
+    method: HEAD
+    url: "{{ item }}"  
+    status_code:
+      - 200
+      - 403
+  with_items:
+    - "{{ coreos_download_url }}"
+    - "{{ tmp_openshift_install_download_url }}"
+    - "{{ tmp_openshift_client_download_url }}"
+    - "{{ helm_cli_location }}"
+
+- name: check if coreos image already downloaded and get checksum
+  stat:
+    checksum_algorithm: sha256
+    path: "{{ coreos_path }}/{{ coreos_file }}"
+  register: coreos_old_image
+
+- name: verify existing coreos image is valid
+  lineinfile:
+    name: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
+    line: "{{ coreos_old_image.stat.checksum }}  {{ coreos_file }}"
+    state: present
+  check_mode: true
+  register: csum_check
+  failed_when: (csum_check is changed) or (csum_check is failed)
+  ignore_errors: true
+  when: coreos_old_image.stat.exists
+
+- name: Download fresh coreos image if previous doesn't exist
+  block:
+
+    - name: download coreos
+      get_url:
+        url: "{{ coreos_download_url }}"
+        dest: "{{ coreos_path }}/{{ coreos_file }}.xz"
+        checksum: "sha256:{{ coreos_csum_str }}"
+      register: coreos_download
+
+    - name: unxz the coreos
+      command: "unxz {{ coreos_path }}/{{ coreos_file }}.xz"
+      args:
+        chdir: "{{ coreos_path }}"
+        creates: "{{ coreos_path }}/{{ coreos_file }}"
+      register: unxz 
+
+    - name: calculate checksum of the new coreos image
+      stat:
+        checksum_algorithm: sha256
+        path: "{{ coreos_path }}/{{ coreos_file }}"
+      register: coreos_csum
+
+    - name: store the checksum of the file
+      copy:
+        dest: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
+        content: "{{ coreos_csum.stat.checksum }}  {{ coreos_file }}\n"
+
+  when: >
+    (not coreos_old_image.stat.exists) or
+    csum_check.changed or
+    csum_check.failed
+
+- name: Create OpenShift artifacts directory
+  file:
+    path: "/opt/openshift-{{ item }}-{{ openshift_version }}"
+    state: directory
+    mode: u+rwx,g-rx,o-rx
+  with_items:
+  - install
+  - client
+
+- name: Download Openshift installer
+  unarchive:
+    src: "{{ tmp_openshift_install_download_url }}"
+    dest: "/opt/openshift-install-{{ openshift_version }}/"
+    remote_src: yes
+    mode: u+rwx,g-rx,o-rx
+    creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
+
+- name: Download Openshift client
+  unarchive:
+    src: "{{ tmp_openshift_client_download_url }}"
+    dest: "/opt/openshift-client-{{ openshift_version }}/"
+    remote_src: yes
+    mode: u+rwx,g-rx,o-rx
+    creates: "/opt/openshift-client-{{ openshift_version }}/oc"
+
+- name: Create a symbolic link
+  file:
+    src: "{{ item.value }}"
+    dest: "{{ item.key }}"
+    state: link
+    force: yes
+  with_dict:
+    "/usr/local/bin/oc": "/opt/openshift-client-{{ openshift_version }}/oc"
+    "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
+    "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"

@@ -42,6 +42,12 @@
 - name: Download OpenShift Artifacts
   include: download-openshift-artifacts.yml
   tags: download-openshift-artifacts
+  when: install_okd is not defined 
+
+- name: Download OKD Artifacts
+  include: download-okd-artifacts.yml
+  tags: download-openshift-artifacts
+  when: install_okd is defined
 
 - name: Create ignition files
   include: create-ignition.yml
