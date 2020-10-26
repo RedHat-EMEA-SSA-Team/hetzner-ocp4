@@ -4,18 +4,25 @@
   set_fact:
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
+- set_fact:
+    check_urls:
+      - "{{ coreos_download_url }}"
+      - "{{ tmp_openshift_install_download_url }}"
+      - "{{ tmp_openshift_client_download_url }}"
+      - "{{ helm_cli_location }}"
+
+- set_fact:
+    check_urls: "{{ check_urls + coreos_csum_rul }}"
+  when: install_okd is not defined
 
 - name: Check download urls
   uri:
     method: HEAD
     url: "{{ item }}"  
-    status_code: 200
-  with_items:
-    - "{{ coreos_download_url }}"
-    - "{{ coreos_csum_url }}"
-    - "{{ tmp_openshift_install_download_url }}"
-    - "{{ tmp_openshift_client_download_url }}"
-    - "{{ helm_cli_location }}"
+    status_code:
+      - 200
+      - 403
+  with_items: "{{ check_urls }}"
 
 - name: check if coreos image already downloaded and get checksum
   stat:
@@ -41,7 +48,7 @@
       get_url:
         url: "{{ coreos_download_url }}"
         dest: "{{ coreos_path }}/{{ coreos_file }}.gz"
-        checksum: "sha256:{{ coreos_csum_url }}"
+        checksum: "sha256:{{ coreos_csum_str | default(coreos_csum_url) }}"
       register: coreos_download
 
     - name: unzip the coreos
@@ -50,6 +57,15 @@
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
       register: unzip
+      when: install_okd not defined
+
+    - name: unxz the coreos
+      command: "unxz {{ coreos_path }}/{{ coreos_file }}.xz"
+      args:
+        chdir: "{{ coreos_path }}"
+        creates: "{{ coreos_path }}/{{ coreos_file }}"
+      register: unxz
+      when: install_okd is defined
 
     - name: calculate checksum of the new coreos image
       stat:
