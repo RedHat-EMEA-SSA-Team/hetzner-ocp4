@@ -25,10 +25,11 @@ oc create secret generic hetzner-ocp4-pipeline\
 cloudflare_account_email: info@example.com
 letsencrypt_directory: "https://acme-staging-v02.api.letsencrypt.org/directory"
 
+# Created with: htpasswd -nb admin openshift
+# Example password is openshift
 auth_htpasswd:
-  - admin:$apr1$fwtOSKTC$CeS86bGLeuXcStFvl/3Ky/
-  - local:$apr1$81BkJ4dI$XGcaDat/h529tjbf4SNH//
-
+  - admin:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
+  - local:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
 storage_nfs: true
 
 cluster_role_bindings:
