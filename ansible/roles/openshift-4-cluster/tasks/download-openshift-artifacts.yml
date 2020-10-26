@@ -47,7 +47,7 @@
     - name: download coreos
       get_url:
         url: "{{ coreos_download_url }}"
-        dest: "{{ coreos_path }}/{{ coreos_file }}.gz"
+        dest: "{{ coreos_path }}/{{ coreos_file }}.{{ 'xz' if install_okd else 'gz' }}"
         checksum: "sha256:{{ coreos_csum_str | default(coreos_csum_url) }}"
       register: coreos_download
 
@@ -57,7 +57,7 @@
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
       register: unzip
-      when: install_okd not defined
+      when: install_okd is not defined
 
     - name: unxz the coreos
       command: "unxz {{ coreos_path }}/{{ coreos_file }}.xz"
