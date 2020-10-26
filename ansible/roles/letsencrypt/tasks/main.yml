@@ -109,7 +109,7 @@
     tenant: "{{ le_azure_tenant }}"
     time_to_live: 60
     resource_group: "{{ le_azure_resource_group }}"
-    relative_name: "{{ item.0.key }}"
+    relative_name: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '')}}"
     zone_name: "{{ public_domain }}"
     record_type: TXT
     records:
@@ -190,6 +190,21 @@
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "gcp" and sample_com_challenge is changed
+
+- name: Delete DNS record at Azure
+  azure_rm_dnsrecordset:
+    client_id: "{{ le_azure_client_id }}"
+    secret: "{{ le_azure_secret }}"
+    subscription_id: "{{ le_azure_subscription_id }}"
+    tenant: "{{ le_azure_tenant }}"
+    resource_group: "{{ le_azure_resource_group }}"
+    relative_name: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '')}}"
+    zone_name: "{{ public_domain }}"
+    record_type: TXT
+    state: absent
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "azure" and sample_com_challenge is changed
 
 - name: concat root ca and intermediate
   shell: "cat {{ le_certificates_dir }}/isrgrootx1.pem {{ le_certificates_dir }}/{{ le_public_domain }}/intermediate.crt >> {{ le_certificates_dir }}/{{ le_public_domain }}/ca-bundle.pem"
