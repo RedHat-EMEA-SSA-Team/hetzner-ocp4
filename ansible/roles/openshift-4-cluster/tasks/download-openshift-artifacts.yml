@@ -4,18 +4,27 @@
   set_fact:
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
+- set_fact:
+    check_urls:
+      - "{{ coreos_download_url }}"
+      - "{{ tmp_openshift_install_download_url }}"
+      - "{{ tmp_openshift_client_download_url }}"
+      - "{{ helm_cli_location }}"
+
+- set_fact:
+    check_urls: "{{ check_urls + [coreos_csum_url] }}"
+  when: coreos_csum_str is not defined
 
 - name: Check download urls
   uri:
     method: HEAD
     url: "{{ item }}"
-    status_code: 200
-  with_items:
-    - "{{ coreos_download_url }}"
-    - "{{ coreos_csum_url }}"
-    - "{{ tmp_openshift_install_download_url }}"
-    - "{{ tmp_openshift_client_download_url }}"
-    - "{{ helm_cli_location }}"
+    status_code:
+      - 200
+      # Forbidden because of github forwards to aws s3.
+      # HEAD request to S3 is forbidden
+      - 403
+  with_items: "{{ check_urls }}"
 
 - name: check if coreos image already downloaded and get checksum
   stat:
@@ -40,21 +49,36 @@
     #   fix not shipped yet
     - name: Findout exactly sha256
       set_fact:
-        sha256: "{{ lookup('url', coreos_csum_url,  split_lines=False ).split('\n') |map('regex_search','.*' + coreos_download_url | basename + '$') | select('string') | first | regex_search('^([a-z0-9])+')}}"
+        coreos_csum_str: "{{ lookup('url', coreos_csum_url,  split_lines=False ).split('\n') |map('regex_search','.*' + coreos_download_url | basename + '$') | select('string') | first | regex_search('^([a-z0-9])+')}}"
+      when: coreos_csum_str is not defined
 
     - name: download coreos
       get_url:
         url: "{{ coreos_download_url }}"
-        dest: "{{ coreos_path }}/{{ coreos_file }}.gz"
-        checksum: "sha256:{{ sha256 }}"
+        dest: "{{ coreos_path }}/{{ coreos_download_url | basename }}"
+        checksum: "sha256:{{ coreos_csum_str }}"
       register: coreos_download
 
+    - name: Get filetype
+      stat:
+        path: "{{ coreos_path }}/{{ coreos_download_url | basename }}"
+      register: coreos_stat
+
     - name: unzip the coreos
-      command: "gunzip {{ coreos_path }}/{{ coreos_file }}.gz"
+      command: "gunzip {{ coreos_path }}/{{ coreos_download_url | basename }}"
       args:
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
       register: unzip
+      when: coreos_stat.stat.mimetype == 'application/x-gzip'
+
+    - name: unxz the coreos
+      command: "unxz {{ coreos_path }}/{{ coreos_download_url | basename }}"
+      args:
+        chdir: "{{ coreos_path }}"
+        creates: "{{ coreos_path }}/{{ coreos_file }}"
+      register: unxz
+      when: coreos_stat.stat.mimetype == 'application/x-xz'
 
     - name: calculate checksum of the new coreos image
       stat:

@@ -24,7 +24,7 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 
 **These instructions are for running CentOS and 'root' machines which is setup following [Hetzner CentOS](docs/hetzner.md) documentation. You might have to modify commands if running on another Linux distro.  Feel free to provided instructions for providers.**
 
-**NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)   
+**NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)
 
 ** Supported root server operating systems: **
 - CentOS 8
@@ -124,7 +124,7 @@ DNS records are constructed based on _cluster_name_ and _public_domain_ values. 
 
 If you use another DNS provider, feel free to contribute. :D
 
-With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster. 
+With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.
 
 Please configure in `cluster.yml` all necessary credentials:
 
@@ -168,6 +168,7 @@ Please configure in `cluster.yml` all necessary credentials:
 * [How to install an OpenShift nighly or RC (any kind of pre-release)](docs/ocp-pre-release.md)
 * [Disk management (add disk to vm, wipe node)](docs/disk-management.md)
 * [How to passthrough nvme or gpu (pci-passthrough](docs/pci-passthrough.md)
+* [How to install OKD](docs/how-to-install-okd.md)
 
 # Useful commands
 
