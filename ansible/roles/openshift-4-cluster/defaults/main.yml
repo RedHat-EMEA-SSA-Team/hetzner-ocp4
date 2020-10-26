@@ -49,7 +49,7 @@ coreos_csum_url: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhc
 # you can check available version numbers from here:
 # https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/
 coreos_path: /var/lib/libvirt/images
-coreos_file: "rhcos-{{ coreos_version }}.qcow2"
+coreos_file: "{{ coreos_download_url | basename | regex_search('.*qcow2') }}"
 coreos_image_location: "{{ coreos_path }}/{{ coreos_file }}"
 
 certificates_dir: "{{ playbook_dir }}/../certificate"
