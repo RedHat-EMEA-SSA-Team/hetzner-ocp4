@@ -1,5 +1,4 @@
 ---
-install_okd: true
 openshift_version: 4.5.0-0.okd-2020-10-15-235428
 openshift_location: https://github.com/openshift/okd/releases/download/{{ openshift_version }}
 coreos_version: 32.20201004.3.0

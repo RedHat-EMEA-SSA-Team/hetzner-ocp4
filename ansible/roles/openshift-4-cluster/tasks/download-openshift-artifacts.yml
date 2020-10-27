@@ -12,8 +12,8 @@
       - "{{ helm_cli_location }}"
 
 - set_fact:
-    check_urls: "{{ check_urls + coreos_csum_rul }}"
-  when: install_okd is not defined
+    check_urls: "{{ check_urls + [coreos_csum_url] }}"
+  when: coreos_csum_str is not defined
 
 - name: Check download urls
   uri:
