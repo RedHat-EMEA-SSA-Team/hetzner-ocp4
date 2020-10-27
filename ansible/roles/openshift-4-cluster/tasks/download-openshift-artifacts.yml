@@ -43,11 +43,14 @@
 
 - name: Download fresh coreos image if previous doesn't exist
   block:
+    - name: Get file type
+      set_fact:
+        file_type: "{{ (coreos_download_url | splitext)[-1] }}"
 
     - name: download coreos
       get_url:
         url: "{{ coreos_download_url }}"
-        dest: "{{ coreos_path }}/{{ coreos_file }}.{{ 'xz' if install_okd else 'gz' }}"
+        dest: "{{ coreos_path }}/{{ coreos_file }}{{ file_type }}"
         checksum: "sha256:{{ coreos_csum_str | default(coreos_csum_url) }}"
       register: coreos_download
 
@@ -57,7 +60,7 @@
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
       register: unzip
-      when: install_okd is not defined
+      when: file_type == '.gz'
 
     - name: unxz the coreos
       command: "unxz {{ coreos_path }}/{{ coreos_file }}.xz"
@@ -65,7 +68,7 @@
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
       register: unxz
-      when: install_okd is defined
+      when: file_type == '.xz'
 
     - name: calculate checksum of the new coreos image
       stat:
