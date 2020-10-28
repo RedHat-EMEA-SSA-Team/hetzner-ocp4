@@ -50,7 +50,7 @@ subscription-manager repos --disable=*
 subscription-manager repos \
     --enable="rhel-7-server-rpms" \
     --enable="rhel-7-server-extras-rpms" \
-    --enable="rhel-7-server-ansible-2.8-rpms" \
+    --enable="rhel-7-server-ansible-2.9-rpms" \
     --enable="rhel-7-server-ose-4.2-rpms" \
     --enable="rhel-7-server-openstack-14-rpms"
 ```
