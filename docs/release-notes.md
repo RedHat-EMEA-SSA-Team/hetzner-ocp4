@@ -20,6 +20,21 @@ azure_tenant: tenant_id
 azure_resource_group: dns_zone_resource_group
 ```
 
+### Add okd4 support
+
+cluster.yml example:
+```
+image_pull_secret: '{"auths":{"fake":{"auth": "bar"}}}'
+
+openshift_version: 4.5.0-0.okd-2020-10-15-235428
+openshift_location: https://github.com/openshift/okd/releases/download/{{ openshift_version }}
+coreos_version: 32.20201004.3.0
+coreos_download_url: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/32.20201004.3.0/x86_64/fedora-coreos-32.20201004.3.0-qemu.x86_64.qcow2.xz
+coreos_csum_str: 5a4f80e85b66d3c7a0d5789d3f4f65d30a57871b6fe49dc791e490763f1eacdb
+```
+
+Thanks to @sandrich for contriution.
+
 ### Fixes
 
  * Fixed #123 useage of letsencrypt_account_email & cloudflare_account_email
