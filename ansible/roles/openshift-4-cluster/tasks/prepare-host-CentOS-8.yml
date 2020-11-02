@@ -19,6 +19,12 @@
       # ansible k8s need python2-openshift
       - openshift
 
+- name: Enable & Start firewalld
+  service:
+    name: firewalld
+    state: started
+    enabled: True
+
 - name: Allow NFS traffic from VM's to Host
   firewalld:
     zone: libvirt
