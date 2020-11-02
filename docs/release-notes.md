@@ -41,6 +41,8 @@ Thanks to @sandrich for contriution.
  * add mode (0644) for ignition file
  * Update auth_htpasswd example with know password - because of #133
  * Add work-a-round for https://github.com/ansible/ansible/issues/71420
+ * Fixed #125 Fresh centos 8.2 -- firewalld reload failed because "FirewallD is
+   not running"
 
 ## 2020-09-24
 
