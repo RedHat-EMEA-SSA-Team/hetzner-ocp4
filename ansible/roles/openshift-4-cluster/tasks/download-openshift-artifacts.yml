@@ -8,7 +8,7 @@
 - name: Check download urls
   uri:
     method: HEAD
-    url: "{{ item }}"  
+    url: "{{ item }}"
     status_code: 200
   with_items:
     - "{{ coreos_download_url }}"
@@ -36,12 +36,17 @@
 
 - name: Download fresh coreos image if previous doesn't exist
   block:
+    # Work-a-round for https://github.com/ansible/ansible/issues/71420
+    #   fix not shipped yet
+    - name: Findout exactly sha256
+      set_fact:
+        sha256: "{{ lookup('url', coreos_csum_url,  split_lines=False ).split('\n') |map('regex_search','.*' + coreos_download_url | basename + '$') | select('string') | first | regex_search('^([a-z0-9])+')}}"
 
     - name: download coreos
       get_url:
         url: "{{ coreos_download_url }}"
         dest: "{{ coreos_path }}/{{ coreos_file }}.gz"
-        checksum: "sha256:{{ coreos_csum_url }}"
+        checksum: "sha256:{{ sha256 }}"
       register: coreos_download
 
     - name: unzip the coreos
