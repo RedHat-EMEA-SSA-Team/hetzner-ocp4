@@ -3,7 +3,7 @@
 If you prefer to use [OKD](https://docs.okd.io/latest/welcome/index.html) instead of OCP you need to define the following variables inside your cluster.yml
 
 ```
-image_pull_secret: {"auths":{"fake":{"auth": "bar"}}}
+image_pull_secret: '{"auths":{"fake":{"auth": "bar"}}}'
 
 openshift_version: 4.5.0-0.okd-2020-10-15-235428
 openshift_location: https://github.com/openshift/okd/releases/download/{{ openshift_version }}
