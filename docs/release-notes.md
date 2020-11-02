@@ -1,12 +1,31 @@
 # RELEASE NOTES
 
-## 2020-10
+## 2020-xx
 
 ### Dump OpenShift version to 4.6
 
 ### SDN plugin defaults to OVNKubernetes
 
 cluster.yaml support sdn_plugin_name variable. Valid values are OVNKubernetes and OpenShiftSDN
+
+### Add Azure DNS Support
+
+```init
+dns_provider: [route53|cloudflare|gcp|azure]
+# Azure
+azure_client_id: client_id
+azure_secret: key
+azure_subscription_id: subscription_id
+azure_tenant: tenant_id
+azure_resource_group: dns_zone_resource_group
+```
+
+### Fixes
+
+ * Fixed #123 useage of letsencrypt_account_email & cloudflare_account_email
+ * add mode (0644) for ignition file
+ * Update auth_htpasswd example with know password - because of #133
+ * Add work-a-round for https://github.com/ansible/ansible/issues/71420
 
 ## 2020-09-24
 
