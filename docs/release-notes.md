@@ -33,7 +33,7 @@ coreos_download_url: https://builds.coreos.fedoraproject.org/prod/streams/stable
 coreos_csum_str: 5a4f80e85b66d3c7a0d5789d3f4f65d30a57871b6fe49dc791e490763f1eacdb
 ```
 
-Thanks to @sandrich for contriution.
+Thanks to @sandrich for contribution.
 
 ### Fixes
 
