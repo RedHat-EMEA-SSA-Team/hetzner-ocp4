@@ -2,20 +2,20 @@
 
 Some notes how you can setup a air-gapped / disconnected OpenShift 4 cluster with hetzner-ocp4
 
-## Create network 
+## Create network
 
-Create only the network, important to install and start the mirror registry add 
+Create only the network, important to install and start the mirror registry add
 ```
 network_forward_mode: "route"
 ```
-into `cluster.yml` and setup the network: 
+into `cluster.yml` and setup the network:
 ```
 ./ansible/02-create-cluster.yml --tags network
 ```
 
 ## Setup mirror registry on kvm-host
 
-Create host entry for image registry mirror: 
+Create host entry for image registry mirror:
 ```
 echo 192.168.50.1 host.compute.local >> /etc/hosts
 ```
@@ -29,7 +29,7 @@ mkdir -p /var/lib/libvirt/images/mirror-registry/{auth,certs,data}
 openssl req -newkey rsa:4096 -nodes -sha256 \
   -keyout /var/lib/libvirt/images/mirror-registry/certs/domain.key \
   -x509 -days 365 -subj "/CN=host.compute.local" \
-  -out /var/lib/libvirt/images/mirror-registry/certs/domain.crt 
+  -out /var/lib/libvirt/images/mirror-registry/certs/domain.crt
 
 cp -v /var/lib/libvirt/images/mirror-registry/certs/domain.crt /etc/pki/ca-trust/source/anchors/
 update-ca-trust
@@ -37,7 +37,7 @@ update-ca-trust
 htpasswd -bBc /var/lib/libvirt/images/mirror-registry/auth/htpasswd admin r3dh4t\!1
 ```
 
-Create internal registry service: `/etc/systemd/system/mirror-registry.service`  
+Create internal registry service: `/etc/systemd/system/mirror-registry.service`
 **Change REGISTRY_HTTP_ADDR in case you use different network**
 ```
 cat - > /etc/systemd/system/mirror-registry.service <<EOF
@@ -120,13 +120,13 @@ Install oc client
 Mirror images:
 ```
 export OCP_RELEASE=$(oc version -o json  --client | jq -r '.releaseClientVersion')
-export LOCAL_REGISTRY='host.compute.local:5000' 
-export LOCAL_REPOSITORY='ocp4/openshift4' 
-export PRODUCT_REPO='openshift-release-dev' 
-export LOCAL_SECRET_JSON='pullsecret.json' 
-export RELEASE_NAME="ocp-release" 
+export LOCAL_REGISTRY='host.compute.local:5000'
+export LOCAL_REPOSITORY='ocp4/openshift4'
+export PRODUCT_REPO='openshift-release-dev'
+export LOCAL_SECRET_JSON='pullsecret.json'
+export RELEASE_NAME="ocp-release"
 export ARCHITECTURE=x86_64
-# export REMOVABLE_MEDIA_PATH=<path> 
+# export REMOVABLE_MEDIA_PATH=<path>
 
 # Try run:
 
@@ -519,11 +519,11 @@ registry.redhat.io/rhscl/ruby-24-rhel7:latest
 registry.redhat.io/rhscl/ruby-25-rhel7:latest"
 
 
-for i in $IMAGES ; do 
+for i in $IMAGES ; do
   oc image mirror -a ${LOCAL_SECRET_JSON} \
   $i \
   ${LOCAL_REGISTRY}/${i//registry.redhat.io\/}
-done; 
+done;
 
 oc create configmap registry-config --from-file=${LOCAL_REGISTRY/:/..}=/var/lib/libvirt/images/mirror-registry/certs/domain.crt -n openshift-config
 
@@ -536,7 +536,7 @@ oc patch configs.samples.operator.openshift.io/cluster \
 
 ```
 
-### How to skip imagestreams 
+### How to skip imagestreams
 
 ```
 oc patch configs.samples.operator.openshift.io/cluster \
@@ -546,3 +546,51 @@ oc patch configs.samples.operator.openshift.io/cluster \
 ```
 
 Maybe checkout the missing imagestreams bevor: `oc describe configs.samples.operator.openshift.io/cluster`
+
+
+### How to upgrade your cluster
+
+Official documentation: [Updating a restricted network cluster](https://docs.openshift.com/container-platform/latest/updating/updating-restricted-network-cluster.html)
+
+```yaml
+export OCP_RELEASE= <<<< TARGET RELEASE >>>>>
+export LOCAL_REGISTRY='host.compute.local:5000'
+export LOCAL_REPOSITORY='ocp4/openshift4'
+export PRODUCT_REPO='openshift-release-dev'
+export LOCAL_SECRET_JSON='pullsecret.json'
+export RELEASE_NAME="ocp-release"
+export ARCHITECTURE=x86_64
+
+# Mirror new release
+oc adm -a ${LOCAL_SECRET_JSON} release mirror \
+  --from=quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
+  --to=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY} \
+  --to-release-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE}
+
+# Get release digest
+
+export DIGEST="$(oc adm release info quay.io/openshift-release-dev/ocp-release:${OCP_RELEASE}-${ARCHITECTURE} | sed -n 's/Pull From: .*@//p')"
+
+export DIGEST_ALGO="${DIGEST%%:*}"
+export DIGEST_ENCODED="${DIGEST#*:}"
+
+export SIGNATURE_BASE64=$(curl -s "https://mirror.openshift.com/pub/openshift-v4/signatures/openshift/release/${DIGEST_ALGO}=${DIGEST_ENCODED}/signature-1" | base64 -w0 && echo)
+
+oc apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-image-${OCP_RELEASE}
+  namespace: openshift-config-managed
+  labels:
+    release.openshift.io/verification-signatures: ""
+binaryData:
+  ${DIGEST_ALGO}-${DIGEST_ENCODED}: ${SIGNATURE_BASE64}
+EOF
+
+# Start upgrade
+oc adm upgrade \
+  --allow-explicit-upgrade \
+  --to-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}@${DIGEST}
+
+```
