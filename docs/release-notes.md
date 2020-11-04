@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## 2020-xx
+## 2020-11-04
 
 ### Dump OpenShift version to 4.6
 
