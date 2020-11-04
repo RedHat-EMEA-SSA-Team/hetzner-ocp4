@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## 2020-11-04
+
+### Bump OpenShift Version to 4.5.16
+[Changelog](https://docs.openshift.com/container-platform/4.5/release_notes/ocp-4-5-release-notes.html#ocp-4-5-16)
+
 ## 2020-09-24
 
 ### Update
