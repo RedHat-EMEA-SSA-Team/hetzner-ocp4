@@ -12,6 +12,14 @@
     add_host: 
       name: "{{ hetzner_hostname }}"
 
+  - name: Check DNS record
+    assert:
+      that:
+        - lookup('dig', '{{ hetzner_hostname }}.') == '{{ hetzner_ip }}'
+      fail_msg: "{{ hetzner_hostname }} does not point to {{ hetzner_ip }}"
+      success_msg: "{{ hetzner_hostname }} points to {{ hetzner_ip }}"
+      quiet: yes
+
 - name: install hetzner server
   hosts: all
   gather_facts: no
