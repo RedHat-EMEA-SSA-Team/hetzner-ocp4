@@ -42,10 +42,10 @@ image_pull_secret: |-
   {"auths":{"cloud.openshift.com":{"auth":"....
 
 # Hetzner informations (for role provision-hetzner)
-hetzner_hostname: "hostnmae"
+hetzner_hostname: "hostname"
 hetzner_webservice_username: "xxxx"
 hetzner_webservice_password: "xxxxx"
-hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-76-64-minimal.tar.gz"
+hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-82-64-minimal.tar.gz"
 hetzner_ip: "178.63.99.94"
 
 hetzner_disk1: sda
