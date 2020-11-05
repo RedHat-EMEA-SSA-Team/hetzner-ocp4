@@ -57,8 +57,11 @@
 - name: Remove server from local known_hosts file
   local_action:
     module: command
-    cmd: "/usr/bin/ssh-keygen -R {{ inventory_hostname }}"
+    cmd: "/usr/bin/ssh-keygen -R {{ item }}"
   ignore_errors: yes
+  loop:
+    - "{{ hetzner_hostname }}"
+    - "{{ hetzner_ip }}"
 
 - name: Pause a bit for the hardware reset to kick in
   pause: seconds=15
@@ -116,8 +119,13 @@
   ignore_errors: yes
 
 - name: Remove server from local known_hosts file
-  local_action: command  /usr/bin/ssh-keygen -R {{ inventory_hostname }}
+  local_action:
+    module: command
+    cmd: "/usr/bin/ssh-keygen -R {{ item }}"
   ignore_errors: yes
+  loop:
+    - "{{ hetzner_hostname }}"
+    - "{{ hetzner_ip }}"
 
 - name: Wait 300 seconds for port 22 to become open
   wait_for:
