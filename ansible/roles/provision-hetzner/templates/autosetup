@@ -1,7 +1,7 @@
 DRIVE1 /dev/{{ hetzner_disk1 }}
 DRIVE2 /dev/{{ hetzner_disk2 }}
-SWRAID 1
-SWRAIDLEVEL 0
+SWRAID {{ hetzner_swraid }}
+SWRAIDLEVEL {{ hetzner_swraid_level }}
 BOOTLOADER grub
 HOSTNAME {{ hetzner_hostname }}
 PART /boot ext3 512M

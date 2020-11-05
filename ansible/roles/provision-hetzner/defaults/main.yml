@@ -4,6 +4,8 @@ hetzner_disk1: nvme0n1
 hetzner_disk2: nvme1n1
 hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-82-64-minimal.tar.gz"
 hetzner_image_ignore_errors: false
+hetzner_swraid: 1
+hetzner_swraid_level: 0
 # hetzner_webservice_username: 
 # hetzner_webservice_password:
 # hetzner_hostname: "hostname.example.com"

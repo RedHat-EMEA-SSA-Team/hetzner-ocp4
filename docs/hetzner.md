@@ -133,8 +133,10 @@ If you do not want to do the above steps by hand: use Ansible! :-)
     hetzner_disk1: nvme0n1
     hetzner_disk2: nvme1n1
 
+    # Optional (see ../ansible/roles/provision-hetzner/defaults/main.yml):
     #   hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-82-64-minimal.tar.gz"
     #   hetzner_autosetup_file: "{{ playbook_dir }}/my-autosetup-for-openshift"
+    #   ...
     ```
 
 2) Run playbook: `./ansible/00-provision-hetzner.yml`

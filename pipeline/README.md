@@ -48,6 +48,9 @@ hetzner_webservice_password: "xxxxx"
 hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-82-64-minimal.tar.gz"
 hetzner_ip: "178.63.99.94"
 
+hetzner_swraid: 1
+hetzner_swraid_level: 1
+
 hetzner_disk1: sda
 hetzner_disk2: sdb
 ```
