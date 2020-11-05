@@ -1,5 +1,15 @@
 # RELEASE NOTES
 
+## 2020-11-05
+
+### Dump default CentOS version to 8.2
+
+### Make raid levels configurable
+
+### Fix removal of known_hosts
+
+### Check if DNS record exists
+
 ## 2020-11-04
 
 ### Dump OpenShift version to 4.6
