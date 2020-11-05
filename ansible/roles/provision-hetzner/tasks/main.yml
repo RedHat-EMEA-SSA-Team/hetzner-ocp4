@@ -27,7 +27,7 @@
   delegate_to: localhost
 
 - name: Activate rescue mode
-  when:  rescue.json.rescue.active == false
+  when: rescue.json.rescue.active == false
   uri:
     url: "https://robot-ws.your-server.de/boot/{{ hetzner_ip }}/rescue"
     method: POST
@@ -88,7 +88,7 @@
   command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup"
   environment:
     TERM: "vt100"
-  ignore_errors: true
+  ignore_errors: yes
   register: result
 
 - debug:
@@ -130,7 +130,7 @@
 - name: Check ansible_python_interpreter
   ping:
   register: rc
-  ignore_errors: true
+  ignore_errors: yes
 
 - name: Set ansible_python_interpreter to /usr/libexec/platform-python (RHEL 8)
   set_fact:

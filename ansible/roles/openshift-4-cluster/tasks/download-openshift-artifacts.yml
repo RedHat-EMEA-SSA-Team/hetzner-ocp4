@@ -40,7 +40,7 @@
   check_mode: true
   register: csum_check
   failed_when: (csum_check is changed) or (csum_check is failed)
-  ignore_errors: true
+  ignore_errors: yes
   when: coreos_old_image.stat.exists
 
 - name: Download fresh coreos image if previous doesn't exist
