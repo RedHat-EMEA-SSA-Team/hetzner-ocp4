@@ -34,6 +34,7 @@ auth_htpasswd:
   - local:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
 
 storage_nfs: true # Default is false
+masters_schedulable: false # Default is false
 
 auth_redhatsso:
   client_id: "xxxxx.apps.googleusercontent.com"

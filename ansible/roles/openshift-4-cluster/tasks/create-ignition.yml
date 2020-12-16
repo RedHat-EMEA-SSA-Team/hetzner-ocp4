@@ -14,7 +14,17 @@
     dest: "{{ openshift_install_dir }}/install-config.yaml.original"
     src: "{{ openshift_install_dir }}/install-config.yaml"
 
+- name: Create manifest files
+  command: "{{ openshift_install_command }} create manifests --dir={{ openshift_install_dir }}"
+  when: masters_schedulable != true
+
+- name: Make Master nodes unschedulable
+  lineinfile:
+    path: "{{ openshift_install_dir }}/manifests/cluster-scheduler-02-config.yml"
+    regexp: '^(.*)mastersSchedulable(.*)$'
+    line: '  masterSchedulable: False'
+    backrefs: yes
+  when: masters_schedulable != true
+
 - name: Create ignition files
   command: "{{ openshift_install_command }} --dir={{ openshift_install_dir }} create ignition-configs"
-  args:
-    creates: "{{ openshift_install_dir}}/.openshift_install_state.json"

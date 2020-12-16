@@ -75,3 +75,6 @@ storage_nfs_target_namespace: openshift-nfs-provisioner
 
 # sdn plugin
 sdn_plugin_name: OVNKubernetes
+
+# Master node schedulable
+masters_schedulable: false
