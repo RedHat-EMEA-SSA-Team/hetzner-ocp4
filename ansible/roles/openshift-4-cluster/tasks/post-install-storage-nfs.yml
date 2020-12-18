@@ -1,12 +1,12 @@
 ---
 # Install packages
 # Configure
-# 
+#
 # Handlers
-# 
+#
 
 - name: Ensure NFS utilities are installed.
-  package: 
+  package:
     name: nfs-utils
     state: present
 
@@ -17,15 +17,11 @@
     enabled: true
 
 - set_fact:
-    nfs_server: "nfs"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
-
-- set_fact:
     nfs_server: "nfs-server"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version != '7'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '8'
 
 - name: Ensure nfs is running.
-  service: 
+  service:
     name: "{{ nfs_server }}"
     state: started
     enabled: yes
@@ -34,7 +30,7 @@
   blockinfile:
     path: /etc/exports
     backup: yes
-    create: yes 
+    create: yes
     marker: "# {mark} OpenShift cluster - {{ cluster_name }}"
     owner: root
     group: root
@@ -75,7 +71,7 @@
         capacity:
           storage: 100Gi
         nfs:
-          path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry" 
+          path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry"
           server: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
         persistentVolumeReclaimPolicy: Recycle
 
@@ -95,7 +91,7 @@
         resources:
           requests:
             storage: 100Gi
-      
+
 - name: Add pvc registry-storage to image registry
   command: |
     oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --config {{ openshift_install_dir }}/auth/kubeconfig
@@ -103,8 +99,8 @@
   retries: 60
   delay: 30
   until: registry_status.rc == 0
-  tags: 
-   - storage  
+  tags:
+   - storage
 
 - name: Adjust directory permissions
   file:
@@ -115,7 +111,7 @@
   - "infra-registry"
   - "user-pvs"
 
-- name: Create Namespace 
+- name: Create Namespace
   k8s:
     state: present
     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
