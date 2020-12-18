@@ -1,0 +1,6 @@
+---
+- name: Install boto on RHEL/CentOS 8 via dnf/yum
+  yum:
+    name:
+      - python3-boto3
+    state: present

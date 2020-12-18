@@ -1,0 +1,11 @@
+---
+- name: Install Azure Ansible pip dependencies
+  pip:
+    name:
+    - packaging
+    - msrest
+    - msrestazure
+    - azure.common
+    - azure.mgmt
+    - azure.storage
+    - azure.mgmt.automation
