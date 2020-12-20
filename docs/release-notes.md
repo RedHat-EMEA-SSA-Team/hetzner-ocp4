@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## 2020-12-20
+
+### Add create new compute nodes support
+
+docs/add-compute-nodes.md
+
 ## 2020-11-04
 
 ### Dump OpenShift version to 4.6
