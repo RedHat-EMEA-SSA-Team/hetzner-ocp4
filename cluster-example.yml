@@ -54,6 +54,13 @@ cluster_role_bindings:
   - cluster_role: cluster-admin
     name: admin
 
+compute_count: 3
+compute_vcpu: 2
+compute_memory_size: 16384
+compute_memory_unit: 'MiB'
+# qemu-img image size specified.
+#   You may use k, M, G, T, P or E suffixe
+compute_root_disk_size: '120G'
 
 image_pull_secret: |-
   asdfghfdsa
