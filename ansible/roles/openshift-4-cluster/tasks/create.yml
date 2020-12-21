@@ -42,7 +42,7 @@
     le_azure_subscription_id: "{{ azure_subscription_id }}"
     le_azure_tenant: "{{ azure_tenant }}"
     le_azure_resource_group:  "{{ azure_resource_group }}"
-    
+
   tags: letsencrypt
   when: letsencrypt_disabled == false
 
@@ -94,7 +94,8 @@
     vm_memory_size: "{{ compute_memory_size }}"
     vm_memory_unit: "{{ compute_memory_unit }}"
     vm_root_disk_size: "{{ compute_root_disk_size }}"
-  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+  with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
+  when: compute_count > 0
 
 - name: Include post installation tasks
   include: post-install.yml
