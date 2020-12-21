@@ -7,14 +7,15 @@ compute:
 controlPlane:
   name: master
   platform: {}
-  replicas: {{ master_count }} 
+  replicas: {{ master_count }}
 metadata:
   name: {{ cluster_name }}
 networking:
   clusterNetworks:
   - cidr: 10.128.0.0/14
     hostSubnetLength: 9
-  machineCIDR: 10.0.0.0/16
+  machineNetwork:
+  - cidr: {{ vn_subnet }}/24
   serviceCIDR: 172.30.0.0/16
   type: {{ sdn_plugin_name }}
 platform:
@@ -28,10 +29,10 @@ additionalTrustBundle: |
   {{ install_config_additionalTrustBundle |indent(width=2) }}
 {% endif %}
 {%- if install_config_imageContentSources is defined %}
-imageContentSources: 
+imageContentSources:
   {{ install_config_imageContentSources  | to_nice_yaml(indent=2) | indent(width=2) }}
 {% endif %}
 {%- if install_config_proxy is defined %}
-proxy: 
+proxy:
   {{ install_config_proxy  | to_nice_yaml(indent=2) | indent(width=2) }}
 {% endif %}
