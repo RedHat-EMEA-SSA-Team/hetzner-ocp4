@@ -14,6 +14,11 @@
       - python3-openshift
     state: present
 
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
 - name: Enable & Start firewalld
   service:
     name: firewalld
