@@ -1,4 +1,7 @@
 ---
+- name: Build k8s variables
+  import_tasks: build-k8s-vars.yml
+
 - name: Check certificates exist
   stat:
     path: "{{ certficate_fullchain }}"
@@ -13,7 +16,11 @@
     - name: Create secret with certificates for openshift-ingress
       k8s:
         state: present
-        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        kubeconfig: "{{ k8s_kubeconfig }}"
+        host: "{{ k8s_host }}"
+        ca_cert: "{{ k8s_ca_cert }}"
+        client_cert: "{{ k8s_client_cert }}"
+        client_key: "{{ k8s_client_key }}"
         definition:
           apiVersion: v1
           kind: Secret
@@ -27,7 +34,11 @@
     - name: Patch ingresscontroller/default
       k8s:
         state: present
-        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        kubeconfig: "{{ k8s_kubeconfig }}"
+        host: "{{ k8s_host }}"
+        ca_cert: "{{ k8s_ca_cert }}"
+        client_cert: "{{ k8s_client_cert }}"
+        client_key: "{{ k8s_client_key }}"
         merge_type: merge
         definition:
           apiVersion: operator.openshift.io/v1
@@ -38,12 +49,16 @@
           spec:
             defaultCertificate:
               name: letsencrypt-router-certs
-    # Hot fix, remove of openshift api cert installation because of 
+    # Hot fix, remove of openshift api cert installation because of
     #          https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/117
     # - name: Create secret with certificates for openshift api
     #   k8s:
     #     state: present
-    #     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    #     kubeconfig: "{{ k8s_kubeconfig }}"
+    #     host: "{{ k8s_host }}"
+    #     ca_cert: "{{ k8s_ca_cert }}"
+    #     client_cert: "{{ k8s_client_cert }}"
+    #     client_key: "{{ k8s_client_key }}"
     #     definition:
     #       apiVersion: v1
     #       kind: Secret
@@ -57,7 +72,11 @@
     # - name: Patch api server config
     #   k8s:
     #     state: present
-    #     kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    #     kubeconfig: "{{ k8s_kubeconfig }}"
+    #     host: "{{ k8s_host }}"
+    #     ca_cert: "{{ k8s_ca_cert }}"
+    #     client_cert: "{{ k8s_client_cert }}"
+    #     client_key: "{{ k8s_client_key }}"
     #     merge_type: merge
     #     definition:
     #       apiVersion: config.openshift.io/v1
