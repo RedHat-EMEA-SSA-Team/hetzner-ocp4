@@ -156,5 +156,5 @@ Please configure in `cluster.yml` all necessary credentials:
 
 | Problem | Command |
 |---|---|
-|Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-demo ./watch-stats.sh```
+|Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-${cluster_name} ./watch-stats.sh```
 |Start cluster after reboot|```./ansible/04-start-cluster.yml```
