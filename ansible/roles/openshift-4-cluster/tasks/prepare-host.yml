@@ -8,6 +8,11 @@
     state: started
     enabled: yes
 
+- name: 'Restart libvirtd because of Issue #146'
+  systemd:
+    name: libvirtd
+    state: restarted
+
 - name: Verify KVM module is loaded
   shell: "lsmod | grep -i kvm"
   register: result
