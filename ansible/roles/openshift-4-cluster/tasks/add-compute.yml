@@ -1,0 +1,41 @@
+---
+
+- name: Number of computes to add into the cluster
+  debug:
+    msg: "{{ compute_count }}"
+
+# This task assume to have 3 worker running (TODO extract the worker node in the cluster and assert them into a var).
+- name: Add new compute nodes ip and mac into the libvirt network
+  virt_net:
+    name: "{{ cluster_name }}"
+    command: modify
+    xml: "<host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + item|int) }}' name='compute-{{ item|int }}.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + item|int }}'/>"
+  with_sequence: start=3 end="{{ compute_count|int - 1 }}" stride=1
+
+- name: Create compute node
+  include: create-vm.yml
+  vars:
+    vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
+    vm_network: "{{ cluster_name }}"
+    vm_ignition_file: "{{ openshift_install_dir }}/worker.ign"
+    vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + item|int) }}"
+    vm_vcpu: "{{ compute_vcpu }}"
+    vm_special_cpu: "{{ compute_special_cpu | default('') }}"
+    vm_memory_size: "{{ compute_memory_size }}"
+    vm_memory_unit: "{{ compute_memory_unit }}"
+    vm_root_disk_size: "{{ compute_root_disk_size }}"
+  with_sequence: start=3 end="{{ compute_count|int - 1 }}" stride=1
+
+- name: Start background node approver process
+  async: 1800   #   30 minutes
+  poll: 0
+  shell: |
+    while true
+    do
+      oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" get csr --no-headers | \
+        awk '/Pending/ {print $1}' | \
+        xargs --no-run-if-empty oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
+      sleep 1
+    done
+
+#TODO: Add check the new worker nodes until they are ready in the cluster

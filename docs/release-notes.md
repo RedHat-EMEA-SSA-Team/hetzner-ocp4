@@ -1,5 +1,15 @@
 # RELEASE NOTES
 
+# RELEASE NOTES
+
+## 2020-12-20
+
+### Add create new compute nodes support
+
+Now adding new compute/worker nodes are supported usign the same and valid worker.ign
+
+docs/add-compute-nodes.md
+
 ## 2020-11-04
 
 ### Dump OpenShift version to 4.6
