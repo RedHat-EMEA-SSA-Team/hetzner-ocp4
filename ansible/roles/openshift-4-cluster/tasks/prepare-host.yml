@@ -38,6 +38,3 @@
     insertafter: '^\[Network\]'
     regexp: '^IPForward='
   when: stat_result.stat.exists == True
-
-- name: Include DNS provider dependencies
-  include: "prepare-for-dns-provider-{{ dns_provider }}.yml"

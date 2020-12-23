@@ -1,0 +1,18 @@
+---
+- name: Delete DNS record at GCP
+  gcp_dns_resource_record_set:
+    name: "{{ item }}.{{ pd_public_domain }}."
+    managed_zone:
+        name: "{{ gcp_managed_zone_name }}"
+        dnsName: "{{ gcp_managed_zone_domain }}"
+    type: A
+    ttl: 120
+    target:
+    - "{{ pd_public_ip }}"
+    project: "{{ gcp_project }}"
+    auth_kind: serviceaccount
+    service_account_file: "{{ gcp_serviceaccount_file }}"
+    state: absent
+  with_items:
+  - api
+  - '*.apps'

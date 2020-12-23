@@ -1,0 +1,17 @@
+---
+- name: Delete DNS record at Azure
+  azure_rm_dnsrecordset:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    relative_name: "{{ item }}.{{ cluster_name }}"
+    zone_name: "{{ public_domain }}"
+    record_type: A
+    state: absent
+  with_items:
+  - api
+  - '*.apps'
+  tags:
+    - public_dns
