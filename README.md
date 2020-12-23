@@ -37,6 +37,21 @@ When following below instructional steps, you will end with a setup similar to
 
 ![](images/architecture.png)
 
+## Strongly recommend: configure Hetzner Firewall
+
+Here an example Hetzner firewall configuration:
+
+![](images/firewall.png)
+
+
+|Name|Source IP|Destination IP|Source port|Destination port|Protocol|TCP flags|Action|
+|---|---|---|---|---|---|---|---|---|---|---|
+|ssh||||22|tcp||accept|
+|api+ingress||||80,443,6443|tcp||accept|
+|icmp|||||icmp||accept|
+|[outgoing connections](https://docs.hetzner.com/robot/dedicated-server/firewall/#out-going-tcp-connections)||||32768-65535|tcp|ack|accept|
+
+
 ## In case of Red Hat Enterprise Linux 8
 
 Subscrip your RHEL Host:
