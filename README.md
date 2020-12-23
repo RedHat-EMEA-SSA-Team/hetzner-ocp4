@@ -45,7 +45,7 @@ Here an example Hetzner firewall configuration:
 
 
 |Name|Source IP|Destination IP|Source port|Destination port|Protocol|TCP flags|Action|
-|---|---|---|---|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|---|---|
 |ssh||||22|tcp||accept|
 |api+ingress||||80,443,6443|tcp||accept|
 |icmp|||||icmp||accept|
