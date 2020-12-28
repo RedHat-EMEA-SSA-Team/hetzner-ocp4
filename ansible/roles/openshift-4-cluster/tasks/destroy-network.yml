@@ -24,12 +24,12 @@
   when: dns_provider == 'none'
 
 - name: Destroy OpenShift 4 load balancer
-  import_role: 
+  import_role:
     name: openshift-4-loadbalancer
     tasks_from: destroy.yml
   vars:
     lb_name: "openshift-4-loadbalancer-{{ cluster_name }}"
-  tags: 
+  tags:
     lb
 
 - name: Destroy Network {{ vn_name }}
@@ -47,19 +47,3 @@
   shell: "firewall-cmd --zone=internal --list-sources | grep -q '{{ vn_subnet }}/24'"
   ignore_errors: true
   register: grep_rc
-
-- name: Remove network from internal network zone
-  #  Firewalld module do not work:
-  #   fatal: [localhost]: FAILED! => {"changed": false, "msg": "ERROR: Exception caught: org.fedoraproject.FirewallD1.Exception: BUILTIN_ZONE: 'internal' is built-in zone Permanent operation"}
-  # firewalld:
-  #   source: "{{ vn_subnet }}/24"
-  #   zone: internal
-  #   state: absent
-  #   permanent: yes
-  command: "firewall-cmd --zone=internal --remove-source={{ vn_subnet }}/24  --permanent"
-  notify: 'reload firewalld'
-  when: grep_rc.rc == 0 and ansible_distribution == "RedHat" and ansible_distribution_major_version == '7'
-
-- name: firewalld reload
-  command: firewall-cmd --reload
-  when: ansible_distribution == "RedHat" and ansible_distribution_major_version == '7'

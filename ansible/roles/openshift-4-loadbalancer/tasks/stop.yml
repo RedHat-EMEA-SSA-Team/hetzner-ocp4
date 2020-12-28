@@ -12,4 +12,6 @@
 - name: Check {{ lb_name }}.service
   fail:
     msg: "Load balancer service {{ lb_name }}.service is not running!!! Please check, run: systemctl status {{ lb_name }}.service"
-  when: services_state.ansible_facts.services[ lb_name  + '.service'].state != 'unknown'
+  when:
+    - services_state.ansible_facts.services[ lb_name  + '.service'].state != 'inactive'
+    - services_state.ansible_facts.services[ lb_name  + '.service'].status != 'disabled'

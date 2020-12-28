@@ -1,8 +1,31 @@
 # RELEASE NOTES
 
+## 2020-12-28
+
+* **Add support of 3 node compact cluster (Fixed issue #158 )**
+* Bump OpenShift version to 4.6.8
+* Fixed issue #147 - Add recommended hetzner firewall documentation
+* **Add support for add-ons (post_install_add_ons)**
+  * Checkout [add-ons.md](add-ons.md) for details.
+* Clean DNS provider handling and dependencies managment
+* **Added an option to make masters un/schedulable**
+* Fixed issue #162 Stop Cluster - Check openshift-4-loadbalancer-demo2.service FAILS
+* Fixed issue #156 - podman command in readme.md not showing stats
+* Fixed issue #152 Set installconfig.networking.machineNetwork in install-config.yaml
+* Do not use kubeconfig directly anymore because of #149
+* Fixed issue qemu-img: Unable to initialize gcrypt #160
+* Cleanup OS dependencies
+  * Cleanup DNS provider dependencies - only install dependencies if needed
+  * Cleanup DNS provider dependencies - only install dependencies if needed
+  * Add missing package (RHEL8)
+  * Remove pip install and use rpm's if possible
+* **Remove RHEL 7 support  (fixed issue #153)**
+* Fixed issue #146 - BUG in ansible-playbook ansible/setup - failed: iptables: No chain/target/match by that name.
+* Introduce openshift_mirror variable - setup your own openshift mirror to get rid of connections problems.
+
 ## 2020-11-04
 
-### Dump OpenShift version to 4.6
+### Bump OpenShift version to 4.6
 
 ### SDN plugin defaults to OVNKubernetes
 

@@ -17,7 +17,7 @@
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
 - name: Start background node approver process
-  async: 1800   #   30 minutes              
+  async: 1800   #   30 minutes
   poll: 0
   shell: |
     while true
@@ -27,6 +27,13 @@
         xargs --no-run-if-empty oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
       sleep 1
     done
+
+- name: Build k8s variables
+  import_tasks: build-k8s-vars.yml
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
 
 - name: Provision nfs storage
   import_tasks: post-install-storage-nfs.yml
@@ -72,7 +79,11 @@
     - name: Create htpasswd secret
       k8s:
         state: present
-        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        kubeconfig: "{{ k8s_kubeconfig }}"
+        host: "{{ k8s_host }}"
+        ca_cert: "{{ k8s_ca_cert }}"
+        client_cert: "{{ k8s_client_cert }}"
+        client_key: "{{ k8s_client_key }}"
         definition:
           apiVersion: v1
           data:
@@ -104,7 +115,11 @@
     - name: Create google secret secret
       k8s:
         state: present
-        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        kubeconfig: "{{ k8s_kubeconfig }}"
+        host: "{{ k8s_host }}"
+        ca_cert: "{{ k8s_ca_cert }}"
+        client_cert: "{{ k8s_client_cert }}"
+        client_key: "{{ k8s_client_key }}"
         definition:
           apiVersion: v1
           data:
@@ -146,7 +161,11 @@
     - name: Create GitHub secret
       k8s:
         state: present
-        kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+        kubeconfig: "{{ k8s_kubeconfig }}"
+        host: "{{ k8s_host }}"
+        ca_cert: "{{ k8s_ca_cert }}"
+        client_cert: "{{ k8s_client_cert }}"
+        client_key: "{{ k8s_client_key }}"
         definition:
           apiVersion: v1
           data:
@@ -179,7 +198,11 @@
 - name: Configure identity providers
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
         apiVersion: config.openshift.io/v1
         kind: OAuth
@@ -200,7 +223,11 @@
 - name: Setup cluster role bindings
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: ClusterRoleBinding
       apiVersion: rbac.authorization.k8s.io/v1
@@ -218,6 +245,18 @@
   tags:
     - post-install
     - rolebindings
+
+###########################################################################################
+# Handle post-install-add-ons
+###########################################################################################
+
+- name: Include post-install-add-ons
+  include: post-install-add-ons.yml
+  when: add_ons_enabled
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
 
 ###########################################################################################
 # Print Cluster informations

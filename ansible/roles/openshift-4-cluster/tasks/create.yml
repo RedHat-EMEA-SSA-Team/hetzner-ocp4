@@ -1,4 +1,23 @@
 ---
+
+- name: Check add-ons.yml
+  stat:
+    path: "{{ playbook_dir }}/../add-ons.yml"
+  register: add_ons_yml
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
+
+- name: Enable add-ons
+  set_fact:
+    add_ons_enabled: true
+  when: add_ons_yml.stat.exists
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
+
 - import_tasks: create-network.yml
   vars:
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
@@ -42,7 +61,7 @@
     le_azure_subscription_id: "{{ azure_subscription_id }}"
     le_azure_tenant: "{{ azure_tenant }}"
     le_azure_resource_group:  "{{ azure_resource_group }}"
-    
+
   tags: letsencrypt
   when: letsencrypt_disabled == false
 
@@ -94,7 +113,8 @@
     vm_memory_size: "{{ compute_memory_size }}"
     vm_memory_unit: "{{ compute_memory_unit }}"
     vm_root_disk_size: "{{ compute_root_disk_size }}"
-  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+  with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
+  when: compute_count > 0
 
 - name: Include post installation tasks
   include: post-install.yml

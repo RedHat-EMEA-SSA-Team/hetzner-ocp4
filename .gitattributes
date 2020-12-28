@@ -1,0 +1,8 @@
+*.yml linguist-detectable=true
+*.yaml linguist-detectable=true
+*.yaml.j2 linguist-detectable=false
+*.xml.j2 linguist-detectable=false
+*.service.j2 linguist-detectable=false
+*.md linguist-detectable=true
+*.md linguist-language=Markdown
+*.md linguist-documentation=false

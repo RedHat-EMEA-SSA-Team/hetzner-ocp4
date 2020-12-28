@@ -1,0 +1,43 @@
+---
+
+- name: Create own kubeconfig directory
+  file:
+    state: directory
+    path: "{{ openshift_install_dir }}/config/"
+
+- name: Copy kubeconfig
+  copy:
+    src: "{{ openshift_install_dir }}/auth/kubeconfig"
+    dest: "{{ openshift_install_dir }}/config/kubeconfig"
+
+- name: Fetch Kubeconfig
+  set_fact:
+    kubeconfig: "{{ lookup('file',  openshift_install_dir ~ '/config/kubeconfig' ) | from_yaml}}"
+
+- name: Select cluster & user
+  set_fact:
+    cluster: "{{ kubeconfig | json_query('clusters[?name==`'~ cluster_name ~'`].cluster') | first }}"
+    user: "{{ kubeconfig | json_query('users[?name==`admin`].user') | first }}"
+
+- name: Set kube variables
+  set_fact:
+    k8s_kubeconfig: "{{ openshift_install_dir }}/config/kubeconfig"
+    k8s_host: "{{ cluster.server }}"
+    k8s_ca_cert: "{{ openshift_install_dir }}/config/ca.crt"
+    k8s_client_key: "{{ openshift_install_dir }}/config/client.key"
+    k8s_client_cert: "{{ openshift_install_dir }}/config/client.crt"
+
+- name: Create k8s_ca_cert
+  copy:
+    content: "{{ cluster['certificate-authority-data'] | b64decode}}"
+    dest: "{{ k8s_ca_cert }}"
+
+- name: Create k8s_client_key
+  copy:
+    content: "{{ user['client-key-data'] | b64decode}}"
+    dest: "{{ k8s_client_key }}"
+
+- name: Create k8s_client_cert
+  copy:
+    content: "{{ user['client-certificate-data'] | b64decode}}"
+    dest: "{{ k8s_client_cert }}"

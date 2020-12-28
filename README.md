@@ -37,23 +37,20 @@ When following below instructional steps, you will end with a setup similar to
 
 ![](images/architecture.png)
 
-## In case of Red Hat Enterprise Linux 7
+## Strongly recommend: configure Hetzner Firewall
 
-Subscrip your RHEL Host:
-```
-subscription-manager register
+Here an example Hetzner firewall configuration:
 
-subscription-manager attach --pool=...
+![](images/firewall.png)
 
-subscription-manager repos --disable=*
 
-subscription-manager repos \
-    --enable="rhel-7-server-rpms" \
-    --enable="rhel-7-server-extras-rpms" \
-    --enable="rhel-7-server-ansible-2.9-rpms" \
-    --enable="rhel-7-server-ose-4.2-rpms" \
-    --enable="rhel-7-server-openstack-14-rpms"
-```
+|Name|Source IP|Destination IP|Source port|Destination port|Protocol|TCP flags|Action|
+|---|---|---|---|---|---|---|---|
+|ssh||||22|tcp||accept|
+|api+ingress||||80,443,6443|tcp||accept|
+|icmp|||||icmp||accept|
+|[outgoing connections](https://docs.hetzner.com/robot/dedicated-server/firewall/#out-going-tcp-connections)||||32768-65535|tcp|ack|accept|
+
 
 ## In case of Red Hat Enterprise Linux 8
 
@@ -151,6 +148,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |`install_config_imageContentSources`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
 |`letsencrypt_disabled`|`false`|This allows you to disable letsencrypt setup. (Default is enabled letsencrypt.)
 |`sdn_plugin_name`|`OVNKubernetes`|This allows you to change SDN plugin. Valid values are OpenShiftSDN and OVNKubernetes. (Default is OVNKubernetes.)
+|`masters_schedulable`|true|Set to false if don't want to allow workload onto the master nodes. (Default is to allow this)|
 
 ## Prepare kvm-host and install OpenShift
 
@@ -161,7 +159,8 @@ Please configure in `cluster.yml` all necessary credentials:
 
 # Additional documentation
 
-* [How to install and manage more than one OpenShift Cluster with  hetzner-ocp4](docs/multi-cluster-guide.md)
+* [How to use add-ons (post_install_add_ons)](docs/add-ons.md)
+* [How to install and manage more than one OpenShift Cluster with hetzner-ocp4](docs/multi-cluster-guide.md)
 * [How to install an air-gapped cluster with hetzner-ocp4](docs/air-gapped.md)
 * [How to install an proxy cluster with hetzner-ocp4](docs/proxy.md)
 * [How to setup a container native virtualization lab (nested) with hetzner-ocp4](docs/cnv.md)
@@ -174,5 +173,5 @@ Please configure in `cluster.yml` all necessary credentials:
 
 | Problem | Command |
 |---|---|
-|Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-demo ./watch-stats.sh```
+|Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-${cluster_name} ./watch-stats.sh```
 |Start cluster after reboot|```./ansible/04-start-cluster.yml```

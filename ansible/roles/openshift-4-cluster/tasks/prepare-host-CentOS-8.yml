@@ -9,15 +9,15 @@
       # ansible virt need lxml
       - python3-lxml
       - python3-pip
+      # Important for python3-openshift
+      - python3-requests-oauthlib
+      - python3-openshift
     state: present
 
-- name: Install boto via pip
-  pip:
-    name:
-      # ansible route53 need  python-boto
-      - boto
-      # ansible k8s need python2-openshift
-      - openshift
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
 
 - name: Enable & Start firewalld
   service:

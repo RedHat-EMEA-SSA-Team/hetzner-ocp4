@@ -1,0 +1,13 @@
+---
+- name: Include vars of stuff.yaml into the 'stuff' variable (2.2).
+  include_vars: "{{ playbook_dir }}/../add-ons.yml"
+
+- name: "Handle post_install_add_ons (include_role)"
+  include_role:
+    name: "{{ item.name }}"
+    tasks_from: "{{ item.tasks_from | default('main.yml') }}"
+  tags:
+    - post-install
+    - add-ons
+    - post-install-add-ons
+  with_items: "{{ post_install_add_ons | default ([]) }}"
