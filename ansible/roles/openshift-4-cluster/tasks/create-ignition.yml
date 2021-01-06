@@ -1,5 +1,5 @@
 ---
-- name: Ensure installion directory
+- name: Ensure installation directory
   file:
     path: "{{ openshift_install_dir }}"
     state: directory
