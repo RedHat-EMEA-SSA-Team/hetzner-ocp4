@@ -1,7 +1,7 @@
 ntp
 =========
 
-this addon adds a NTP MachineConfig to the nodes. Per default it uses the Hetzner NTP Servers
+this add-on adds a NTP MachineConfig to the nodes. Per default it uses the Hetzner NTP Servers
 
 Role Variables
 --------------
