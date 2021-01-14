@@ -1,4 +1,6 @@
+{% for ntp_server in ntp_servers %}
 server {{ ntp_server }} iburst
+{% endfor %}
 stratumweight 0
 driftfile /var/lib/chrony/drift
 rtcsync
