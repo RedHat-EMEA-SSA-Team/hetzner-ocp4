@@ -1,0 +1,3 @@
+---
+# defaults file for ntp
+ntp_server: ntp.hetzner.de
