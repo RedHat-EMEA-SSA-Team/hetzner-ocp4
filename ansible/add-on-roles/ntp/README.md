@@ -1,28 +1,27 @@
-ntp
-=========
+# ntp
 
 this add-on adds a NTP MachineConfig to the nodes. Per default it uses the Hetzner NTP Servers
 
-Role Variables
---------------
+## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+This addons adds 2 MachineConfigs which will configure chrony to use a specific NTP server.
 
-Example config
-----------------
+## Example config
+
+```
+ntp_server: ntp.hetzner.de
+```
 
 ```
 post_install_add_ons:
-  - name: 'web-terminal'
+  - name: 'ntp'
     tasks_from: 'post-install.yml'
 ```
 
-License
--------
+## License
 
 Apache 2.0
 
-Author Information
-------------------
+## Author Information
 
 Jonas Janz
