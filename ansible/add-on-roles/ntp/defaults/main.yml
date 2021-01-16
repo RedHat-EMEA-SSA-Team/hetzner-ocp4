@@ -1,0 +1,6 @@
+---
+# defaults file for ntp
+ntp_servers:
+  - ntp1.hetzner.de
+  - ntp2.hetzner.de
+  - ntp3.hetzner.de

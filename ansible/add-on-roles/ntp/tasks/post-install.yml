@@ -1,0 +1,24 @@
+---
+- set_fact:
+    chrony_conf: "{{ lookup('template', 'templates/chrony.conf.j2') | b64encode }}"
+
+- shell: "echo {{ chrony_conf }} | base64 -w0"
+  register: register_encoded_chrony_conf
+
+- name: Apply NTP machineconfig
+  k8s:
+    state: present
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
+    definition: "{{ lookup('template', 'templates/cluster-ntp-machineconfig.yaml.j2') }}"
+  vars:
+    ntp_chrony_conf_base64: "{{ chrony_conf }}"
+    role: "{{ loop_role }}"
+  with_items:
+    - master
+    - worker
+  loop_control:
+    loop_var: loop_role

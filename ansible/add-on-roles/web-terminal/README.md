@@ -1,4 +1,4 @@
-web-termin
+web-terminal
 =========
 
 A brief description of the role goes here.

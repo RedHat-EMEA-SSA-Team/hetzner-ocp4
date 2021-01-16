@@ -2,7 +2,6 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
   labels:
-  labels:
     machineconfiguration.openshift.io/role: {{ role }}
   name: 50-{{ role }}-rhsm-conf
 spec:

@@ -1,0 +1,21 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 50-{{ role }}-ntp-chrony-conf
+spec:
+  config:
+    ignition:
+      version: 3.1.0
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,{{ ntp_chrony_conf_base64 }}
+        filesystem: root
+        mode: 420
+        overwrite: true
+        path: /etc/chrony.conf
+        user:
+          name: root
+

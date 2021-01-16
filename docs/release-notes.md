@@ -1,5 +1,8 @@
 # RELEASE NOTES
 
+## LATEST
+* Adds the [NTP Add-On](/ansible/add-on-roles/ntp)
+
 ## 2020-12-28
 
 * **Add support of 3 node compact cluster (Fixed issue #158 )**
