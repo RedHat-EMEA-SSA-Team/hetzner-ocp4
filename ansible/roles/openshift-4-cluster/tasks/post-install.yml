@@ -31,9 +31,7 @@
 - name: Build k8s variables
   import_tasks: build-k8s-vars.yml
   tags:
-    - post-install
-    - add-ons
-    - post-install-add-ons
+    - always
 
 - name: Provision nfs storage
   import_tasks: post-install-storage-nfs.yml
