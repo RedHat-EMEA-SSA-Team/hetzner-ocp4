@@ -100,7 +100,7 @@
 
 - name: Add pvc registry-storage to image registry
   command: |
-    oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --config {{ openshift_install_dir }}/auth/kubeconfig
+    oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig
   register: registry_status
   retries: 60
   delay: 30
