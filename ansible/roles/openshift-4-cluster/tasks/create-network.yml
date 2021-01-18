@@ -42,8 +42,6 @@
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
   tags: lb
 
-- debug: var=compute_count
-
 - name: Add compute nodes to ingress_http and ingress_https
   set_fact:
     tmp_ingress_http: "{{ tmp_ingress_http }} + [ 'compute-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + item|int }}:80' ]"
