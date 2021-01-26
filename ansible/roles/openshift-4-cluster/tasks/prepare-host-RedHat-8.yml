@@ -8,8 +8,9 @@
       - "@virtualization-tools"
       # ansible virt need lxml
       - python3-lxml
+      # Important for python3-openshift
+      - python3-requests-oauthlib
       - python3-openshift
-      - python3-boto
     state: present
 
 - name: Upgrade all packages

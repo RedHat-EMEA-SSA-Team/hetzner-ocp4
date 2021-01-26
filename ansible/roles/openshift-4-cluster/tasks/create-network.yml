@@ -2,7 +2,7 @@
 # Debug...
 # - template:
 #     src: templates/network.xml.j2
-#     dest: network.xml     
+#     dest: network.xml
 
 - name: Define network {{ cluster_name }}
   virt_net:
@@ -20,21 +20,9 @@
     autostart: yes
     name: "{{ cluster_name }}"
 
-- name: Add network to internal network zone
-  firewalld:
-    source: "{{ vn_subnet }}/24"
-    zone: internal
-    state: enabled
-    permanent: yes
-  notify: 'reload firewalld'
-  when: ansible_distribution == "RedHat" and ansible_distribution_major_version == '7'
-
-- name: firewalld reload
-  command: firewall-cmd --reload
-  when: ansible_distribution == "RedHat" and ansible_distribution_major_version == '7'
-
 # Build lb config:
-- set_fact: 
+- name: Build initial load balancer config
+  set_fact:
     tmp_api: "[ 'bootstrap={{ vn_subnet.split('.')[:3] | join('.')}}.2:6443' ]"
     tmp_api_listen: "[ '{{ vn_subnet.split('.')[:3] | join('.')}}.1:6443','{{ listen_address }}:6443' ]"
     tmp_ingress_http: "[]"
@@ -45,7 +33,8 @@
     tmp_machine_config_server_listen: "['{{ vn_subnet.split('.')[:3] | join('.')}}.1:22623']"
   tags: lb
 
-- set_fact: 
+- name: Add master nodes to ingress_http and ingress_https
+  set_fact:
     tmp_api: "{{ tmp_api }} + [ 'master-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + item|int }}:6443' ]"
     tmp_machine_config_server: "{{ tmp_machine_config_server }} + [ 'master-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + item|int }}:22623' ]"
     tmp_ingress_http: "{{ tmp_ingress_http }} + [ 'master-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + item|int }}:80' ]"
@@ -53,11 +42,14 @@
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
   tags: lb
 
+- debug: var=compute_count
 
-- set_fact: 
+- name: Add compute nodes to ingress_http and ingress_https
+  set_fact:
     tmp_ingress_http: "{{ tmp_ingress_http }} + [ 'compute-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + item|int }}:80' ]"
     tmp_ingress_https: "{{ tmp_ingress_https }} + [ 'compute-{{item}}={{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + item|int }}:443' ]"
-  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+  with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
+  when: compute_count > 0
   tags: lb
 
 # - debug:
@@ -75,7 +67,7 @@
 #   tags: lb
 
 - name: Create OpenShift 4 load balancer
-  import_role: 
+  import_role:
     name: openshift-4-loadbalancer
     tasks_from: create.yml
   vars:

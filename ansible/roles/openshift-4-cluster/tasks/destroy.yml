@@ -21,14 +21,15 @@
 - include: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
-  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+  with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
+  when: compute_count > 0
 
 - name: Destroy storage-nfs
   import_tasks: destroy-storage-nfs.yml
   when: storage_nfs == true
   tags: storage
 
-- name: Clean OpenShift install directory 
+- name: Clean OpenShift install directory
   file:
     state: absent
     path: "{{ openshift_install_dir }}/"

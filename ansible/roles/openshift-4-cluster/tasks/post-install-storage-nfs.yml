@@ -1,12 +1,12 @@
 ---
 # Install packages
 # Configure
-# 
+#
 # Handlers
-# 
+#
 
 - name: Ensure NFS utilities are installed.
-  package: 
+  package:
     name: nfs-utils
     state: present
 
@@ -17,15 +17,11 @@
     enabled: true
 
 - set_fact:
-    nfs_server: "nfs"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
-
-- set_fact:
     nfs_server: "nfs-server"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version != '7'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '8'
 
 - name: Ensure nfs is running.
-  service: 
+  service:
     name: "{{ nfs_server }}"
     state: started
     enabled: yes
@@ -34,7 +30,7 @@
   blockinfile:
     path: /etc/exports
     backup: yes
-    create: yes 
+    create: yes
     marker: "# {mark} OpenShift cluster - {{ cluster_name }}"
     owner: root
     group: root
@@ -59,11 +55,13 @@
 
 
 - name: Create infra-registry pv
-  # ToDo: quite ugly to use ignore_errors :-/
-  ignore_errors: yes
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       apiVersion: v1
       kind: PersistentVolume
@@ -75,14 +73,18 @@
         capacity:
           storage: 100Gi
         nfs:
-          path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry" 
+          path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry"
           server: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
         persistentVolumeReclaimPolicy: Recycle
 
 - name: Create registry-storage pvc
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       apiVersion: v1
       kind: PersistentVolumeClaim
@@ -95,7 +97,7 @@
         resources:
           requests:
             storage: 100Gi
-      
+
 - name: Add pvc registry-storage to image registry
   command: |
     oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --config {{ openshift_install_dir }}/auth/kubeconfig
@@ -103,8 +105,8 @@
   retries: 60
   delay: 30
   until: registry_status.rc == 0
-  tags: 
-   - storage  
+  tags:
+   - storage
 
 - name: Adjust directory permissions
   file:
@@ -115,10 +117,14 @@
   - "infra-registry"
   - "user-pvs"
 
-- name: Create Namespace 
+- name: Create Namespace
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: Namespace
       apiVersion: v1
@@ -128,7 +134,11 @@
 - name: Create ServiceAccount
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: ServiceAccount
       apiVersion: v1
@@ -139,7 +149,11 @@
 - name: Create ClusteRole nfs-client-provisioner-runner
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: ClusterRole
       apiVersion: rbac.authorization.k8s.io/v1
@@ -162,7 +176,11 @@
 - name: Create ClusterRoleBinding nfs-client-provisioner-runner <-> nfs-client-provisioner
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: ClusterRoleBinding
       apiVersion: rbac.authorization.k8s.io/v1
@@ -180,7 +198,11 @@
 - name: Create Role nfs-client-provisioner
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: Role
       apiVersion: rbac.authorization.k8s.io/v1
@@ -199,7 +221,11 @@
 - name: Create RoleBinding nfs-client-provisioner <-> nfs-client-provisioner
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: RoleBinding
       apiVersion: rbac.authorization.k8s.io/v1
@@ -217,7 +243,11 @@
 - name: Deploy nfs-provisioner
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       kind: Deployment
       apiVersion: apps/v1
@@ -259,7 +289,11 @@
 - name: Storage Class
   k8s:
     state: present
-    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
     definition:
       apiVersion: storage.k8s.io/v1
       kind: StorageClass

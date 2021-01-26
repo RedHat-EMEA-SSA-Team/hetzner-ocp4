@@ -1,0 +1,16 @@
+---
+
+- name: Delete DNS record at CloudFlare
+  cloudflare_dns:
+    state: absent
+    zone: "{{ pd_cloudflare_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    # 1 is auto
+    ttl: 1
+    type: A
+    value: "{{ pd_public_ip }}"
+    account_email: "{{ cloudflare_account_email }}"
+    account_api_token: "{{ cloudflare_account_api_token }}"
+  with_items:
+  - api
+  - '*.apps'

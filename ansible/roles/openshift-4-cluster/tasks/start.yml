@@ -12,13 +12,14 @@
 - include: start-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
-  with_sequence: start=0 end="{{ compute_count|int - 1 }}" stride=1
+  with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
+  when: compute_count > 0
 
 - name: Start OpenShift 4 load balancer
-  import_role: 
+  import_role:
     name: openshift-4-loadbalancer
     tasks_from: start.yml
   vars:
     lb_name: "openshift-4-loadbalancer-{{ cluster_name }}"
-  tags: 
+  tags:
     lb

@@ -1,0 +1,15 @@
+---
+- name: Delete DNS record at Route53
+  route53:
+    state: absent
+    zone: "{{ pd_aws_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    type: A
+    ttl: 120
+    value: "{{ pd_public_ip }}"
+    wait: yes
+    aws_access_key: "{{ pd_aws_access_key }}"
+    aws_secret_key: "{{ pd_aws_secret_key }}"
+  with_items:
+  - api
+  - '*.apps'
