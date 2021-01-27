@@ -15,78 +15,8 @@ into `cluster.yml` and setup the network:
 
 ## Setup mirror registry on kvm-host
 
-Create host entry for image registry mirror:
 ```
-echo 192.168.50.1 host.compute.local >> /etc/hosts
-```
-
-Install & prepare image registry
-```
-yum -y install podman httpd-tools
-
-mkdir -p /var/lib/libvirt/images/mirror-registry/{auth,certs,data}
-
-openssl req -newkey rsa:4096 -nodes -sha256 \
-  -keyout /var/lib/libvirt/images/mirror-registry/certs/domain.key \
-  -x509 -days 365 -subj "/CN=host.compute.local" \
-  -out /var/lib/libvirt/images/mirror-registry/certs/domain.crt
-
-cp -v /var/lib/libvirt/images/mirror-registry/certs/domain.crt /etc/pki/ca-trust/source/anchors/
-update-ca-trust
-
-htpasswd -bBc /var/lib/libvirt/images/mirror-registry/auth/htpasswd admin r3dh4t\!1
-```
-
-Create internal registry service: `/etc/systemd/system/mirror-registry.service`
-**Change REGISTRY_HTTP_ADDR in case you use different network**
-```
-cat - > /etc/systemd/system/mirror-registry.service <<EOF
-[Unit]
-Description=Mirror registry (mirror-registry)
-After=network.target
-
-[Service]
-Type=simple
-TimeoutStartSec=5m
-
-ExecStartPre=-/usr/bin/podman rm "mirror-registry"
-ExecStartPre=/usr/bin/podman pull quay.io/redhat-emea-ssa-team/registry:2
-ExecStart=/usr/bin/podman run --name mirror-registry --net host \
-  -v /var/lib/libvirt/images/mirror-registry/data:/var/lib/registry:z \
-  -v /var/lib/libvirt/images/mirror-registry/auth:/auth:z \
-  -e "REGISTRY_AUTH=htpasswd" \
-  -e "REGISTRY_HTTP_ADDR=192.168.50.1:5000" \
-  -e "REGISTRY_AUTH_HTPASSWD_REALM=registry-realm" \
-  -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
-  -e "REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=TRUE" \
-  -v /var/lib/libvirt/images/mirror-registry/certs:/certs:z \
-  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
-  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
-  -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
-  quay.io/redhat-emea-ssa-team/registry:2
-
-ExecReload=-/usr/bin/podman stop "mirror-registry"
-ExecReload=-/usr/bin/podman rm "mirror-registry"
-ExecStop=-/usr/bin/podman stop "mirror-registry"
-Restart=always
-RestartSec=30
-
-[Install]
-WantedBy=multi-user.target
-EOF
-```
-
-Enable and start mirror registry
-```
-systemctl enable mirror-registry.service
-systemctl start mirror-registry.service
-systemctl status mirror-registry.service
-```
-
-Configure firewall for Centos or RHEL
-```
-firewall-cmd --zone=libvirt --permanent --add-port=5000/tcp
-firewall-cmd --reload
+./docs/air-gapped/setup-registry.yaml
 ```
 
 Check registry
@@ -97,7 +27,9 @@ $ curl -u admin:r3dh4t\!1 https://host.compute.local:5000/v2/_catalog
 
 Create mirror registry pullsecret
 ```
-podman login --authfile mirror-registry-pullsecret.json host.compute.local:5000
+podman login --username admin --password r3dh4t\!1 \
+  --authfile mirror-registry-pullsecret.json \
+  host.compute.local:5000
 ```
 
 
@@ -130,16 +62,18 @@ export ARCHITECTURE=x86_64
 
 # Try run:
 
-oc adm -a ${LOCAL_SECRET_JSON} release mirror \
-     --from=quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
-     --to=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY} \
-     --to-release-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE} --dry-run
+oc adm release mirror \
+  --registry-config ${LOCAL_SECRET_JSON} \
+  --from quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
+  --to ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY} \
+  --to-release-image ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE} \
+  --dry-run
 
-oc adm -a ${LOCAL_SECRET_JSON} release mirror \
-     --from=quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
-     --to=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY} \
-     --to-release-image=${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE}
-
+oc adm release mirror \
+  --registry-config ${LOCAL_SECRET_JSON} \
+  --from quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
+  --to ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY} \
+  --to-release-image ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:${OCP_RELEASE}-${ARCHITECTURE}
 ```
 
 Save the output:
@@ -185,10 +119,9 @@ oc adm release extract -a pullsecret.json --command=openshift-install "${LOCAL_R
 Check openshift-install version:
 ```
 # ./openshift-install version
-./openshift-install 4.5.2
-built from commit 6336a4b3d696dd898eed192e4188edbac99e8c27
-release image host.compute.local:5000/ocp4/openshift4@sha256:8f923b7b8efdeac619eb0e7697106c1d17dd3d262c49d8742b38600417cf7d1d
-```
+./openshift-install 4.6.8
+built from commit f5ba6239853f0904704c04d8b1c04c78172f1141
+release image host.compute.local:5000/ocp4/openshift4@sha256:6ddbf56b7f9776c0498f23a54b65a06b3b846c1012200c5609c4bb716b6bdcdf```
 
 ## Update cluster.yml
 
@@ -198,7 +131,7 @@ Add install_config_additionalTrustBundle and install_config_imageContentSources 
 # Path to extracted openshift-install command
 openshift_install_command: "/root/hetzner-ocp4/openshift-install"
 install_config_additionalTrustBundle: |
-  # Content of /var/lib/libvirt/images/mirror-registry/certs/domain.crt
+  # Content of /var/lib/libvirt/images/mirror-registry/certs/ca.crt
   -----BEGIN CERTIFICATE-----
   MIIEODCCAyCgAwIBAgIJAJhg5kZKGIs4MA0GCSqGSIb3DQEBCwUAMIGoMQswCQYD
   VQQGEwJERTEQMA4GA1UECAwHQmF2YXJpYTEPMA0GA1UEBwwGTXVuaWNoMRswGQYD
@@ -232,6 +165,7 @@ install_config_imageContentSources:
   - host.compute.local:5000/ocp4/openshift4
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
 
+# cat mirror-registry-pullsecret.json | jq -c -r
 image_pull_secret: |
   {"auths":{"host.compute.local:5000":{"auth":"YWRtaW46cjNkaDR0ITE="}}}
 ```
