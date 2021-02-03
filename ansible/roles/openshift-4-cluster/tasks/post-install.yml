@@ -38,6 +38,7 @@
     - storage
     - idp
     - rolebindings
+    - always
 
 - name: Provision nfs storage
   import_tasks: post-install-storage-nfs.yml

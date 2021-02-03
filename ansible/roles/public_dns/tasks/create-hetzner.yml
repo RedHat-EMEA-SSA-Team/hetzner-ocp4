@@ -1,0 +1,56 @@
+---
+- name: Get DNS zone id at Hetzner
+  uri:
+    url: "https://dns.hetzner.com/api/v1/zones"
+    body_format: json
+    return_content: true
+    body:
+      name: "{{ pd_hetzner_zone }}"
+    headers:
+      Auth-API-Token: "{{ hetzner_account_api_token }}"
+      Content-Type: 'application/json'
+  register: pd_hetzner_zone_id
+  tags:
+    - public_dns
+
+- name: Create DNS record at Hetzner
+  uri:
+    url: "https://dns.hetzner.com/api/v1/records"
+    method: POST
+    body_format: json
+    return_content: true
+    body:
+      value: "{{ pd_public_ip }}"
+      ttl: 120
+      type: A
+      name: "{{ item }}.{{ pd_public_domain | replace(public_domain, '') | regex_replace('\\.$', '') }}"
+      zone_id: "{{ pd_hetzner_zone_id.json.zones | json_query('[*].id') | join(', ') }}"
+    headers:
+      Auth-API-Token: "{{ hetzner_account_api_token }}"
+      Content-Type: 'application/json'
+  with_items:
+  - api
+  - '*.apps'
+  tags:
+    - public_dns
+
+- name: Check reverse DNS entry at Hetzner
+  uri:
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    url: "https://robot-ws.your-server.de/rdns/{{ hetzner_ip }}"
+    status_code: [200, 404]
+  register: pd_rdns_entry
+
+- name: Update reverse DNS entry at Hetzner
+  uri:
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    url: "https://robot-ws.your-server.de/rdns/{{ hetzner_ip }}"
+    method: POST
+    body:
+      ptr: "{{ hetzner_hostname }}"
+    body_format: form-urlencoded
+    status_code: [200, 201]
+  changed_when: '"rdns" not in pd_rdns_entry.json or hetzner_hostname != pd_rdns_entry.json.rdns.ptr'
+  when: '"rdns" not in pd_rdns_entry.json or hetzner_hostname != pd_rdns_entry.json.rdns.ptr'

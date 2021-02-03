@@ -58,6 +58,9 @@
         dest: "{{ coreos_path }}/{{ coreos_download_url | basename }}"
         checksum: "sha256:{{ coreos_csum_str }}"
       register: coreos_download
+      until: coreos_download is not failed
+      retries: 3
+      delay: 15
 
     - name: Get filetype
       stat:
@@ -126,6 +129,10 @@
     url: "{{ helm_cli_location }}"
     mode: u+rwx,g+rx,o+rx
     dest: "/opt/openshift-client-{{ openshift_version }}/helm"
+  register: helm_download
+  until: helm_download is not failed
+  retries: 3
+  delay: 15
 
 - name: Create a symbolic link
   file:

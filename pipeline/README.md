@@ -83,6 +83,15 @@ cloudflare_account_api_token: xxxxx
 cloudflare_zone: example.com
 ```
 
+#### hetzner-cluster.yml
+```yaml
+cluster_name: test
+public_domain: hetzner.ci.example.com
+dns_provider: hetzner
+
+hetzner_account_api_token: xxxxx
+hetzner_zone: example.com
+```
 
 ## Install pipeline
 

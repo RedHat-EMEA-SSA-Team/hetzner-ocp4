@@ -17,7 +17,7 @@
 
 - name: Check rescue mode
   uri:
-    url: "https://robot-ws.your-server.de/boot/{{ hetzner_ip }}/rescue"
+    url: "https://robot-ws.your-server.de/boot/{{ ansible_host }}/rescue"
     method: GET
     user: "{{ hetzner_webservice_username }}"
     password: "{{ hetzner_webservice_password }}"
@@ -27,23 +27,22 @@
   delegate_to: localhost
 
 - name: Activate rescue mode
-  when:  rescue.json.rescue.active == false
+  when: rescue.json.rescue.active == false
   uri:
-    url: "https://robot-ws.your-server.de/boot/{{ hetzner_ip }}/rescue"
+    url: "https://robot-ws.your-server.de/boot/{{ ansible_host }}/rescue"
     method: POST
     user: "{{ hetzner_webservice_username }}"
     password: "{{ hetzner_webservice_password }}"
     force_basic_auth: yes
     body: "os=linux&arch=64&authorized_key={{ authorized_key }}"
+    body_format: form-urlencoded
     status_code: 200
-    headers:
-      Content_Type: "application/x-www-form-urlencoded"
   register: activated
   delegate_to: localhost
 
 - name: Execute hardware reset
   uri:
-    url: "https://robot-ws.your-server.de/reset/{{ hetzner_ip }}"
+    url: "https://robot-ws.your-server.de/reset/{{ ansible_host }}"
     method: POST
     user: "{{ hetzner_webservice_username }}"
     password: "{{ hetzner_webservice_password }}"
@@ -55,9 +54,7 @@
   delegate_to: localhost
 
 - name: Remove server from local known_hosts file
-  local_action:
-    module: command
-    cmd: "/usr/bin/ssh-keygen -R {{ inventory_hostname }}"
+  local_action: command /usr/bin/ssh-keygen -R {{ ansible_host }}
   ignore_errors: yes
 
 - name: Pause a bit for the hardware reset to kick in
@@ -66,7 +63,7 @@
 - name: Wait 300 seconds for port 22 to become open
   wait_for:
     port: 22
-    host: '{{ inventory_hostname }}'
+    host: '{{ ansible_host }}'
     delay: 10
     timeout: 300
   connection: local
@@ -88,7 +85,7 @@
   command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup"
   environment:
     TERM: "vt100"
-  ignore_errors: true
+  ignore_errors: yes
   register: result
 
 - debug:
@@ -116,13 +113,13 @@
   ignore_errors: yes
 
 - name: Remove server from local known_hosts file
-  local_action: command  /usr/bin/ssh-keygen -R {{ inventory_hostname }}
+  local_action: command /usr/bin/ssh-keygen -R {{ ansible_host }}
   ignore_errors: yes
 
 - name: Wait 300 seconds for port 22 to become open
   wait_for:
     port: 22
-    host: '{{ inventory_hostname }}'
+    host: '{{ ansible_host }}'
     delay: 10
     timeout: 300
   connection: local
@@ -130,7 +127,7 @@
 - name: Check ansible_python_interpreter
   ping:
   register: rc
-  ignore_errors: true
+  ignore_errors: yes
 
 - name: Set ansible_python_interpreter to /usr/libexec/platform-python (RHEL 8)
   set_fact:
@@ -147,3 +144,38 @@
   systemd:
     name: sshd.service
     state: restarted
+
+- name: Prepare host
+  block:
+  - name: Install required packages
+    yum:
+      name:
+        - ansible
+        - git
+
+  - name: Create temp directory
+    tempfile:
+      state: directory
+    register: temp_dir
+
+  - name: Synchronize files
+    synchronize:
+      src: "{{ playbook_dir }}"
+      dest:  "{{ temp_dir.path }}"
+      delete: yes
+      recursive: yes
+
+  - name: Synchronize cluster.yml
+    synchronize:
+      src: "{{ playbook_dir }}/../cluster.yml"
+      dest:  "{{ temp_dir.path }}/cluster.yml"
+      recursive: yes
+      delete: yes
+
+  - name: Installation command info
+    debug:
+      msg:
+        - "Run setup on {{ ansible_host }} by running"
+        - "pushd {{ temp_dir.path }}/ansible"
+        - "ansible-playbook setup.yml"
+  when: hetzner_provision_prepare_host

@@ -119,6 +119,39 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "azure" and sample_com_challenge is changed
 
+- name: Get DNS zone id at Hetzner
+  uri:
+    url: "https://dns.hetzner.com/api/v1/zones"
+    body_format: json
+    return_content: true
+    body:
+      name: "{{ le_hetzner_zone }}"
+    headers:
+      Auth-API-Token: "{{ hetzner_account_api_token }}"
+      Content-Type: 'application/json'
+  register: le_hetzner_zone_id
+  tags:
+    - public_dns
+
+- name: Create DNS record at Hetzner
+  uri:
+    url: "https://dns.hetzner.com/api/v1/records"
+    method: POST
+    body_format: json
+    return_content: true
+    body:
+      value: "{{ item.1 }}"
+      ttl: 60
+      type: TXT
+      name: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '') }}"
+      zone_id: "{{ le_hetzner_zone_id.json.zones | json_query('[*].id') | join(', ') }}"
+    headers:
+      Auth-API-Token: "{{ le_hetzner_account_api_token }}"
+      Content-Type: 'application/json'
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "hetzner" and sample_com_challenge is changed
+
 - name: DNS record info
   debug:
     msg: "{{ item.0.key }} TXT {{ item.1 }}"
@@ -205,6 +238,24 @@
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "azure" and sample_com_challenge is changed
+
+# - name: Delete DNS record at Hetzner
+#   uri:
+#     url: "https://dns.hetzner.com/api/v1/records/{{ record }}"
+#     method: DELETE
+#     headers:
+#       Auth-API-Token: "{{ le_hetzner_account_api_token }}"
+#       Content-Type: 'application/json'
+#     body_format: json
+#     body:
+#       value: "{{ item.1 }}"
+#       ttl: 60
+#       type: TXT
+#       name: "{{ item.0.key }}"
+#       zone_id: "{{ le_hetzner_zone_id.json.zones | json_query('[*].id') | join(', ') }}"
+#   register: record
+#   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+#   when: le_dns_provider == "hetzner" and sample_com_challenge is changed
 
 - name: concat root ca and intermediate
   shell: "cat {{ le_certificates_dir }}/isrgrootx1.pem {{ le_certificates_dir }}/{{ le_public_domain }}/intermediate.crt >> {{ le_certificates_dir }}/{{ le_public_domain }}/ca-bundle.pem"

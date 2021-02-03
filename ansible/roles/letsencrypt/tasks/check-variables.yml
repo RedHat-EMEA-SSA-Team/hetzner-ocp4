@@ -55,6 +55,16 @@
     - le_azure_resource_group
   when: le_dns_provider == "azure"
 
+- name: Check required Hetzner variables
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_hetzner_account_api_token
+    - le_hetzner_zone
+  when: le_dns_provider == "hetzner"
+
 - name: Debug var only with -vv CloudFlare
   debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
@@ -114,3 +124,12 @@
     - le_public_domain
     - le_acme_directory
   when: le_dns_provider == "azure"
+
+- name: Debug var only with -vv for Hetzner
+  debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_hetzner_account_api_token
+    - le_hetzner_zone
+  when: le_dns_provider == "hetzner"

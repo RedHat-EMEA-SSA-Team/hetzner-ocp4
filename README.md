@@ -131,6 +131,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
 |GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
 |Azure|`azure_client_id: 'client_id'`<br/>`azure_secret: 'key'`<br/>`azure_subscription_id: 'subscription_id'`<br/>`azure_tenant: 'tenant_id'`<br/>`azure_resource_group: 'dns_zone_resource_group'` |
+|Hetzner|`hetzner_account_api_token: 93543ade82AA$73.....` <br>  `hetzner_zone: domain.tld`|
 |none|With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.|
 
 ### Optional configuration
