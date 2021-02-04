@@ -49,11 +49,7 @@ It's expected that you will create and destroy clusters often in the course of d
 
 ## Before you begin, install the build dependencies.
 ```
-yum install gcc-c++ libvirt-devel tar git -y
-wget https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-echo "export PATH=$PATH:/usr/local/go/bin" >> /root/.bashrc
+yum install gcc-c++ libvirt-devel tar git golang -y
 ```
 
 ## Install and Enable Libvirt
@@ -156,7 +152,7 @@ echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.co
 echo listen-address=127.0.0.1 > /etc/NetworkManager/dnsmasq.d/openshift.conf
 echo bind-interfaces >> /etc/NetworkManager/dnsmasq.d/openshift.conf
 echo server=8.8.8.8 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
-echo address=/apps.ocp.openshift.cool/192.168.126.1 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
+echo address=/ocp.openshift.cool/192.168.126.1 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
 ```
 
 3. Reload NetworkManager to pick up the dns configuration change: 
@@ -203,16 +199,10 @@ git clone https://github.com/openshift/installer
 cd installer 
 ```
 
-### In case of Openshift-Installer Version 4.3
+### In case of Openshift-Installer Version 4.6
 
 ```
-git checkout release-4.3
-```
-
-### In case of  Openshift-Installer Version 4.4
-
-```
-git checkout release-4.4
+git checkout release-4.6
 ```
 
 ## Bulding the installer
@@ -238,18 +228,12 @@ Prerequisites: Obtain the OpenShift Container Platform installation program and 
 openshift-install create install-config --dir=ocp
 ```
 
-Edit the install-config.yaml and increase the master and worker replicas from 1 to 3
-You can also change the underlay IP range by changing the machineNetwork cidr.
+Edit the install-config.yaml and increase the master and worker replicas from 1 to 3.
 
-### In case of using the OCP 4.3 installer
-```
-export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=quay.io/openshift-release-dev/ocp-release:4.3.12-x86_64
-openshift-install create cluster --dir=ocp
-```
 
-### In case of using the OCP 4.4 installer
+### Creating the Cluster
 ```
-export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=quay.io/openshift-release-dev/ocp-release:4.4.0-rc.9-x86_64
+export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=quay.io/openshift-release-dev/ocp-release:4.6.8-x86_64
 openshift-install create cluster --dir=ocp
 ```
 
