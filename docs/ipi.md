@@ -171,7 +171,7 @@ PS: It will not update automatically in case of adding more nodes either using m
 
 - 1x bootstrap
 - 3x Master 
-- 3x Workers
+- up to 7x Workers
 
 ```
 firewall-cmd --add-service=http --permanent
@@ -181,9 +181,9 @@ firewall-cmd --reload
 /usr/bin/podman run -d --name loadbalancer --net host \
     -e API="bootstrap=192.168.126.10:6443,master-0=192.168.126.11:6443,master-1=192.168.126.12:6443,master-2=192.168.126.13:6443" \
     -e API_LISTEN="0.0.0.0:6443" \
-    -e INGRESS_HTTP="worker-0=192.168.126.51:80,worker-1=192.168.126.52:80,worker-2=192.168.126.53:80" \
+    -e INGRESS_HTTP="worker-0=192.168.126.51:80,worker-1=192.168.126.52:80,worker-2=192.168.126.53:80",worker-3=192.168.126.54:80,worker-4=192.168.126.55:80,worker-5=192.168.126.56:80",worker-6=192.168.126.57:80" \
     -e INGRESS_HTTP_LISTEN="0.0.0.0:80" \
-    -e INGRESS_HTTPS="worker-0=192.168.126.51:443,worker-1=192.168.126.52:443,worker-2=192.168.126.53:443" \
+    -e INGRESS_HTTPS="worker-0=192.168.126.51:443,worker-1=192.168.126.52:443,worker-2=192.168.126.53:443",worker-3=192.168.126.54:443,worker-4=192.168.126.55:443,worker-5=192.168.126.56:443",worker-6=192.168.126.57:443" \
     -e INGRESS_HTTPS_LISTEN="0.0.0.0:443" \
     -e MACHINE_CONFIG_SERVER="bootstrap=192.168.126.10:22623,master-0=192.168.126.10:22623,master-1=192.168.126.11:22623,master-2=192.168.126.12:22623" \
     -e MACHINE_CONFIG_SERVER_LISTEN="127.0.0.1:22623" \
