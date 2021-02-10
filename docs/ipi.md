@@ -34,16 +34,42 @@ An example install-config.yaml is shown below. This configuration has been modif
 
 ```
 apiVersion: v1
-baseDomain: example.com
-...
+baseDomain: openshift.cool
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 192.168.126.0/24
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
 platform:
   libvirt:
     URI: qemu+tcp://192.168.122.1/system
     network:
-      if: mybridge0
-pullSecret: '{"auths": ...}'
-sshKey: ssh-ed25519 AAAA...
+      if: tt0
+publish: External
+pullSecret: '...'
+sshKey: |
+  ssh-rsa AAAAB...
 ```
+
 # Libvirt Setup
 It's expected that you will create and destroy clusters often in the course of development. These steps only need to be run once.
 
