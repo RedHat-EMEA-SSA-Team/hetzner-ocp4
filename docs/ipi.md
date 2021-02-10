@@ -152,7 +152,7 @@ echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.co
 echo listen-address=127.0.0.1 > /etc/NetworkManager/dnsmasq.d/openshift.conf
 echo bind-interfaces >> /etc/NetworkManager/dnsmasq.d/openshift.conf
 echo server=8.8.8.8 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
-echo server=/ocp.openshift.cool/192.168.126.1 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
+echo address=/ocp.openshift.cool/192.168.126.1 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
 ```
 
 3. Reload NetworkManager to pick up the dns configuration change: 
