@@ -272,7 +272,7 @@ openshift-install destroy cluster
 ```
 
 
-# External Access to your cluster
+# Exposing to the internet ( If you have a valid domain ) 
 
 That is the easy part, Add the following DNS records into your domain.
 
