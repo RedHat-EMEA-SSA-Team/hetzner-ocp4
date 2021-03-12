@@ -4,11 +4,14 @@
   set_fact:
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
+    tmp_opm_download_url: "{{ openshift_location }}/opm-linux-{{ openshift_version }}.tar.gz"
+
 - set_fact:
     check_urls:
       - "{{ coreos_download_url }}"
       - "{{ tmp_openshift_install_download_url }}"
       - "{{ tmp_openshift_client_download_url }}"
+      - "{{ tmp_opm_download_url }}"
       - "{{ helm_cli_location }}"
 
 - set_fact:
@@ -111,6 +114,10 @@
     dest: "/opt/openshift-install-{{ openshift_version }}/"
     remote_src: yes
     mode: u+rwx,g+rx,o+rx
+    owner: root
+    group: root
+    exclude:
+    - 'README.md'
     creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
 
 - name: Download Openshift client
@@ -119,7 +126,23 @@
     dest: "/opt/openshift-client-{{ openshift_version }}/"
     remote_src: yes
     mode: u+rwx,g+rx,o+rx
+    owner: root
+    group: root
+    exclude:
+    - 'README.md'
     creates: "/opt/openshift-client-{{ openshift_version }}/oc"
+
+- name: Download OPM
+  unarchive:
+    src: "{{ tmp_opm_download_url }}"
+    dest: "/opt/openshift-client-{{ openshift_version }}/"
+    remote_src: yes
+    mode: u+rwx,g+rx,o+rx
+    owner: root
+    group: root
+    exclude:
+    - 'README.md'
+    creates: "/opt/openshift-client-{{ openshift_version }}/opm"
 
 - name: Download Helm client
   get_url:
@@ -138,3 +161,4 @@
     "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
     "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"
     "/usr/local/bin/helm": "/opt/openshift-client-{{ openshift_version }}/helm"
+    "/usr/local/bin/opm": "/opt/openshift-client-{{ openshift_version }}/opm"
