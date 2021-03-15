@@ -2,7 +2,7 @@
 ## Check nested  virtualization at kvm-host (intel)
 
 ```
-cat /sys/module/kvm_intel/parameters/nested                         Y
+cat /sys/module/kvm_intel/parameters/nested
 ```
 
 ## Enable nested virtualization at kvm-host (intel)
