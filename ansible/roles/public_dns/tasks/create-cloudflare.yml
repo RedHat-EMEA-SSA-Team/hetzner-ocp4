@@ -1,5 +1,5 @@
 ---
-- name: create cloudflare DNS records
+- name: Create Cloudflare DNS records
   cloudflare_dns:
     zone: "{{ pd_cloudflare_zone }}"
     record: "{{ item }}.{{ pd_public_domain }}"
