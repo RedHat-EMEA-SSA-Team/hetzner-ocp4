@@ -34,26 +34,48 @@ An example install-config.yaml is shown below. This configuration has been modif
 
 ```
 apiVersion: v1
-baseDomain: example.com
-...
+baseDomain: openshift.cool
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 192.168.126.0/24
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
 platform:
   libvirt:
     URI: qemu+tcp://192.168.122.1/system
     network:
-      if: mybridge0
-pullSecret: '{"auths": ...}'
-sshKey: ssh-ed25519 AAAA...
+      if: tt0
+publish: External
+pullSecret: '...'
+sshKey: |
+  ssh-rsa AAAAB...
 ```
+
 # Libvirt Setup
 It's expected that you will create and destroy clusters often in the course of development. These steps only need to be run once.
 
 ## Before you begin, install the build dependencies.
 ```
-yum install gcc-c++ libvirt-devel tar git -y
-wget https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-echo "export PATH=$PATH:/usr/local/go/bin" >> /root/.bashrc
+yum install gcc-c++ libvirt-devel tar git golang -y
 ```
 
 ## Install and Enable Libvirt
@@ -156,7 +178,7 @@ echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.co
 echo listen-address=127.0.0.1 > /etc/NetworkManager/dnsmasq.d/openshift.conf
 echo bind-interfaces >> /etc/NetworkManager/dnsmasq.d/openshift.conf
 echo server=8.8.8.8 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
-echo address=/apps.ocp.openshift.cool/192.168.126.1 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
+echo address=/ocp.openshift.cool/192.168.126.1 >> /etc/NetworkManager/dnsmasq.d/openshift.conf
 ```
 
 3. Reload NetworkManager to pick up the dns configuration change: 
@@ -175,7 +197,7 @@ PS: It will not update automatically in case of adding more nodes either using m
 
 - 1x bootstrap
 - 3x Master 
-- 3x Workers
+- up to 7x Workers
 
 ```
 firewall-cmd --add-service=http --permanent
@@ -185,9 +207,9 @@ firewall-cmd --reload
 /usr/bin/podman run -d --name loadbalancer --net host \
     -e API="bootstrap=192.168.126.10:6443,master-0=192.168.126.11:6443,master-1=192.168.126.12:6443,master-2=192.168.126.13:6443" \
     -e API_LISTEN="0.0.0.0:6443" \
-    -e INGRESS_HTTP="worker-0=192.168.126.51:80,worker-1=192.168.126.52:80,worker-2=192.168.126.53:80" \
+    -e INGRESS_HTTP="worker-0=192.168.126.51:80,worker-1=192.168.126.52:80,worker-2=192.168.126.53:80",worker-3=192.168.126.54:80,worker-4=192.168.126.55:80,worker-5=192.168.126.56:80",worker-6=192.168.126.57:80" \
     -e INGRESS_HTTP_LISTEN="0.0.0.0:80" \
-    -e INGRESS_HTTPS="worker-0=192.168.126.51:443,worker-1=192.168.126.52:443,worker-2=192.168.126.53:443" \
+    -e INGRESS_HTTPS="worker-0=192.168.126.51:443,worker-1=192.168.126.52:443,worker-2=192.168.126.53:443",worker-3=192.168.126.54:443,worker-4=192.168.126.55:443,worker-5=192.168.126.56:443",worker-6=192.168.126.57:443" \
     -e INGRESS_HTTPS_LISTEN="0.0.0.0:443" \
     -e MACHINE_CONFIG_SERVER="bootstrap=192.168.126.10:22623,master-0=192.168.126.10:22623,master-1=192.168.126.11:22623,master-2=192.168.126.12:22623" \
     -e MACHINE_CONFIG_SERVER_LISTEN="127.0.0.1:22623" \
@@ -203,16 +225,10 @@ git clone https://github.com/openshift/installer
 cd installer 
 ```
 
-### In case of Openshift-Installer Version 4.3
+### In case of Openshift-Installer Version 4.6
 
 ```
-git checkout release-4.3
-```
-
-### In case of  Openshift-Installer Version 4.4
-
-```
-git checkout release-4.4
+git checkout release-4.6
 ```
 
 ## Bulding the installer
@@ -238,18 +254,12 @@ Prerequisites: Obtain the OpenShift Container Platform installation program and 
 openshift-install create install-config --dir=ocp
 ```
 
-Edit the install-config.yaml and increase the master and worker replicas from 1 to 3
-You can also change the underlay IP range by changing the machineNetwork cidr.
+Edit the install-config.yaml and increase the master and worker replicas from 1 to 3.
 
-### In case of using the OCP 4.3 installer
-```
-export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=quay.io/openshift-release-dev/ocp-release:4.3.12-x86_64
-openshift-install create cluster --dir=ocp
-```
 
-### In case of using the OCP 4.4 installer
+### Creating the Cluster
 ```
-export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=quay.io/openshift-release-dev/ocp-release:4.4.0-rc.9-x86_64
+export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=quay.io/openshift-release-dev/ocp-release:4.6.8-x86_64
 openshift-install create cluster --dir=ocp
 ```
 
@@ -262,7 +272,7 @@ openshift-install destroy cluster
 ```
 
 
-# External Access to your cluster
+# Exposing to the internet ( If you have a valid domain ) 
 
 That is the easy part, Add the following DNS records into your domain.
 
