@@ -11,6 +11,8 @@
     pd_aws_access_key: "{{ aws_access_key }}"
     pd_aws_secret_key: "{{ aws_secret_key }}"
     pd_aws_zone: "{{ aws_zone }}"
+    pd_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
+    pd_hetzner_zone: "{{ hetzner_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
   tags: public_dns
   when: dns_provider != 'none'
