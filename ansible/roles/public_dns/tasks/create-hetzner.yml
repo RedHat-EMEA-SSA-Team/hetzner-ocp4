@@ -5,14 +5,36 @@
     body_format: json
     return_content: true
     body:
-      name: "{{ pd_hetzner_zone }}"
+      name: "{{ hetzner_zone }}"
     headers:
       Auth-API-Token: "{{ hetzner_account_api_token }}"
       Content-Type: 'application/json'
-  register: pd_hetzner_zone_id
+  register: register_hetzner_zone_id
   tags:
     - public_dns
 
+- set_fact:
+    #hetzner_zone_id:  "{{ register_hetzner_zone_id.json.zones | json_query('[?name==`'~ hetzner_zone ~'`] | [0].id')  }}"
+    # You don't need the name == .. because of the body above.
+    # https://dns.hetzner.com/api-docs#operation/GetZones
+    hetzner_zone_id:  "{{ register_hetzner_zone_id.json.zones[0].id }}"
+
+- name: Get all DNS records
+  uri:
+    url: "https://dns.hetzner.com/api/v1/records?zone_id={{ hetzner_zone_id }}"
+    body_format: json
+    return_content: true
+    headers:
+      Auth-API-Token: "{{ hetzner_account_api_token }}"
+      Content-Type: 'application/json'
+  register: register_hetzner_records
+  tags:
+    - public_dns
+
+- name: Define hetzner_records_to_delete
+  set_fact:
+    available_records: "{{register_hetzner_records.json.records | json_query('[?(value==`'~  pd_public_ip ~'` && ( name==`api.'~ cluster_name ~'` || name ==`*.apps.'~ cluster_name ~'` ) )] | [*].name') }}"
+- debug: var=available_records
 - name: Create DNS record at Hetzner
   uri:
     url: "https://dns.hetzner.com/api/v1/records"
@@ -23,13 +45,15 @@
       value: "{{ pd_public_ip }}"
       ttl: 120
       type: A
-      name: "{{ item }}.{{ pd_public_domain | replace(public_domain, '') | regex_replace('\\.$', '') }}"
-      zone_id: "{{ pd_hetzner_zone_id.json.zones | json_query('[*].id') | join(', ') }}"
+      name: "{{ item }}.{{ cluster_name }}"
+      zone_id: "{{ hetzner_zone_id }}"
     headers:
       Auth-API-Token: "{{ hetzner_account_api_token }}"
       Content-Type: 'application/json'
   with_items:
   - api
   - '*.apps'
+  when: item + '.' + cluster_name not in available_records
   tags:
     - public_dns
+
