@@ -1,6 +1,4 @@
 ---
-- debug: var=record
-
 - name: Delete DNS record at Hetzner
   uri:
     url: "https://dns.hetzner.com/api/v1/records/{{ item.json.record.id }}"
@@ -9,5 +7,5 @@
       Auth-API-Token: "{{ le_hetzner_account_api_token }}"
       Content-Type: 'application/json'
   with_items: "{{ hetzner_record.results }}"
-  when: 
+  when:
     - sample_com_challenge is changed
