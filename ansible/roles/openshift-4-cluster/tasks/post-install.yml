@@ -22,7 +22,7 @@
   shell: |
     while true
     do
-      oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" get csr --no-headers | \
+      /opt/openshift-client-{{ openshift_version }}/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" get csr --no-headers | \
         awk '/Pending/ {print $1}' | \
         xargs --no-run-if-empty oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
       sleep 1
@@ -45,7 +45,7 @@
   tags: storage
 
 - name: Set image registry managementState from Removed to Managed
-  command: "oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig"
+  command: "/opt/openshift-client-{{ openshift_version }}/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig"
   register: registry_status
   retries: 60
   delay: 30
