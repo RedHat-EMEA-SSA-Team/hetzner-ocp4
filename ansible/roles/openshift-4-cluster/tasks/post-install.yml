@@ -24,7 +24,7 @@
     do
       /opt/openshift-client-{{ openshift_version }}/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" get csr --no-headers | \
         awk '/Pending/ {print $1}' | \
-        xargs --no-run-if-empty oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
+        xargs --no-run-if-empty /opt/openshift-client-{{ openshift_version }}/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
       sleep 1
     done
 
