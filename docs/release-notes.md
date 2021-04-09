@@ -1,7 +1,13 @@
 # RELEASE NOTES
 
-## LATEST
-* Adds the [NTP Add-On](/ansible/add-on-roles/ntp)
+## 2021-04-09
+
+ * Bump OpenShift Version to 4.7.0
+ * Add opm installation
+ * Add dns provider: hetzner
+ * Use absolute path to oc binary
+ * Fixed some typos
+ * Adds the [NTP Add-On](/ansible/add-on-roles/ntp)
 
 ## 2020-12-28
 
