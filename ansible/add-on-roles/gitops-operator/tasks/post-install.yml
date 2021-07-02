@@ -1,0 +1,70 @@
+---
+- name: Create Subscription
+  k8s:
+    state: present
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: openshift-gitops-operator
+        namespace: openshift-operators
+      spec:
+        channel: stable
+        installPlanApproval: Automatic
+        name: openshift-gitops-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+
+- name: Create openshift-gitops namespace
+  k8s:
+    state: present
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
+    api_version: v1
+    kind: Namespace
+    name: openshift-gitops
+
+- name: Wait for ArgoCD Application CRD to be available
+  command: "/opt/openshift-client-{{ openshift_version }}/oc get crd applications.argoproj.io --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig"
+  register: application_argocd_status
+  retries: 60
+  delay: 60
+  until: application_argocd_status.rc == 0
+  changed_when: false
+
+
+- name: Create application for cluster config
+  k8s:
+    state: present
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
+    definition:
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: cluster-config
+        namespace: openshift-gitops
+      spec:
+        destination:
+          server: 'https://kubernetes.default.svc'
+        project: default
+        source:
+          directory:
+            recurse: true
+          repoURL: "{{ argocd.repo_url }}"
+          path: "{{ argocd.repo_path }}"
+          targetRevision: "{{ argocd.repo_revision }}"
+        syncPolicy:
+          automated: {}
+
