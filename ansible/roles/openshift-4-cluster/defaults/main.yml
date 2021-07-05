@@ -43,6 +43,10 @@ openshift_mirror: "https://mirror.openshift.com"
 
 openshift_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/ocp/{{openshift_client_version}}"
 
+opm_version: "{{ openshift_client_version }}"
+opm_download_url: "{{ openshift_location }}/opm-linux-{{ opm_version }}.tar.gz"
+opm_dest: "/opt/openshift-client-{{ openshift_client_version }}/"
+
 # reference to coreos qcow file
 coreos_version: 4.7.0
 coreos_download_url: "{{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/{{ coreos_version.split('.')[:2]|join('.') }}/{{ coreos_version }}/rhcos-{{coreos_version}}-x86_64-qemu.x86_64.qcow2.gz"
