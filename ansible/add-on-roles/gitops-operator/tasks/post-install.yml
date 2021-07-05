@@ -42,6 +42,7 @@
 
 
 - name: Create application for cluster config
+  when: argocd is defined
   k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
