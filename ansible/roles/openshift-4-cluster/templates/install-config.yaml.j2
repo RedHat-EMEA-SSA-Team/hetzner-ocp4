@@ -14,9 +14,14 @@ networking:
   clusterNetworks:
   - cidr: 10.128.0.0/14
     hostSubnetLength: 9
+  - cidr: fd00:10:128::/56
+    hostPrefix: 64
   machineNetwork:
   - cidr: {{ vn_subnet }}/24
-  serviceCIDR: 172.30.0.0/16
+  - cidr: {{ vn_subnet_ipv6 }}::/80
+  serviceNetwork:
+  - 172.30.0.0/16
+  - fd00:172:16::/112
   type: {{ sdn_plugin_name }}
 platform:
   none: {}
