@@ -1,4 +1,4 @@
-<network>
+<network ipv6='yes'>
     <name>{{ cluster_name }}</name>
     <domain name="{{ vn_internal_domain }}"/>
     <forward mode='{{ network_forward_mode | default('nat') }}'/>
@@ -14,6 +14,16 @@
             <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
             {% endif %}
         </host>
+
+        <host ip='{{ vn_subnet_ipv6 }}::1'>
+            <hostname>host.{{ vn_internal_domain }}</hostname>
+            <hostname>api-int.{{ vn_public_domain }}</hostname>
+            <hostname>api.{{ vn_public_domain }}</hostname>
+            {% if dns_provider == 'none' %}
+            <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
+            {% endif %}
+        </host>
+
         {% for id in range(0, vn_master_count | int) -%}
         <srv service='etcd-server-ssl' protocol='tcp' domain='{{ vn_public_domain }}' target='etcd-{{ id }}.{{ vn_public_domain }}' port='2380' priority='0' weight='10'/>
         <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + id|int }}'>
@@ -21,7 +31,6 @@
             <hostname>etcd-{{ id }}.{{ vn_public_domain }}</hostname>
         </host>
         {% endfor %}
-
     </dns>
 
     <ip address='{{ vn_subnet.split('.')[:3] | join('.')}}.1' netmask='255.255.255.0'>
@@ -33,8 +42,20 @@
             {% endfor -%}
             {% for id in range(0, vn_compute_count | int) -%}
             <host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + vn_master_count|int + id) }}' name='compute-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + vn_master_count|int + id }}'/>
-            {% endfor %}
-
+            {% endfor -%}
         </dhcp>
     </ip>
+
+    <ip family='ipv6' address='{{ vn_subnet_ipv6 }}::1' prefix='80'>
+        <dhcp>
+            <range start='{{ vn_subnet_ipv6 }}::1000' end='{{ vn_subnet_ipv6 }}::2000' />
+            <host id='01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}' name='bootstrap.{{ vn_internal_domain }}' ip='{{ vn_subnet_ipv6 }}::2'/>
+            {% for id in range(0, vn_master_count | int) -%}
+            <host id='01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}' name='master-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet_ipv6 }}::{{ "%x" % (4096 + id) }}'/>
+            {% endfor -%}
+            {% for id in range(0, vn_compute_count | int) -%}
+            <host id='01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + vn_master_count|int + id) }}' name='compute-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet_ipv6 }}::{{ "%x" % ( 4096 + vn_master_count|int + id ) }}'/>
+            {% endfor -%}
+        </dhcp>
+   </ip>
 </network>

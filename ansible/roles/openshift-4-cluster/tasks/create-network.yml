@@ -4,6 +4,16 @@
 #     src: templates/network.xml.j2
 #     dest: network.xml
 
+# IPv6
+- name: Build private IPv6 subnet
+  set_fact:
+    vn_subnet_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
+
+# - name: Debug network.xml.js
+#   template:
+#     src: templates/network.xml.j2
+#     dest: "/tmp/{{ cluster_name }}-network.xml"
+
 - name: Define network {{ cluster_name }}
   virt_net:
     command: define
