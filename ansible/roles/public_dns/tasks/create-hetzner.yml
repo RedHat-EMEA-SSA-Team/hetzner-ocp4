@@ -34,7 +34,7 @@
 - name: Define hetzner_records_to_delete
   set_fact:
     available_records: "{{register_hetzner_records.json.records | json_query('[?(value==`'~  pd_public_ip ~'` && ( name==`api.'~ cluster_name ~'` || name ==`*.apps.'~ cluster_name ~'` ) )] | [*].name') }}"
-- debug: var=available_records
+
 - name: Create DNS record at Hetzner
   uri:
     url: "https://dns.hetzner.com/api/v1/records"
@@ -56,4 +56,27 @@
   when: item + '.' + cluster_name not in available_records
   tags:
     - public_dns
+
+- name: Create IPv6 DNS record at Hetzner
+  uri:
+    url: "https://dns.hetzner.com/api/v1/records"
+    method: POST
+    body_format: json
+    return_content: true
+    body:
+      value: "{{ pd_public_ipv6 }}"
+      ttl: 120
+      type: AAAA
+      name: "{{ item }}.{{ cluster_name }}"
+      zone_id: "{{ hetzner_zone_id }}"
+    headers:
+      Auth-API-Token: "{{ hetzner_account_api_token }}"
+      Content-Type: 'application/json'
+  with_items:
+  - api
+  - '*.apps'
+  when: item + '.' + cluster_name not in available_records
+  tags:
+    - public_dns
+  when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)
 
