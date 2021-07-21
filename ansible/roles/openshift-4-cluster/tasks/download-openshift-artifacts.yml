@@ -12,6 +12,7 @@
       - "{{ tmp_openshift_client_download_url }}"
       - "{{ opm_download_url }}"
       - "{{ helm_cli_location }}"
+      - "{{ butane_cli_location }}"
 
 - set_fact:
     check_urls: "{{ check_urls + [coreos_csum_url] }}"
@@ -158,6 +159,13 @@
     mode: u+rwx,g+rx,o+rx
     dest: "/opt/openshift-client-{{ openshift_version }}/helm"
 
+- name: Download butane client
+  get_url:
+    url: "{{ butane_cli_location }}"
+    mode: u+rwx,g+rx,o+rx
+    dest: "/opt/openshift-client-{{ openshift_version }}/butane"
+
+
 - name: Create a symbolic link
   file:
     src: "{{ item.value }}"
@@ -169,4 +177,5 @@
     "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
     "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"
     "/usr/local/bin/helm": "/opt/openshift-client-{{ openshift_version }}/helm"
+    "/usr/local/bin/butane": "/opt/openshift-client-{{ openshift_version }}/butane"
     "/usr/local/bin/opm": "{{ opm_dest }}/opm"

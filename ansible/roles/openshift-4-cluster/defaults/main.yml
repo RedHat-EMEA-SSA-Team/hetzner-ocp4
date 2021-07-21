@@ -71,6 +71,9 @@ letsencrypt_disabled: false
 # helm
 helm_cli_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/helm/latest/helm-linux-amd64"
 
+butane_cli_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/butane/v0.13.0-1/butane-amd64"
+
+
 # NFS Storage
 #  storage_nfs do not support multi cluster support, it overwrites the
 #  /etc/exports
