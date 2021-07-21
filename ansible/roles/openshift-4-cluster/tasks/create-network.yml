@@ -14,16 +14,16 @@
       bootstrap:
       - name: bootstrap
         fqdn: "bootstrap.{{ vn_internal_domain }}"
-        mac:     "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
-        duid: "01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
+        mac:              "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
+        duid: "00:03:00:01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
         ipv4: "{{ vn_subnet.split('.')[:3] | join('.')}}.2"
         ipv6: "{{ vn_subnet_ipv6 }}::2"
       masters:
       {% for id in range(0,(master_count | int )) %}
       - name: master-{{ id }}
         fqdn: "master-{{ id }}.{{ vn_internal_domain }}"
-        mac:     "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}"
-        duid: "01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}"
+        mac:              "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}"
+        duid: "00:03:00:01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}"
         ipv4: "{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + id }}"
         ipv6: "{{ vn_subnet_ipv6 }}::{{ "%x" % (4096 + id) }}"
       {% endfor %}
@@ -31,8 +31,8 @@
       {% for id in range(0,(compute_count | int )) %}
       - name: compute-{{ id }}
         fqdn: "compute-{{ id }}.{{ vn_internal_domain }}"
-        mac:     "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + id) }}"
-        duid: "01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + id) }}"
+        mac:              "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + id) }}"
+        duid: "00:03:00:01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + id) }}"
         ipv4: "{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + id }}"
         ipv6: "{{ vn_subnet_ipv6 }}::{{ "%x" % ( 4096 + master_count|int + id ) }}"
       {% endfor %}
