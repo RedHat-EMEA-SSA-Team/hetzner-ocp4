@@ -73,10 +73,14 @@
   set_fact:
     lb_haproxy_cfg: "{{ lookup('template','templates/haproxy.conf.j2') }}"
   vars:
-    ipv4_listen:
+    ipv4_listen_private:
       - "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
-    ipv6_listen:
+    ipv6_listen_private:
       - "{{ vn_subnet_ipv6 }}::1"
+    ipv4_listen_public:
+      - "{{ public_ip | default(listen_address) }}"
+    ipv6_listen_public:
+      - "{{ public_ipv6 | default(listen_address_ipv6) }}"
 
 - name: Debug haproxy config
   debug:
