@@ -28,3 +28,42 @@
 
 - name: Create ignition files
   command: "{{ openshift_install_command }} --dir={{ openshift_install_dir }} create ignition-configs"
+
+# #
+# [connection]
+# ipv6.dhcp-iaid=mac
+# ipv6.dhcp-duid=ll
+- name: Create RHCOS Config
+  copy:
+    dest: "{{ openshift_install_dir }}/{{ item }}.rcc"
+    content: |
+      variant: rhcos
+      version: 0.1.0
+      ignition:
+        config:
+          merge:
+            - local: {{ item }}.ign
+      storage:
+        files:
+          - path: /etc/NetworkManager/conf.d/01-ipv6.conf
+            contents:
+              source: data:,%5Bconnection%5D%0Aipv6.dhcp-iaid%3Dmac%0Aipv6.dhcp-duid%3Dll
+            mode: 420
+            user:
+              name: root
+            overwrite: true
+  with_items:
+  - bootstrap
+  - master
+  - worker
+
+- name: Mangle ignition config
+  command: |
+    /opt/openshift-client-{{ openshift_version }}/butane \
+      --files-dir {{ openshift_install_dir }} \
+      --output {{openshift_install_dir}}/{{ item }}-extra.ign \
+      {{openshift_install_dir}}/{{ item }}.rcc
+  with_items:
+  - bootstrap
+  - master
+  - worker
