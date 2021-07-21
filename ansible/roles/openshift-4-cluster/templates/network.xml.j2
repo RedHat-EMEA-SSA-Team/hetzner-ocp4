@@ -3,9 +3,6 @@
     <domain name="{{ vn_internal_domain }}"/>
     <forward mode='{{ network_forward_mode | default('nat') }}'/>
     <dns>
-        <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.2'>
-            <hostname>bootstrap.{{ vn_internal_domain }}</hostname>
-        </host>
         <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.1'>
             <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
@@ -14,7 +11,6 @@
             <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
             {% endif %}
         </host>
-
         <host ip='{{ vn_subnet_ipv6 }}::1'>
             <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
@@ -23,14 +19,6 @@
             <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
             {% endif %}
         </host>
-
-        {% for id in range(0, vn_master_count | int) -%}
-        <srv service='etcd-server-ssl' protocol='tcp' domain='{{ vn_public_domain }}' target='etcd-{{ id }}.{{ vn_public_domain }}' port='2380' priority='0' weight='10'/>
-        <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + id|int }}'>
-            <hostname>master-{{ id }}.{{ vn_internal_domain }}</hostname>
-            <hostname>etcd-{{ id }}.{{ vn_public_domain }}</hostname>
-        </host>
-        {% endfor %}
     </dns>
 
     <ip address='{{ vn_subnet.split('.')[:3] | join('.')}}.1' netmask='255.255.255.0'>
@@ -61,5 +49,5 @@
                 <host id='{{ node.duid }}' name='{{ node.fqdn }}' ip='{{ node.ipv6 }}'/>
             {% endfor %}
         </dhcp>
-   </ip>
+    </ip>
 </network>
