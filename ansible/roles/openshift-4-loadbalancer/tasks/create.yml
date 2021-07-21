@@ -6,6 +6,12 @@
     state: present
 
 - name: Install OpenShift 4 Loadbalancer SystemD service
+  copy:
+    content: |
+      HAPROXY_CFG="{{ lb_haproxy_cfg }}"
+    dest: "/etc/sysconfig/{{ lb_name }}.env"
+
+- name: Install OpenShift 4 Loadbalancer SystemD service
   template:
     src: systemd.service.j2
     dest: "/etc/systemd/system/{{ lb_name }}.service"

@@ -36,26 +36,30 @@
     <ip address='{{ vn_subnet.split('.')[:3] | join('.')}}.1' netmask='255.255.255.0'>
         <dhcp>
             <range start='{{ vn_subnet.split('.')[:3] | join('.')}}.10' end='{{ vn_subnet.split('.')[:3] | join('.')}}.250'/>
-            <host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}' name='bootstrap.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.2'/>
-            {% for id in range(0, vn_master_count | int) -%}
-            <host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}' name='master-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + id }}'/>
-            {% endfor -%}
-            {% for id in range(0, vn_compute_count | int) -%}
-            <host mac='52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + vn_master_count|int + id) }}' name='compute-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + vn_master_count|int + id }}'/>
-            {% endfor -%}
+            {% for node in nodes.bootstrap %}
+                <host mac='{{ node.mac }}' name='{{ node.fqdn }}' ip='{{ node.ipv4 }}'/>
+            {% endfor %}
+            {% for node in nodes.masters %}
+                <host mac='{{ node.mac }}' name='{{ node.fqdn }}' ip='{{ node.ipv4 }}'/>
+            {% endfor %}
+            {% for node in nodes.workers %}
+                <host mac='{{ node.mac }}' name='{{ node.fqdn }}' ip='{{ node.ipv4 }}'/>
+            {% endfor %}
         </dhcp>
     </ip>
 
     <ip family='ipv6' address='{{ vn_subnet_ipv6 }}::1' prefix='80'>
         <dhcp>
             <range start='{{ vn_subnet_ipv6 }}::1000' end='{{ vn_subnet_ipv6 }}::2000' />
-            <host id='01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}' name='bootstrap.{{ vn_internal_domain }}' ip='{{ vn_subnet_ipv6 }}::2'/>
-            {% for id in range(0, vn_master_count | int) -%}
-            <host id='01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}' name='master-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet_ipv6 }}::{{ "%x" % (4096 + id) }}'/>
-            {% endfor -%}
-            {% for id in range(0, vn_compute_count | int) -%}
-            <host id='01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + vn_master_count|int + id) }}' name='compute-{{ id }}.{{ vn_internal_domain }}' ip='{{ vn_subnet_ipv6 }}::{{ "%x" % ( 4096 + vn_master_count|int + id ) }}'/>
-            {% endfor -%}
+            {% for node in nodes.bootstrap %}
+                <host id='{{ node.duid }}' name='{{ node.fqdn }}' ip='{{ node.ipv6 }}'/>
+            {% endfor %}
+            {% for node in nodes.masters %}
+                <host id='{{ node.duid }}' name='{{ node.fqdn }}' ip='{{ node.ipv6 }}'/>
+            {% endfor %}
+            {% for node in nodes.workers %}
+                <host id='{{ node.duid }}' name='{{ node.fqdn }}' ip='{{ node.ipv6 }}'/>
+            {% endfor %}
         </dhcp>
    </ip>
 </network>
