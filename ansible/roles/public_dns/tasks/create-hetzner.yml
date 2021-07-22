@@ -56,6 +56,7 @@
   when: item + '.' + cluster_name not in available_records
   tags:
     - public_dns
+  when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
 
 - name: Create IPv6 DNS record at Hetzner
   uri:

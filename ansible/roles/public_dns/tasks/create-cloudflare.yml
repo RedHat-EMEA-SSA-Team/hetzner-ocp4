@@ -14,6 +14,7 @@
   - '*.apps'
   tags:
     - public_dns
+  when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
 
 
 - name: Create IPv6 Cloudflare DNS records
