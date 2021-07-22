@@ -8,6 +8,10 @@ vn_name: "openshift-4-cluster"
 vn_internal_domain: "compute.local"
 vn_public_domain: "h42.openshift.pub"
 
+#
+ip_families:
+  - IPv4
+
 listen_address: "{{ hostvars['localhost']['ansible_default_ipv4']['address'] }}"
 listen_address_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'] }}"
 

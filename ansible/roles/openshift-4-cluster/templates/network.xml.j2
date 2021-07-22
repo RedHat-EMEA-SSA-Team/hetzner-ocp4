@@ -1,8 +1,9 @@
-<network ipv6='yes'>
+<network {%- if 'IPv6' in ip_families  %} ipv6='yes' {% endif -%}>
     <name>{{ cluster_name }}</name>
     <domain name="{{ vn_internal_domain }}"/>
     <forward mode='{{ network_forward_mode | default('nat') }}'/>
     <dns>
+        {% if 'IPv4' in ip_families  %}
         <host ip='{{ vn_subnet.split('.')[:3] | join('.')}}.1'>
             <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
@@ -11,6 +12,8 @@
             <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
             {% endif %}
         </host>
+        {% endif %}
+        {% if 'IPv6' in ip_families  %}
         <host ip='{{ vn_subnet_ipv6 }}::1'>
             <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
@@ -19,8 +22,9 @@
             <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
             {% endif %}
         </host>
+        {% endif %}
     </dns>
-
+    {% if 'IPv4' in ip_families  %}
     <ip address='{{ vn_subnet.split('.')[:3] | join('.')}}.1' netmask='255.255.255.0'>
         <dhcp>
             <range start='{{ vn_subnet.split('.')[:3] | join('.')}}.10' end='{{ vn_subnet.split('.')[:3] | join('.')}}.250'/>
@@ -35,7 +39,8 @@
             {% endfor %}
         </dhcp>
     </ip>
-
+    {% endif %}
+    {% if 'IPv6' in ip_families  %}
     <ip family='ipv6' address='{{ vn_subnet_ipv6 }}::1' prefix='80'>
         <dhcp>
             <range start='{{ vn_subnet_ipv6 }}::1000' end='{{ vn_subnet_ipv6 }}::2000' />
@@ -50,4 +55,5 @@
             {% endfor %}
         </dhcp>
     </ip>
+    {% endif %}
 </network>

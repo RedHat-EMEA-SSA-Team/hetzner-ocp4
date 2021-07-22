@@ -4,9 +4,23 @@
 #     src: templates/network.xml.j2
 #     dest: network.xml
 
-- name: Build private IPv6 subnet
+- name: Build IPv6 subnet
   set_fact:
     vn_subnet_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
+    ipv6_listen_public:
+      - "{{ public_ipv6 | default(listen_address_ipv6) }}"
+    ipv6_listen_private:
+      - "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}::1"
+  when: "'IPv6' in ip_families"
+
+- name: Build IPv4 subnet
+  set_fact:
+    vn_subnet_ipv4:  "{{ vn_subnet.split('.')[:3] | join('.') }}"
+    ipv4_listen_private:
+      - "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+    ipv4_listen_public:
+      - "{{ public_ip | default(listen_address) }}"
+  when: "'IPv4' in ip_families"
 
 - name: Build list of nodes
   set_fact:
@@ -16,32 +30,54 @@
         fqdn: "bootstrap.{{ vn_internal_domain }}"
         mac:              "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
         duid: "00:03:00:01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
-        ipv4: "{{ vn_subnet.split('.')[:3] | join('.')}}.2"
+        {% if 'IPv4' in ip_families -%}
+        ipv4: "{{ vn_subnet_ipv4 }}.2"
+        {% endif -%}
+        {% if 'IPv6' in ip_families -%}
         ipv6: "{{ vn_subnet_ipv6 }}::2"
+        {% endif %}
+
       masters:
       {% for id in range(0,(master_count | int )) %}
+
       - name: master-{{ id }}
         fqdn: "master-{{ id }}.{{ vn_internal_domain }}"
         mac:              "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}"
         duid: "00:03:00:01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + id) }}"
-        ipv4: "{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + id }}"
+        {% if 'IPv4' in ip_families -%}
+        ipv4: "{{ vn_subnet_ipv4 }}.{{ 10 + id }}"
+        {% endif -%}
+        {% if 'IPv6' in ip_families -%}
         ipv6: "{{ vn_subnet_ipv6 }}::{{ "%x" % (4096 + id) }}"
+        {% endif -%}
       {% endfor %}
+
       workers:
       {% for id in range(0,(compute_count | int )) %}
+
       - name: compute-{{ id }}
         fqdn: "compute-{{ id }}.{{ vn_internal_domain }}"
         mac:              "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + id) }}"
         duid: "00:03:00:01:52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + id) }}"
-        ipv4: "{{ vn_subnet.split('.')[:3] | join('.')}}.{{ 10 + master_count|int + id }}"
+        {% if 'IPv4' in ip_families -%}
+        ipv4: "{{ vn_subnet_ipv4 }}.{{ 10 + master_count|int + id }}"
+        {% endif -%}
+        {% if 'IPv6' in ip_families -%}
         ipv6: "{{ vn_subnet_ipv6 }}::{{ "%x" % ( 4096 + master_count|int + id ) }}"
+        {% endif -%}
       {% endfor %}
+
+
+- name: Print nodes string
+  debug:
+    msg: "{{ __data_structure__.split('\n')  }}"
+    verbosity: 3
 
 - name: Build dict from node yaml
   set_fact:
     nodes: "{{ __data_structure__ | from_yaml }}"
 
-- name: Print nodes
+- name: Print nodes yaml
   debug:
     var: "nodes"
     verbosity: 1
@@ -72,15 +108,6 @@
 - name: Build haproxy config
   set_fact:
     lb_haproxy_cfg: "{{ lookup('template','templates/haproxy.conf.j2') }}"
-  vars:
-    ipv4_listen_private:
-      - "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
-    ipv6_listen_private:
-      - "{{ vn_subnet_ipv6 }}::1"
-    ipv4_listen_public:
-      - "{{ public_ip | default(listen_address) }}"
-    ipv6_listen_public:
-      - "{{ public_ipv6 | default(listen_address_ipv6) }}"
 
 - name: Debug haproxy config
   debug:
@@ -105,8 +132,8 @@
     tasks_from: create.yml
   vars:
     pd_provider: "{{ dns_provider }}"
-    pd_public_ip: "{{ public_ip | default(listen_address) }}"
-    pd_public_ipv6: "{{ public_ipv6 | default(listen_address_ipv6) }}"
+    pd_public_ip: "{% if 'IPv4' in ip_families %}{{ public_ip | default(listen_address) }}{% endif %}"
+    pd_public_ipv6: "{% if 'IPv6' in ip_families %}{{ public_ipv6 | default(listen_address_ipv6) }}{% endif %}"
     pd_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
     pd_cloudflare_zone: "{{ cloudflare_zone }}"
     pd_aws_access_key: "{{ aws_access_key }}"
