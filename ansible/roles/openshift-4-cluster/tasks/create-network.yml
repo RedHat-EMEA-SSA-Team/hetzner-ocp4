@@ -52,7 +52,7 @@
         {% endif -%}
       {% endfor %}
 
-      workers:
+      workers: {% if compute_count|int < 1 %}[]{% endif %}
       {% for id in range(0,(compute_count | int )) %}
 
       - name: compute-{{ id }}
