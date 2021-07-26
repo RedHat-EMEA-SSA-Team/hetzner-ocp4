@@ -110,7 +110,38 @@ Here is an example about [_cluster.yml_](cluster-example.yml) file that contains
 |letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
 |image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
-## Pre-releases
+### Cluster design (single node, compact or normal)
+
+It is possible to install three different types of cluster designes: single node, compact or normal.
+
+#### Single Node
+
+Recommended `cluster.yml` settings:
+```yaml
+master_count: 1
+compute_count: 0
+masters_schedulable: true # is default
+```
+
+#### Compact
+
+Recommended `cluster.yml` settings:
+```yaml
+master_count: 3
+compute_count: 0
+masters_schedulable: true # is default
+```
+
+#### Normal
+
+Recommended `cluster.yml` settings:
+```yaml
+master_count: 3
+compute_count: 2 # at least 2 recommended
+masters_schedulable: false
+```
+
+### Pre-releases
 
 [Read this if you want to deploy pre releases](docs/ocp-pre-release.md)
 
