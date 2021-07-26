@@ -39,6 +39,8 @@ When following below instructional steps, you will end with a setup similar to
 
 ## Strongly recommend: configure Hetzner Firewall
 
+**Important:** Hetzner Firewall only support IPv4 - IPv6 must be solved via the host firewall(d)!
+
 Here an example Hetzner firewall configuration:
 
 ![](images/firewall.png)
