@@ -1,9 +1,15 @@
 ---
+
+- name: Collect services facts
+  service_facts:
+  register: services_state
+
 - name: Stop and disable {{ lb_name }}.service
   systemd:
     name: "{{ lb_name }}.service"
     enabled: false
     state: stopped
+  when: services_state.ansible_facts.services[ lb_name  + '.service'] is defined
 
 - name: Remove OpenShift 4 Loadbalancer SystemD service
   file:
