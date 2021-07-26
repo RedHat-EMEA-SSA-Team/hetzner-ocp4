@@ -121,6 +121,11 @@ Recommended `cluster.yml` settings:
 master_count: 1
 compute_count: 0
 masters_schedulable: true # is default
+# It's recommended to increase the master capacity too
+# master_vcpu: 4
+# master_memory_size: 16384
+# master_memory_unit: 'MiB'
+# master_root_disk_size: '120G'
 ```
 
 #### Compact
