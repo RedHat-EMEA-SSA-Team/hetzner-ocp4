@@ -1,15 +1,23 @@
 ---
+
+- name: Collect services facts
+  service_facts:
+  register: services_state
+
 - name: Stop and disable {{ lb_name }}.service
   systemd:
     name: "{{ lb_name }}.service"
     enabled: false
     state: stopped
-  ignore_errors: true
+  when: services_state.ansible_facts.services[ lb_name  + '.service'] is defined
 
-- name: Remove OpenShift 4 Loadbalancer SystemD service 
+- name: Remove OpenShift 4 Loadbalancer SystemD service
   file:
-    path: "/etc/systemd/system/{{ lb_name }}.service"
+    path: "{{ item }}"
     state: absent
+  with_items:
+    - "/etc/sysconfig/{{ lb_name }}.env"
+    - "/etc/systemd/system/{{ lb_name }}.service"
 
 - debug:
     msg: "Podman will stay in the Host, Play with it! ;-)"

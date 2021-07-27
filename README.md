@@ -39,6 +39,8 @@ When following below instructional steps, you will end with a setup similar to
 
 ## Strongly recommend: configure Hetzner Firewall
 
+**Important:** Hetzner Firewall only support IPv4 - IPv6 must be solved via the host firewall(d)!
+
 Here an example Hetzner firewall configuration:
 
 ![](images/firewall.png)
@@ -101,12 +103,50 @@ Here is an example about [_cluster.yml_](cluster-example.yml) file that contains
 |---|---|
 |cluster_name  |Name of the cluster to be installed |
 |public_domain  |Root domain that will be used for your cluster.  |
+|ip_families|Decide whether you want IPv4, IPv6 or dual-stack, detault: "['IPv4']"|
 |public_ip  |Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv4']['address']`. |
-|dns_provider  |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_ or _none_. Check __Setup public DNS records__ for more info. |
+|public_ipv6  |Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv6']['address']`. |
+|dns_provider  |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. |
 |letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
 |image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
 
-## Pre-releases
+### Cluster design (single node, compact or normal)
+
+It is possible to install three different types of cluster designes: single node, compact or normal.
+
+#### Single Node
+
+Recommended `cluster.yml` settings:
+```yaml
+master_count: 1
+compute_count: 0
+masters_schedulable: true # is default
+# It's recommended to increase the master capacity too
+# master_vcpu: 4
+# master_memory_size: 16384
+# master_memory_unit: 'MiB'
+# master_root_disk_size: '120G'
+```
+
+#### Compact
+
+Recommended `cluster.yml` settings:
+```yaml
+master_count: 3
+compute_count: 0
+masters_schedulable: true # is default
+```
+
+#### Normal
+
+Recommended `cluster.yml` settings:
+```yaml
+master_count: 3
+compute_count: 2 # at least 2 recommended
+masters_schedulable: false
+```
+
+### Pre-releases
 
 [Read this if you want to deploy pre releases](docs/ocp-pre-release.md)
 
@@ -132,13 +172,14 @@ Please configure in `cluster.yml` all necessary credentials:
 |GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
 |Azure|`azure_client_id: 'client_id'`<br/>`azure_secret: 'key'`<br/>`azure_subscription_id: 'subscription_id'`<br/>`azure_tenant: 'tenant_id'`<br/>`azure_resource_group: 'dns_zone_resource_group'` |
 |Hetzner|`hetzner_account_api_token: 93543ade82AA$73.....` <br>  `hetzner_zone: domain.tld`|
+|TransIP|`transip_token: eyJ0eXAiOiJKV....` <br> `transip_zone: domain.tld`|
 |none|With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.|
 
 ### Optional configuration
 
 |Variable | Default | Description |
 |---|---|---|
-|`storage_nfs`|false|Install NFS Storage with dynamic provisioning|
+|`storage_nfs`|false|Setup a local NFS server, create a Storage Class (with [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) ) pointing to it, and use that StorageClass for the internal Registry Storage|
 |`vm_autostart`|false|Create cluster VMs with `autostart` enabled|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |

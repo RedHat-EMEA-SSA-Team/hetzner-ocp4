@@ -4,15 +4,15 @@
   set_fact:
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
-    tmp_opm_download_url: "{{ openshift_location }}/opm-linux-{{ openshift_version }}.tar.gz"
 
 - set_fact:
     check_urls:
       - "{{ coreos_download_url }}"
       - "{{ tmp_openshift_install_download_url }}"
       - "{{ tmp_openshift_client_download_url }}"
-      - "{{ tmp_opm_download_url }}"
+      - "{{ opm_download_url }}"
       - "{{ helm_cli_location }}"
+      - "{{ butane_cli_location }}"
 
 - set_fact:
     check_urls: "{{ check_urls + [coreos_csum_url] }}"
@@ -101,12 +101,13 @@
 
 - name: Create OpenShift artifacts directory
   file:
-    path: "/opt/openshift-{{ item }}-{{ openshift_version }}"
+    path: "{{ item }}"
     state: directory
     mode: u+rwx,g+rx,o+rx
   with_items:
-  - install
-  - client
+  - "/opt/openshift-install-{{ openshift_version }}"
+  - "/opt/openshift-client-{{ openshift_version }}"
+  - "{{ opm_dest }}"
 
 - name: Download Openshift installer
   unarchive:
@@ -132,23 +133,38 @@
     - 'README.md'
     creates: "/opt/openshift-client-{{ openshift_version }}/oc"
 
-- name: Download OPM
+- name: Download OPM (gz)
   unarchive:
-    src: "{{ tmp_opm_download_url }}"
-    dest: "/opt/openshift-client-{{ openshift_version }}/"
+    src: "{{ opm_download_url }}"
+    dest: "{{ opm_dest }}"
     remote_src: yes
     mode: u+rwx,g+rx,o+rx
     owner: root
     group: root
     exclude:
     - 'README.md'
-    creates: "/opt/openshift-client-{{ openshift_version }}/opm"
+    creates: "{{ opm_dest }}/opm"
+  when: opm_download_url | regex_search("^(.*)\.tar\.gz$")
+
+- name: Download OPM
+  get_url:
+    url: "{{ opm_download_url }}"
+    dest: "{{ opm_dest }}/opm"
+    mode: u+rwx,g+rx,o+rx
+  when: not opm_download_url | regex_search("^(.*)\.tar\.gz$")
 
 - name: Download Helm client
   get_url:
     url: "{{ helm_cli_location }}"
     mode: u+rwx,g+rx,o+rx
     dest: "/opt/openshift-client-{{ openshift_version }}/helm"
+
+- name: Download butane client
+  get_url:
+    url: "{{ butane_cli_location }}"
+    mode: u+rwx,g+rx,o+rx
+    dest: "/opt/openshift-client-{{ openshift_version }}/butane"
+
 
 - name: Create a symbolic link
   file:
@@ -161,4 +177,5 @@
     "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
     "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"
     "/usr/local/bin/helm": "/opt/openshift-client-{{ openshift_version }}/helm"
-    "/usr/local/bin/opm": "/opt/openshift-client-{{ openshift_version }}/opm"
+    "/usr/local/bin/butane": "/opt/openshift-client-{{ openshift_version }}/butane"
+    "/usr/local/bin/opm": "{{ opm_dest }}/opm"

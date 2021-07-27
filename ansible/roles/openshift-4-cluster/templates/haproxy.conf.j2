@@ -1,0 +1,139 @@
+global
+    log         127.0.0.1 local2
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+
+defaults
+    mode                    http
+    log                     global
+    #option                  httplog
+    option                  dontlognull
+    #option http-server-close
+    #option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+{% if 'IPv4' in ip_families  %}
+listen ingress-http
+{% for listen in ipv4_listen_private + ipv4_listen_public %}
+    bind {{ listen }}:80
+{% endfor %}
+    mode tcp
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv4 }}:80 check
+{% endfor %}
+{% for node in nodes.workers %}
+    server {{ node.name }} {{ node.ipv4 }}:80 check
+{% endfor %}
+
+listen ingress-https
+{% for listen in ipv4_listen_private + ipv4_listen_public %}
+    bind {{ listen }}:443
+{% endfor %}
+    mode tcp
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv4 }}:443 check
+{% endfor %}
+{% for node in nodes.workers %}
+    server {{ node.name }} {{ node.ipv4 }}:443 check
+{% endfor %}
+
+listen api
+{% for listen in ipv4_listen_private + ipv4_listen_public %}
+    bind {{ listen }}:6443
+{% endfor %}
+    mode tcp
+{% for node in nodes.bootstrap %}
+    server {{ node.name }} {{ node.ipv4 }}:6443 check
+{% endfor %}
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv4 }}:6443 check
+{% endfor %}
+{% for node in nodes.workers %}
+    server {{ node.name }} {{ node.ipv4 }}:6443 check
+{% endfor %}
+
+listen machine-config-server
+{% for listen in ipv4_listen_private %}
+    bind {{ listen }}:22623
+{% endfor %}
+    mode tcp
+{% for node in nodes.bootstrap %}
+    server {{ node.name }} {{ node.ipv4 }}:22623 check
+{% endfor %}
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv4 }}:22623 check
+{% endfor %}
+{% endif %}
+
+{% if 'IPv6' in ip_families  %}
+# IPv6
+listen ingress-http-ipv6
+{% for listen in ipv6_listen_private + ipv6_listen_public %}
+    bind {{ listen }}:80
+{% endfor %}
+    mode tcp
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv6 }}:80 check
+{% endfor %}
+{% for node in nodes.workers %}
+    server {{ node.name }} {{ node.ipv6 }}:80 check
+{% endfor %}
+
+listen ingress-https-ipv6
+{% for listen in ipv6_listen_private + ipv6_listen_public %}
+    bind {{ listen }}:443
+{% endfor %}
+    mode tcp
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv6 }}:443 check
+{% endfor %}
+{% for node in nodes.workers %}
+    server {{ node.name }} {{ node.ipv6 }}:443 check
+{% endfor %}
+
+listen api-ipv6
+{% for listen in ipv6_listen_private + ipv6_listen_public %}
+    bind {{ listen }}:6443
+{% endfor %}
+    mode tcp
+{% for node in nodes.bootstrap %}
+    server {{ node.name }} {{ node.ipv6 }}:6443 check
+{% endfor %}
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv6 }}:6443 check
+{% endfor %}
+{% for node in nodes.workers %}
+    server {{ node.name }} {{ node.ipv6 }}:6443 check
+{% endfor %}
+
+listen machine-config-server-ipv6
+{% for listen in ipv6_listen_private %}
+    bind {{ listen }}:22623
+{% endfor %}
+    mode tcp
+{% for node in nodes.bootstrap %}
+    server {{ node.name }} {{ node.ipv6 }}:22623 check
+{% endfor %}
+{% for node in nodes.masters %}
+    server {{ node.name }} {{ node.ipv6 }}:22623 check
+{% endfor %}
+{% endif %}

@@ -8,7 +8,12 @@ vn_name: "openshift-4-cluster"
 vn_internal_domain: "compute.local"
 vn_public_domain: "h42.openshift.pub"
 
-listen_address: "{{ hostvars['localhost']['ansible_default_ipv4']['address'] }}"
+#
+ip_families:
+  - IPv4
+
+listen_address: "{{ hostvars['localhost']['ansible_default_ipv4']['address'] | default('') }}"
+listen_address_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'] | default('') }}"
 
 master_count: 3
 master_vcpu: 4
@@ -31,7 +36,7 @@ vm_autostart: false
 # Important: OpenShift version must match to RHEL CoreOS version!
 
 # reference to OpenShift version
-openshift_version: 4.7.2
+openshift_version: 4.8.2
 openshift_install_command: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
 # dev-pre:
 # {{ openshift_mirror }}/pub/openshift-v4/clients/ocp-dev-preview
@@ -43,8 +48,12 @@ openshift_mirror: "https://mirror.openshift.com"
 
 openshift_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/ocp/{{openshift_client_version}}"
 
+opm_version: "{{ openshift_client_version }}"
+opm_download_url: "{{ openshift_location }}/opm-linux-{{ opm_version }}.tar.gz"
+opm_dest: "/opt/openshift-client-{{ openshift_client_version }}/"
+
 # reference to coreos qcow file
-coreos_version: 4.7.0
+coreos_version: 4.8.2
 coreos_download_url: "{{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/{{ coreos_version.split('.')[:2]|join('.') }}/{{ coreos_version }}/rhcos-{{coreos_version}}-x86_64-qemu.x86_64.qcow2.gz"
 coreos_csum_url: "{{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/{{ coreos_version.split('.')[:2]|join('.') }}/{{ coreos_version }}/sha256sum.txt"
 
@@ -65,6 +74,9 @@ letsencrypt_directory: "https://acme-v02.api.letsencrypt.org/directory"
 letsencrypt_disabled: false
 # helm
 helm_cli_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/helm/latest/helm-linux-amd64"
+
+butane_cli_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/butane/latest/butane-amd64"
+
 
 # NFS Storage
 #  storage_nfs do not support multi cluster support, it overwrites the

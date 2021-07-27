@@ -1,6 +1,12 @@
 ---
 cluster_name: ocp4
 public_domain: example.com
+
+# DualStack:
+ip_families:
+  - IPv4
+  - IPv6
+
 # set custom public ip for DNS entries. Defaults to: hostvars['localhost']['ansible_default_ipv4']['address']
 # public_ip: 92.100.42.2
 dns_provider: [route53|cloudflare|gcp|azure|hetzner]

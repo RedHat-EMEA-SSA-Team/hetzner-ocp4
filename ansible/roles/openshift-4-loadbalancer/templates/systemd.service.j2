@@ -6,19 +6,13 @@ After=network.target
 Type=simple
 TimeoutStartSec=5m
 
-ExecStartPre=-/usr/bin/podman rm "{{ lb_name }}"
-ExecStartPre=/usr/bin/podman pull quay.io/redhat-emea-ssa-team/openshift-4-loadbalancer
+EnvironmentFile=/etc/sysconfig/{{ lb_name }}.env
 
+ExecStartPre=-/usr/bin/podman rm "{{ lb_name }}"
+ExecStartPre=/usr/bin/podman pull {{ lb_container_image }}
 ExecStart=/usr/bin/podman run --name {{ lb_name }} --net host \
-  -e API={{ lb_api }} \
-  -e API_LISTEN={{ lb_api_listen }} \
-  -e INGRESS_HTTP={{ lb_ingress_http }} \
-  -e INGRESS_HTTP_LISTEN={{ lb_ingress_http_listen }} \
-  -e INGRESS_HTTPS={{ lb_ingress_https }} \
-  -e INGRESS_HTTPS_LISTEN={{ lb_ingress_https_listen }} \
-  -e MACHINE_CONFIG_SERVER={{ lb_machine_config_server }} \
-  -e MACHINE_CONFIG_SERVER_LISTEN={{ lb_machine_config_server_listen }} \
-  quay.io/redhat-emea-ssa-team/openshift-4-loadbalancer
+  --env-host=true \
+  {{ lb_container_image }}
 
 ExecReload=-/usr/bin/podman stop "{{ lb_name }}"
 ExecReload=-/usr/bin/podman rm "{{ lb_name }}"

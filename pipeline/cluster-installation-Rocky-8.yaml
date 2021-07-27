@@ -1,0 +1,65 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: cluster-installation-centos-8
+spec:
+  resources:
+  - name: workspace
+    type: git
+  tasks:
+    - name: reset-server
+      taskRef:
+        name: reset-hetzner-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+      params:
+        - name: cluster-yml-secret
+          value: cluster-yml-centos8
+    - name: init-server
+      runAfter:
+      - reset-server
+      taskRef:
+        name: init-server
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+    - name: prepare-host
+      runAfter:
+      - init-server
+      taskRef:
+        name: prepare-host
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+    - name: create-cluster
+      runAfter:
+      - prepare-host
+      taskRef:
+        name: generic-playbook-runner
+      params:
+        - name: playbook
+          value: 02-create-cluster.yml
+        - name: cluster-yml-secret
+          value: cluster-yml-centos8
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace
+    - name: destroy-cluster
+      runAfter:
+      - create-cluster
+      taskRef:
+        name: generic-playbook-runner
+      params:
+        - name: playbook
+          value: 99-destroy-cluster.yml
+        - name: cluster-yml-secret
+          value: cluster-yml-centos8
+      resources:
+        inputs:
+        - name: hetzner-ocp4
+          resource: workspace

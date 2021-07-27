@@ -1,2 +1,3 @@
 ---
 lb_name: "openshift-4-loadbalancer"
+lb_container_image: quay.io/redhat-emea-ssa-team/openshift-4-loadbalancer:master

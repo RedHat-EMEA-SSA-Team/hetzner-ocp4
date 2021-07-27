@@ -13,3 +13,19 @@
   with_items:
   - api
   - '*.apps'
+
+- name: Delete DNS record at Route53
+  route53:
+    state: absent
+    zone: "{{ pd_aws_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    type: AAAA
+    ttl: 120
+    value: "{{ pd_public_ipv6 }}"
+    wait: yes
+    aws_access_key: "{{ pd_aws_access_key }}"
+    aws_secret_key: "{{ pd_aws_secret_key }}"
+  with_items:
+  - api
+  - '*.apps'
+  when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)
