@@ -7,6 +7,7 @@
   * Cleanup: Remove pipeline/ directory
   * Update to ansible-automation-platform-2.6
   * Add cloudflare_api_token support ( Issue #86 )
+  * Update proxy doc
 
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
