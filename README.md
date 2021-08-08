@@ -210,6 +210,7 @@ Please configure in `cluster.yml` all necessary credentials:
 * [Disk management (add disk to vm, wipe node)](docs/disk-management.md)
 * [How to passthrough nvme or gpu (pci-passthrough](docs/pci-passthrough.md)
 * [How to install OKD](docs/how-to-install-okd.md)
+* [Virsh commands cheatsheet to manage KVM guest virtual machines](https://computingforgeeks.com/virsh-commands-cheatsheet/)
 
 # Useful commands
 
