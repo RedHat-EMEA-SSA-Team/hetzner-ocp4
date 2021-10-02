@@ -182,6 +182,8 @@ Please configure in `cluster.yml` all necessary credentials:
 |---|---|---|
 |`storage_nfs`|false|Setup a local NFS server, create a Storage Class (with [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) ) pointing to it, and use that StorageClass for the internal Registry Storage|
 |`vm_autostart`|false|Create cluster VMs with `autostart` enabled|
+|`vm_storage_backend`|`qcow2`|You can choose between default `qcow2` and `lvm` as storage backend.|
+|`vm_storage_backend_location`|empty|Important for vm_storage_backend lvm, please add the volume group for example `vg0`|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
