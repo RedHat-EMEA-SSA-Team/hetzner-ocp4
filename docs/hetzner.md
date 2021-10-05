@@ -123,19 +123,22 @@ You are now ready to reboot your system into the newly installed OS.
 
 If you do not want to do the above steps by hand: use Ansible! :-)
 
-1) Create `cluster.yml` with some hetzner specific options:
+1) Create a `cluster.yml` in the repo's root folder and add your Hetzner server specifc information, as in the following example:
     ```
-    # Hetzner informations (for role provision-hetzner)
-    hetzner_hostname: "hostname.domain.tld"
-    hetzner_webservice_username: "xxxx"
-    hetzner_webservice_password: "xxxx"
-    hetzner_ip: "xxx.xxx.xxx.xxx"
-    hetzner_disk1: nvme0n1
-    hetzner_disk1: nvme1n1
-
-    # Optional:
-    #   hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-75-64-minimal.tar.gz"
-    #   hetzner_autosetup_file: "{{ playbook_dir }}/my-autosetup-for-openshift"
+   hetzner_webservice_username: "USERNAME"
+   hetzner_webservice_password: "PASSWORD"
+   hetzner_hostname: "HOSTNAME"
+   hetzner_ip: "IP_ADDRESS"
     ```
 
-2) Run playbook: `./ansible/00-provision-hetzner.yml`
+   More detailed information about the configurable parameters can be found in the [defaults variable file](../ansible/roles/provision-hetzner/defaults/main.yml)
+
+2) Run playbook: `ansible/00-provision-hetzner.yml`
+
+   Assuming you protected the SSH private key for logging into your Hetzner server with a password, you should use the ssh-agent for calling the Ansible playbook, so that the password for the SSH key is requested once and then stored for the entire session (so that you don't need to enter your password multiple times). The full playbook call from the repo's root folder (using the standard private SSH key name `id_rsa`) would then look like this:
+
+   ```
+   ssh-agent bash
+   ssh-add ~/.ssh/id_rsa
+   ansible-playbook ansible/00-provision-hetzner.yml
+   ```
