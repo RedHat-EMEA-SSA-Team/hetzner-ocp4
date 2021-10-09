@@ -137,7 +137,24 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
-
+- name: Create DNS record at DigitalOcean
+  digitalocean_dns:
+    uri:
+      url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ digitalocean_token }}"
+      body_format: json
+      body:
+        dnsEntry:
+          name: "{{ item.0.key | replace( digitalocean_zone ,'') | regex_replace('\\.$', '') }}"
+          expire: 60
+          type: TXT
+          content: "{{ item.1 }}"
+    status_code: 201
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "digitalocean" and sample_com_challenge is changed
 
 - name: DNS record info
   debug:
@@ -231,6 +248,25 @@
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "azure" and sample_com_challenge is changed
+
+- name: Delete DNS record at DigitalOcean
+  digitalocean_dns:
+    uri:
+      url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records"
+    method: DELETE
+    headers:
+      Authorization: "Bearer {{ digitalocean_token }}"
+    body_format: json
+    body:
+      dnsEntry:
+        name: "{{ item.0.key | replace( digitalocean_zone , '') | regex_replace('\\.$', '') }}"
+        expire: 60
+        type: TXT
+        content: "{{ item.1 }}"
+    status_code: 204
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "digitalocean" and sample_com_challenge is changed
 
 
 - name: Delete DNS record at TransIP
