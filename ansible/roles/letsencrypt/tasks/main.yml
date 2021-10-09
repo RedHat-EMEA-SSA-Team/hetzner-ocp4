@@ -249,8 +249,8 @@
   when: le_dns_provider == "azure" and sample_com_challenge is changed
 
 - name: Delete DNS record at DigitalOcean
-    uri:
-      url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records"
+  uri:
+    url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records"
     method: DELETE
     headers:
       Authorization: "Bearer {{ digitalocean_token }}"
