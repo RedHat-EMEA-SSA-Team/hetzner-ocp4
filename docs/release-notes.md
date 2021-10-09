@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## 2021-10-10
+
+ * Added DigitalOcean DNS
+ * Fixed some typos
+ * Added subnet_ip for deployments where LB IP and Public IP are different.
+
 ## 2021-04-09
 
  * Bump OpenShift Version to 4.7.0
