@@ -146,9 +146,8 @@
     body_format: json
     body:
       name: "{{ item.0.key | replace( digitalocean_zone ,'') | regex_replace('\\.$', '') }}"
-      expire: 60
       type: TXT
-      content: "{{ item.1 }}"
+      data: "{{ item.1 }}"
     status_code: 201
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
@@ -256,9 +255,8 @@
     body_format: json
     body:
       name: "{{ item.0.key | replace( digitalocean_zone , '') | regex_replace('\\.$', '') }}"
-      expire: 60
       type: TXT
-      content: "{{ item.1 }}"
+      data: "{{ item.1 }}"
     status_code: 204
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
