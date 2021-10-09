@@ -65,6 +65,30 @@
     - le_hetzner_zone
   when: le_dns_provider == "hetzner"
 
+- name: Check required DigitalOcean variables
+  assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_digitalocean_token
+    - le_digitalocean_zone
+  when: le_dns_provider == "digitalocean"
+
+- name: Debug var only with -vv DigitalOcean
+  debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_letsencrypt_account_email
+    - le_digitalocean_token
+    - le_digitalocean_zone
+    - le_public_domain
+    - le_certificates_dir
+    - le_public_domain
+    - le_acme_directory
+  when: le_dns_provider == "digitalocean"
+
 - name: Debug var only with -vv CloudFlare
   debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"

@@ -1,0 +1,17 @@
+- name: Create DNS record at DigitalOcean
+  uri:
+    url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ digitalocean_token }}"
+    body_format: json
+    body:
+      name: "{{ item }}.{{ cluster_name }}"
+      type: A
+      data: "{{ pd_public_ip }}"
+    status_code: 201
+  with_items:
+    - api
+    - '*.apps'
+  tags:
+    - public_dns

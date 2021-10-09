@@ -15,7 +15,7 @@
   set_fact:
     vn_subnet_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
     ipv6_listen_public:
-      - "{{ public_ipv6 | default(listen_address_ipv6) }}"
+      - "{{ subnet_ipv6 | default(listen_address_ipv6) }}"
     ipv6_listen_private:
       - "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}::1"
   when: "'IPv6' in ip_families"
@@ -26,7 +26,7 @@
     ipv4_listen_private:
       - "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
     ipv4_listen_public:
-      - "{{ public_ip | default(listen_address) }}"
+      - "{{ subnet_ip | default(listen_address) }}"
   when: "'IPv4' in ip_families"
 
 - name: Build list of nodes
@@ -139,6 +139,7 @@
     tasks_from: create.yml
   vars:
     pd_provider: "{{ dns_provider }}"
+    pd_subnet_ip: "{% if 'IPv4' in ip_families %}{{ subnet_ip | default(listen_address) }}{% endif %}"
     pd_public_ip: "{% if 'IPv4' in ip_families %}{{ public_ip | default(listen_address) }}{% endif %}"
     pd_public_ipv6: "{% if 'IPv6' in ip_families %}{{ public_ipv6 | default(listen_address_ipv6) }}{% endif %}"
     pd_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
@@ -157,6 +158,6 @@
     path: /etc/hosts
     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
     block: |
-      {{ public_ip | default(listen_address) }} api.{{ cluster_name }}.{{ public_domain }}
+      {{ subnet_ip | default(listen_address) }} api.{{ cluster_name }}.{{ public_domain }}
   tags: public_dns
   when: dns_provider == 'none'
