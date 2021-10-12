@@ -1,4 +1,4 @@
-- name: Create DNS record at DigitalOcean
+- name: Delete DNS record at DigitalOcean
   community.digitalocean.digital_ocean_domain_record:
     oauth_token: "{{ digitalocean_token }}"
     state: absent
@@ -14,7 +14,7 @@
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
 
 
-- name: Create IPv6 DNS record at DigitalOcean
+- name: Delete IPv6 DNS record at DigitalOcean
   community.digitalocean.digital_ocean_domain_record:
     oauth_token: "{{ digitalocean_token }}"
     state: absent
