@@ -11,28 +11,28 @@ controlPlane:
 metadata:
   name: {{ cluster_name }}
 networking:
-  clusterNetworks:
+  clusterNetwork:
 {% if 'IPv4' in ip_families  %}
-  - cidr: 10.128.0.0/14
-    hostSubnetLength: 9
+  - cidr: {{ networking_clusternetwork_cidr_ipv4 }}
+    hostPrefix: {{ networking_clusternetwork_hostprefix_ipv4 }}
 {% endif %}
 {% if 'IPv6' in ip_families  %}
-  - cidr: fd00:10:128::/56
-    hostPrefix: 64
+  - cidr: {{ networking_clusternetwork_cidr_ipv6 }}
+    hostPrefix: {{ networking_clusternetwork_hostprefix_ipv6 }}
 {% endif %}
   machineNetwork:
 {% if 'IPv4' in ip_families  %}
-  - cidr: {{ vn_subnet }}/24
+  - cidr: {{ networking_machinenetwork_cidr_ipv4 }}
 {% endif %}
 {% if 'IPv6' in ip_families  %}
-  - cidr: {{ vn_subnet_ipv6 }}::/80
+  - cidr: {{ networking_machinenetwork_cidr_ipv6 }}
 {% endif %}
   serviceNetwork:
 {% if 'IPv4' in ip_families  %}
-  - 172.30.0.0/16
+  - "{{ networking_servicenetwork_cidr_ipv4 }}"
 {% endif %}
 {% if 'IPv6' in ip_families  %}
-  - fd00:172:16::/112
+  - "{{ networking_servicenetwork_cidr_ipv6 }}"
 {% endif %}
   type: {{ sdn_plugin_name }}
 platform:
