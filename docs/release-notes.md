@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## 2021-10-10
+
+ * Bump OKD version to 4.8.0
+ * Add DNS provider: digitalocean
+ * Created a new variable for load balancer ip.
+
 ## 2021-04-09
 
  * Bump OpenShift Version to 4.7.0
