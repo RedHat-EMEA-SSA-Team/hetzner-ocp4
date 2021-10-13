@@ -15,7 +15,7 @@
   set_fact:
     vn_subnet_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
     ipv6_listen_public:
-      - "{{ load_balancer_public_ipv6 | default(public_ipv6) }}"
+      - "{{ load_balancer_public_ipv6 | default(listen_address_ipv6) }}"
     ipv6_listen_private:
       - "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}::1"
   when: "'IPv6' in ip_families"
@@ -26,7 +26,7 @@
     ipv4_listen_private:
       - "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
     ipv4_listen_public:
-      - "{{ load_balancer_public_ip | default(public_ip) }}"
+      - "{{ load_balancer_public_ip | default(listen_address) }}"
   when: "'IPv4' in ip_families"
 
 - name: Build list of nodes
@@ -139,9 +139,9 @@
     tasks_from: create.yml
   vars:
     pd_provider: "{{ dns_provider }}"
-    pd_load_balancer_public_ip: "{% if 'IPv4' in ip_families %}{{ load_balancer_public_ip | default(public_ip) }}{% endif %}"
+    pd_load_balancer_public_ip: "{% if 'IPv4' in ip_families %}{{ load_balancer_public_ip | default(listen_address) }}{% endif %}"
     pd_public_ip: "{% if 'IPv4' in ip_families %}{{ public_ip | default(listen_address) }}{% endif %}"
-    pd_load_balancer_public_ipv6: "{% if 'IPv6' in ip_families %}{{ load_balancer_public_ipv6 | default(public_ipv6) }}{% endif %}"
+    pd_load_balancer_public_ipv6: "{% if 'IPv6' in ip_families %}{{ load_balancer_public_ipv6 | default(listen_address) }}{% endif %}"
     pd_public_ipv6: "{% if 'IPv6' in ip_families %}{{ public_ipv6 | default(listen_address_ipv6) }}{% endif %}"
     pd_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
     pd_cloudflare_zone: "{{ cloudflare_zone }}"
@@ -161,6 +161,6 @@
     path: /etc/hosts
     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
     block: |
-      {{ load_balancer_public_ip | default(public_ip) }} api.{{ cluster_name }}.{{ public_domain }}
+      {{ load_balancer_public__ip | default(listen_address) }} api.{{ cluster_name }}.{{ public_domain }}
   tags: public_dns
   when: dns_provider == 'none'
