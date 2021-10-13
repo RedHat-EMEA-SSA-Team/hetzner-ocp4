@@ -38,8 +38,3 @@
     insertafter: '^\[Network\]'
     regexp: '^IPForward='
   when: stat_result.stat.exists == True
-
-# Fixes issue where DNS records aren't deleted.
-- name: Install DigitalOcean Ansible plugin
-  shell: "ansible-galaxy collection install community.digitalocean"
-  register: result

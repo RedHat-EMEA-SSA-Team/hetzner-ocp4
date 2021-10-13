@@ -1,3 +1,8 @@
+# Fixes issue where DNS records aren't deleted.
+- name: Install DigitalOcean Ansible plugin
+  shell: "ansible-galaxy collection install community.digitalocean"
+  register: result
+
 - name: Create DNS record at DigitalOcean
   community.digitalocean.digital_ocean_domain_record:
     oauth_token: "{{ digitalocean_token }}"
