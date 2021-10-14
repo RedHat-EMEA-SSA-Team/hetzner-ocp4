@@ -15,6 +15,12 @@ ip_families:
 listen_address: "{{ hostvars['localhost']['ansible_default_ipv4']['address'] | default('') }}"
 listen_address_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'] | default('') }}"
 
+# Default: qcow2
+# For more performance use LVM
+vm_storage_backend: qcow2
+# Only necessary for LVM, ignored by qcow but should be '/var/lib/libvirt/images/'
+vm_storage_backend_location:
+
 master_count: 3
 master_vcpu: 4
 master_memory_size: 16384

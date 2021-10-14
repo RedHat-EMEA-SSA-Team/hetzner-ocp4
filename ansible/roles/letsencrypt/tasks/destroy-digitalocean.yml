@@ -1,0 +1,9 @@
+---
+- name: Delete DNS record at DigitalOcean
+  uri:
+    url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records/{{ item.json.domain_record.id }}"
+    method: DELETE
+    headers:
+      Authorization: "Bearer {{ digitalocean_token }}"
+    status_code: 200, 204
+  with_items: "{{ digitalocean_records.results }}"

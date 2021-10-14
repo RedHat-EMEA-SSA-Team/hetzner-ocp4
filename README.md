@@ -153,8 +153,8 @@ masters_schedulable: false
 
 ### Setup public DNS records
 
-Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_, _GCP DNS_ or _none_.
-If you want to use _Route53_, _Cloudflare_ or _GCP_ as your DNS provider, you have to add a few variables. Check the instructions below.
+Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_, _DigitalOcean_, _GCP DNS_ or _none_.
+If you want to use _Route53_, _Cloudflare_, _DigitalOcean_ or _GCP_ as your DNS provider, you have to add a few variables. Check the instructions below.
 
 DNS records are constructed based on _cluster_name_ and _public_domain_ values. With above values DNS records should be
 - api._cluster_name_._public_domain_
@@ -168,11 +168,12 @@ Please configure in `cluster.yml` all necessary credentials:
 
 | DNS provider | Variables  |
 |---|---|
-|CloudFlare|`cloudflare_account_email: john@example.com` <br> Use the global api key here! (API-Token is not supported!) (Details in #86) <br>`cloudflare_account_api_token: 9348234sdsd894.....` <br>  `cloudflare_zone: domain.tld`|
-|Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
-|GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
 |Azure|`azure_client_id: 'client_id'`<br/>`azure_secret: 'key'`<br/>`azure_subscription_id: 'subscription_id'`<br/>`azure_tenant: 'tenant_id'`<br/>`azure_resource_group: 'dns_zone_resource_group'` |
+|CloudFlare|`cloudflare_account_email: john@example.com` <br> Use the global api key here! (API-Token is not supported!) (Details in #86) <br>`cloudflare_account_api_token: 9348234sdsd894.....` <br>  `cloudflare_zone: domain.tld`|
+|DigitalOcean|`digitalocean_token: e7a6f82c3245b65cf4.....` <br>  `digitalocean_zone: domain.tld`|
+|GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
 |Hetzner|`hetzner_account_api_token: 93543ade82AA$73.....` <br>  `hetzner_zone: domain.tld`|
+|Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
 |TransIP|`transip_token: eyJ0eXAiOiJKV....` <br> `transip_zone: domain.tld`|
 |none|With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.|
 
@@ -182,6 +183,8 @@ Please configure in `cluster.yml` all necessary credentials:
 |---|---|---|
 |`storage_nfs`|false|Setup a local NFS server, create a Storage Class (with [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) ) pointing to it, and use that StorageClass for the internal Registry Storage|
 |`vm_autostart`|false|Create cluster VMs with `autostart` enabled|
+|`vm_storage_backend`|`qcow2`|You can choose between default `qcow2` and `lvm` as storage backend.|
+|`vm_storage_backend_location`|empty|Important for vm_storage_backend lvm, please add the volume group for example `vg0`|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
@@ -211,6 +214,7 @@ Please configure in `cluster.yml` all necessary credentials:
 * [Disk management (add disk to vm, wipe node)](docs/disk-management.md)
 * [How to passthrough nvme or gpu (pci-passthrough](docs/pci-passthrough.md)
 * [How to install OKD](docs/how-to-install-okd.md)
+* [Virsh commands cheatsheet to manage KVM guest virtual machines](https://computingforgeeks.com/virsh-commands-cheatsheet/)
 
 # Useful commands
 
@@ -218,3 +222,9 @@ Please configure in `cluster.yml` all necessary credentials:
 |---|---|
 |Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-${cluster_name} ./watch-stats.sh```
 |Start cluster after reboot|```./ansible/04-start-cluster.yml```
+
+
+
+# Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4.svg)](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4)

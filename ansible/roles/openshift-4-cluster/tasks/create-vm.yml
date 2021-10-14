@@ -6,17 +6,36 @@
   command: "qemu-img create -f qcow2 -b {{ coreos_image_location }} /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2 {{ vm_root_disk_size }}"
   args:
     creates: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
+  when: vm_storage_backend == "qcow2"
+
+- name: Convert coreos qcow into raw image
+  command: "qemu-img convert {{ coreos_image_location }} -O raw {{ coreos_image_location }}.raw "
+  args:
+    creates: "{{ coreos_image_location }}.raw"
+  when: vm_storage_backend == "lvm"
+
+- name: Create logical volume
+  lvol:
+    vg: "{{ vm_storage_backend_location }}"
+    lv: "{{ vm_instance_name }}"
+    state: present
+    size: "{{ vm_root_disk_size }}"
+  when: vm_storage_backend == "lvm"
+
+- name: Copy/dd coreos into device
+  command: "dd if={{ coreos_image_location }}.raw of=/dev/{{ vm_storage_backend_location }}/{{ vm_instance_name }} bs=4M"
+  when: vm_storage_backend == "lvm"
 
 - name: Copy ignition {{ vm_instance_name }}
   copy:
     src: "{{ vm_ignition_file }}"
     dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.ign"
     mode: '0644'
-  
-# - name: Debug - create /tmp/{{ vm_instance_name }}.virt.xml
-#   template:
-#     src: "vm.xml.j2"
-#     dest: "/tmp/{{ vm_instance_name }}.virt.xml"
+
+- name: Debug - create /tmp/{{ vm_instance_name }}.virt.xml
+  template:
+    src: "vm.xml.j2"
+    dest: "/tmp/{{ vm_instance_name }}.virt.xml"
 
 - name: Define VirtualMachine {{ vm_instance_name }}
   virt:
@@ -25,7 +44,7 @@
     xml: "{{ lookup('template', 'templates/vm.xml.j2') }}"
 
 - name: Start VirtualMachine {{ vm_instance_name }}
-  virt: 
+  virt:
     name: "{{ vm_instance_name }}"
     state: running
     autostart: "{{ vm_autostart }}"

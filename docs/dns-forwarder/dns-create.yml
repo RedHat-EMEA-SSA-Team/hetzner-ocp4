@@ -1,4 +1,4 @@
-#!/usr/bin/env ansible-playbook 
+#!/usr/bin/env ansible-playbook
 ---
 - hosts: localhost
   connection: local
@@ -10,7 +10,7 @@
   - ../../cluster.yml
   vars:
     centos_download_url: https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
-    centos_image_location: /var/lib/libvirt/images/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2 
+    centos_image_location: /var/lib/libvirt/images/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
     # centos_download_url: https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
     # centos_image_location: /var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud.qcow2
 
@@ -22,11 +22,6 @@
     args:
       creates: "{{ centos_image_location }}"
       warn: false
-
-  - name: Install cloud-utils
-    package:
-      name: cloud-utils
-  
 
   - name: Build inventory
     add_host:
@@ -45,6 +40,7 @@
       vm_memory_unit: 'MiB'
       groups:
         - dns
+
     loop:
     - { name: "{{ cluster_name }}-dns-1", vm_ip_address: "{{ vn_subnet.split('.')[:3] | join('.')}}.2" }
     - { name: "{{ cluster_name }}-dns-2", vm_ip_address: "{{ vn_subnet.split('.')[:3] | join('.')}}.3" }
@@ -52,21 +48,26 @@
 - hosts: dns
   gather_facts: false
   become: true
-  tasks: 
+  tasks:
   #########################################################################################################
   # Spinup instances
   #########################################################################################################
   - name: Spinn up instances
     connection: local
-    block: 
+    block:
     - name: Create disk for {{ vm_instance_name }}
       command: "qemu-img create -f qcow2 -b {{ centos_image_location }} /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2 {{ vm_root_disk_size }}"
       args:
         creates: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
 
+    - name: Creates directory
+      file:
+        path: "/var/lib/libvirt/images/{{ vm_instance_name }}"
+        state: directory
+
     - name: Create cloud-init meta-data
       copy:
-        dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.meta-data"
+        dest: "/var/lib/libvirt/images/{{ vm_instance_name }}/meta-data"
         content: |
           instance-id: {{ lookup('lines','uuidgen') }}
           local-hostname: {{ vm_instance_name }}
@@ -84,18 +85,19 @@
     # Root pw r3dh4t1!
     - name: Create cloud-init user-data
       copy:
-        dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.user-data"
+        dest: "/var/lib/libvirt/images/{{ vm_instance_name }}/user-data"
         content: |
           #cloud-config
 
           ssh_authorized_keys:
           - {{ ssh_public_key }}
 
+
           hostname: {{ vm_instance_name }}
           fqdn: {{ vm_instance_name }}
           # set the locale
           locale: en_US.UTF-8
-  
+
           # timezone: set the timezone for this instance
           timezone: UTC
 
@@ -107,14 +109,16 @@
             sudo: ALL=(ALL) NOPASSWD:ALL
             ssh_authorized_keys:
               - {{ ssh_public_key }}
+
             lock_passwd: false
             passwd: $6$BH7mErbrdppnmXf1$kHwl49XSEvLPSKgeFaJAArjwjxfnMdDbT1DwHykkJr/W9WYJCoHu7nOg1mAWFtY29X.ZgLrzthXA.j71mLugB0
 
     - name: Create CD-ROM ISO with cloud-init config
       shell: |
-        cloud-localds /var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso \
-          /var/lib/libvirt/images/{{ vm_instance_name }}.user-data \
-          /var/lib/libvirt/images/{{ vm_instance_name }}.meta-data &&
+        genisoimage  -output /var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso \
+          -volid cidata -joliet -rock -graft-points  \
+          /var/lib/libvirt/images/{{ vm_instance_name }}/user-data \
+          /var/lib/libvirt/images/{{ vm_instance_name }}/meta-data &&
         chown qemu:wheel /var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso
       args:
         creates: "/var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso"
@@ -196,7 +200,7 @@
           </domain>
 
     - name: Start VirtualMachine {{ vm_instance_name }}
-      virt: 
+      virt:
         name: "{{ vm_instance_name }}"
         state: running
     - name: Wait 300 seconds for port 22 to become open
@@ -215,7 +219,7 @@
   become: true
   tags:
     - vm
-  tasks: 
+  tasks:
 
   - name: Setup nameserver
     copy:
@@ -231,7 +235,7 @@
 
   - name: Install dnsmasq
     yum:
-      name: 
+      name:
         - dnsmasq
         - bind-utils
 

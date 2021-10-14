@@ -138,18 +138,13 @@
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
 - name: Create DNS record at DigitalOcean
-  uri:
-    url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ digitalocean_token }}"
-    body_format: json
-    body:
-      name: "{{ item.0.key | replace( digitalocean_zone ,'') | regex_replace('\\.$', '') }}"
-      type: TXT
-      data: "{{ item.1 }}"
-    status_code: 201
-  register: record
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: present
+    domain: "{{ digitalocean_zone }}"
+    type: TXT
+    name: "{{ item.0.key | replace( digitalocean_zone , '') | regex_replace('\\.$', '') }}"
+    data: "{{ item.1 }}"
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "digitalocean" and sample_com_challenge is changed
 
@@ -162,7 +157,7 @@
 - name: Include DNS provider
   include: "create-{{ le_dns_provider }}.yml"
   when:
-  - le_dns_provider in ['hetzner']
+  - le_dns_provider in ['hetzner', 'digitalocean']
   - sample_com_challenge is changed
 
 - pause:
@@ -246,18 +241,15 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "azure" and sample_com_challenge is changed
 
+
 - name: Delete DNS record at DigitalOcean
-  uri:
-    url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records/{{ item }}"
-    method: DELETE
-    headers:
-      Authorization: "Bearer {{ digitalocean_token }}"
-    body_format: json
-    body:
-      name: "{{ item.0.key | replace( digitalocean_zone , '') | regex_replace('\\.$', '') }}"
-      type: TXT
-      data: "{{ item.1 }}"
-    status_code: 200, 204
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: absent
+    domain: "{{ digitalocean_zone }}"
+    type: TXT
+    name: "{{ item.0.key | replace( digitalocean_zone , '') | regex_replace('\\.$', '') }}"
+    data: "{{ item.1 }}"
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "digitalocean" and sample_com_challenge is changed
 
@@ -280,11 +272,10 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
-
 - name: Include DNS provider
   include: "destroy-{{ le_dns_provider }}.yml"
   when:
-  - le_dns_provider in ['hetzner']
+  - le_dns_provider in ['hetzner', 'digitalocean']
   - sample_com_challenge is changed
 
 - name: concat root ca and intermediate
