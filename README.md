@@ -99,7 +99,7 @@ We are now ready to install `libvirt` as our hypervisor, provision VMs and prepa
 
 Here is an example about [_cluster.yml_](cluster-example.yml) file that contains information about the cluster that is going to be installed.
 
-| variable | describtion  |
+| variable | description  |
 |---|---|
 |cluster_name  |Name of the cluster to be installed |
 |public_domain  |Root domain that will be used for your cluster.  |
