@@ -102,13 +102,17 @@ Here is an example about [_cluster.yml_](cluster-example.yml) file that contains
 | variable | description  |Default|
 |---|---|---|
 |`cluster_name`               |Name of the cluster to be installed | **Required** |
+|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
+|`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
+|`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
 |`public_domain`              |Root domain that will be used for your cluster.  | **Required** |
 |`ip_families`                |Decide whether you want IPv4, IPv6 or dual-stack. | `['IPv4']` |
-|`public_ip`                  |Override for public ip entries. Used for dns records at your dns_provider. | `hostvars['localhost']['ansible_default_ipv4']['address']`. |
-|`public_ipv6`                |Same as `public_ip` vut for IPv6 | `hostvars['localhost']['ansible_default_ipv6']['address']`. | `public_ipv6` |
-|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
-|`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
-|`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
+|`listen_address`             |Listen address for the load balancer on your host system.  |`hostvars['localhost']['ansible_default_ipv4']['address']` |
+|`listen_address_ipv6`        |Same as listen_address but for IPv6 |`hostvars['localhost']['ansible_default_ipv6']['address']`|
+|`public_ip`                  |Optional to overwrite public ip, if it is different from `listen_address`. Used for dns records at your dns_provider. | `listen_address` |
+|`public_ipv6`                |Same as `public_ip` but for IPv6 | `listen_address_ipv6` |
+|`masters_schedulable`        |Optional to overwrite masters schedulable| `false` |
+|`sdn_plugin_name`            |Optional to change the SDN plugin between `OVNKubernetes` or `OpenShiftSDN` | `OVNKubernetes` |
 
 ### Cluster design (single node, compact or normal)
 
