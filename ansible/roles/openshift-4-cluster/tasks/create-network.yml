@@ -159,6 +159,5 @@
     path: /etc/hosts
     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
     block: |
-      {{ public_ip | default(listen_address) }} api.{{ cluster_name }}.{{ public_domain }}
+      {{ listen_address }} api.{{ cluster_name }}.{{ public_domain }}
   tags: public_dns
-  when: dns_provider == 'none'

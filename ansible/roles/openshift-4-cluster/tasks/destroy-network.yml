@@ -24,7 +24,6 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
     block: ""
   tags: public_dns
-  when: dns_provider == 'none'
 
 - name: Destroy OpenShift 4 load balancer
   import_role:
