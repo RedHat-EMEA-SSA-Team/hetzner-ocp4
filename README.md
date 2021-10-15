@@ -99,16 +99,16 @@ We are now ready to install `libvirt` as our hypervisor, provision VMs and prepa
 
 Here is an example about [_cluster.yml_](cluster-example.yml) file that contains information about the cluster that is going to be installed.
 
-| variable | description  |
-|---|---|
-|cluster_name  |Name of the cluster to be installed |
-|public_domain  |Root domain that will be used for your cluster.  |
-|ip_families|Decide whether you want IPv4, IPv6 or dual-stack, detault: "['IPv4']"|
-|public_ip  |Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv4']['address']`. |
-|public_ipv6  |Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv6']['address']`. |
-|dns_provider  |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. |
-|letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
-|image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
+| variable | description  |Default|
+|---|---|---|
+|`cluster_name`               |Name of the cluster to be installed | **Required** |
+|`public_domain`              |Root domain that will be used for your cluster.  | **Required** |
+|`ip_families`                |Decide whether you want IPv4, IPv6 or dual-stack. | `['IPv4']` |
+|`public_ip`                  |Override for public ip entries. Used for dns records at your dns_provider. | `hostvars['localhost']['ansible_default_ipv4']['address']`. |
+|`public_ipv6`                |Same as `public_ip` vut for IPv6 | `hostvars['localhost']['ansible_default_ipv6']['address']`. | `public_ipv6` |
+|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
+|`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
+|`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
 
 ### Cluster design (single node, compact or normal)
 
