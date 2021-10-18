@@ -89,10 +89,10 @@
     type: TXT
     ttl: 60
     managed_zone:
-        name: "{{ le_gcp_managed_zone_name }}"
-        dnsName: "{{ le_gcp_managed_zone_domain }}"
+      name: "{{ le_gcp_managed_zone_name }}"
+      dnsName: "{{ le_gcp_managed_zone_domain }}"
     target:
-    - "{{ item.1 }}"
+      - "{{ item.1 }}"
     project: "{{ le_gcp_project }}"
     auth_kind: serviceaccount
     service_account_file: "{{ le_gcp_serviceaccount_file }}"
@@ -113,7 +113,7 @@
     zone_name: "{{ public_domain }}"
     record_type: TXT
     records:
-    - entry: "{{ item.1 }}"
+      - entry: "{{ item.1 }}"
     state: present
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
@@ -137,6 +137,17 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
+- name: Create DNS record at DigitalOcean
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: present
+    domain: "{{ digitalocean_zone }}"
+    type: TXT
+    name: "{{ item.0.key | replace( digitalocean_zone , '') | regex_replace('\\.$', '') }}"
+    data: "{{ item.1 }}"
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "digitalocean" and sample_com_challenge is changed
+
 - name: DNS record info
   debug:
     msg: "{{ item.0.key }} TXT {{ item.1 }}"
@@ -146,8 +157,8 @@
 - name: Include DNS provider
   include: "create-{{ le_dns_provider }}.yml"
   when:
-  - le_dns_provider in ['hetzner', 'digitalocean']
-  - sample_com_challenge is changed
+    - le_dns_provider in ['hetzner', 'digitalocean']
+    - sample_com_challenge is changed
 
 - pause:
     seconds: 120
@@ -201,12 +212,12 @@
   gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
     managed_zone:
-        name: "{{ le_gcp_managed_zone_name }}"
-        dnsName: "{{ le_gcp_managed_zone_domain }}"
+      name: "{{ le_gcp_managed_zone_name }}"
+      dnsName: "{{ le_gcp_managed_zone_domain }}"
     type: TXT
     ttl: 60
     target:
-    - "{{ item.1 }}"
+      - "{{ item.1 }}"
     project: "{{ le_gcp_project }}"
     auth_kind: serviceaccount
     service_account_file: "{{ le_gcp_serviceaccount_file }}"
@@ -230,6 +241,19 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "azure" and sample_com_challenge is changed
 
+
+- name: Delete DNS record at DigitalOcean
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: absent
+    domain: "{{ digitalocean_zone }}"
+    type: TXT
+    name: "{{ item.0.key | replace( digitalocean_zone , '') | regex_replace('\\.$', '') }}"
+    data: "{{ item.1 }}"
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "digitalocean" and sample_com_challenge is changed
+
+
 - name: Delete DNS record at TransIP
   uri:
     url: "https://api.transip.nl/v6/domains/{{ transip_zone }}/dns"
@@ -251,8 +275,8 @@
 - name: Include DNS provider
   include: "destroy-{{ le_dns_provider }}.yml"
   when:
-  - le_dns_provider in ['hetzner', 'digitalocean']
-  - sample_com_challenge is changed
+    - le_dns_provider in ['hetzner', 'digitalocean']
+    - sample_com_challenge is changed
 
 - name: concat root ca and intermediate
   shell: "cat {{ le_certificates_dir }}/isrgrootx1.pem {{ le_certificates_dir }}/{{ le_public_domain }}/intermediate.crt >> {{ le_certificates_dir }}/{{ le_public_domain }}/ca-bundle.pem"
