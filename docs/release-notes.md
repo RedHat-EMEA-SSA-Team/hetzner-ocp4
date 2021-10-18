@@ -1,13 +1,23 @@
 # RELEASE NOTES
 
+## 2021-10-18
+
+* Add DigitalOcean plugin and DNS provider
+
+## 2021-10-13
+
+* Bump OKD to 4.8.0
+* Bump opm to 1.19.0
+* Add Load Balancer variable.
+
 ## 2021-04-09
 
- * Bump OpenShift Version to 4.7.0
- * Add opm installation
- * Add dns provider: hetzner
- * Use absolute path to oc binary
- * Fixed some typos
- * Adds the [NTP Add-On](/ansible/add-on-roles/ntp)
+* Bump OpenShift Version to 4.7.0
+* Add opm installation
+* Add dns provider: hetzner
+* Use absolute path to oc binary
+* Fixed some typos
+* Adds the [NTP Add-On](/ansible/add-on-roles/ntp)
 
 ## 2020-12-28
 
@@ -15,7 +25,7 @@
 * Bump OpenShift version to 4.6.8
 * Fixed issue #147 - Add recommended hetzner firewall documentation
 * **Add support for add-ons (post_install_add_ons)**
-  * Checkout [add-ons.md](add-ons.md) for details.
+    * Checkout [add-ons.md](add-ons.md) for details.
 * Clean DNS provider handling and dependencies managment
 * **Added an option to make masters un/schedulable**
 * Fixed issue #162 Stop Cluster - Check openshift-4-loadbalancer-demo2.service FAILS
@@ -24,10 +34,10 @@
 * Do not use kubeconfig directly anymore because of #149
 * Fixed issue qemu-img: Unable to initialize gcrypt #160
 * Cleanup OS dependencies
-  * Cleanup DNS provider dependencies - only install dependencies if needed
-  * Cleanup DNS provider dependencies - only install dependencies if needed
-  * Add missing package (RHEL8)
-  * Remove pip install and use rpm's if possible
+    * Cleanup DNS provider dependencies - only install dependencies if needed
+    * Cleanup DNS provider dependencies - only install dependencies if needed
+    * Add missing package (RHEL8)
+    * Remove pip install and use rpm's if possible
 * **Remove RHEL 7 support  (fixed issue #153)**
 * Fixed issue #146 - BUG in ansible-playbook ansible/setup - failed: iptables: No chain/target/match by that name.
 * Introduce openshift_mirror variable - setup your own openshift mirror to get rid of connections problems.
@@ -69,12 +79,12 @@ Thanks to @sandrich for contribution.
 
 ### Fixes
 
- * Fixed #123 useage of letsencrypt_account_email & cloudflare_account_email
- * add mode (0644) for ignition file
- * Update auth_htpasswd example with know password - because of #133
- * Add work-a-round for https://github.com/ansible/ansible/issues/71420
- * Fixed #125 Fresh centos 8.2 -- firewalld reload failed because "FirewallD is
-   not running"
+* Fixed #123 useage of letsencrypt_account_email & cloudflare_account_email
+* add mode (0644) for ignition file
+* Update auth_htpasswd example with know password - because of #133
+* Add work-a-round for https://github.com/ansible/ansible/issues/71420
+* Fixed #125 Fresh centos 8.2 -- firewalld reload failed because "FirewallD is
+  not running"
 
 ## 2020-09-24
 
@@ -98,14 +108,14 @@ Added option `vm_autostart` default (false).
 
 ### Big fixes
 
- - fix(typo): correctly name identity_providers
- - Cleanup post install tag name use post-install instead of postinstall
- - Use --kubeconfig instead of --config
- - Fixed #116 - LE certificate is not configured after fresh installation.
- - Add daemon_reload to systemctl service installation
- - Update ansible repo for RHEL
- - Update docs/air-gapped.md
- - Add draft tekton pipeline to test hetzner-ocp4
+- fix(typo): correctly name identity_providers
+- Cleanup post install tag name use post-install instead of postinstall
+- Use --kubeconfig instead of --config
+- Fixed #116 - LE certificate is not configured after fresh installation.
+- Add daemon_reload to systemctl service installation
+- Update ansible repo for RHEL
+- Update docs/air-gapped.md
+- Add draft tekton pipeline to test hetzner-ocp4
 
 ## 2020-07-03
 
@@ -199,5 +209,3 @@ Add varialbe `letsencrypt_disabled: true` to cluster yaml to disable Let's Encry
 ### Added release notes doc
 
 Just simple doc to track new features and fixes.
-
-
