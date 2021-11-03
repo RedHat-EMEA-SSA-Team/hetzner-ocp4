@@ -13,26 +13,26 @@ metadata:
 networking:
   clusterNetwork:
 {% if 'IPv4' in ip_families  %}
-  - cidr: {{ networking_clusternetwork_cidr_ipv4 }}
-    hostPrefix: {{ networking_clusternetwork_hostprefix_ipv4 }}
+  - cidr: 10.128.0.0/14
+    hostPrefix: 9
 {% endif %}
 {% if 'IPv6' in ip_families  %}
-  - cidr: {{ networking_clusternetwork_cidr_ipv6 }}
-    hostPrefix: {{ networking_clusternetwork_hostprefix_ipv6 }}
+  - cidr: fd00:10:128::/56
+    hostPrefix: 64
 {% endif %}
   machineNetwork:
 {% if 'IPv4' in ip_families  %}
-  - cidr: {{ networking_machinenetwork_cidr_ipv4 }}
+  - cidr: {{ vn_subnet }}/24
 {% endif %}
 {% if 'IPv6' in ip_families  %}
-  - cidr: {{ networking_machinenetwork_cidr_ipv6 }}
+  - cidr: {{ vn_subnet_ipv6 }}::/80
 {% endif %}
   serviceNetwork:
 {% if 'IPv4' in ip_families  %}
-  - "{{ networking_servicenetwork_cidr_ipv4 }}"
+  - 172.30.0.0/16
 {% endif %}
 {% if 'IPv6' in ip_families  %}
-  - "{{ networking_servicenetwork_cidr_ipv6 }}"
+  - fd00:172:16::/112
 {% endif %}
   type: {{ sdn_plugin_name }}
 platform:
@@ -53,3 +53,4 @@ imageContentSources:
 proxy:
   {{ install_config_proxy  | to_nice_yaml(indent=2) | indent(width=2) }}
 {% endif %}
+
