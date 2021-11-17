@@ -1,5 +1,12 @@
 # RELEASE NOTES
 
+## xxxx-xx-xx
+
+ * Refactor DigitalOcean DNS provider
+    * Added IPv6 support
+    * Switch to ansible galaxy module
+      Please run `./ansible/setup.yml` or `./ansible/01-prepare-host.yml` to install ansible galaxy module. Or via: `ansible-galaxy collection install community.digitalocean`
+
 ## 2021-04-09
 
  * Bump OpenShift Version to 4.7.0

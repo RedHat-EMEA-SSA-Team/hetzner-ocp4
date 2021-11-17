@@ -38,3 +38,7 @@
     insertafter: '^\[Network\]'
     regexp: '^IPForward='
   when: stat_result.stat.exists == True
+
+# Install ansible collection for digitalocean dns provider
+- name: Ansible collection community.digitalocean
+  command: "ansible-galaxy collection install community.digitalocean"

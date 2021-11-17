@@ -1,26 +1,32 @@
 ---
-- name: Get all DNS records
-  uri:
-    url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records"
-    headers:
-      Authorization: "Bearer {{ digitalocean_token }}"
-      Content-Type: 'application/json'
-    body_format: json
-    return_content: true
-  register: register_digitalocean_records
+
+- name: Destroy DNS record at DigitalOcean
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: absent
+    domain: "{{ digitalocean_zone }}"
+    type: A
+    name: "{{ item }}.{{ cluster_name }}"
+    data: "{{ pd_public_ip }}"
+    force_update: yes
+  with_items:
+  - api
+  - '*.apps'
   tags:
     - public_dns
 
-- name: Define digitalocean_records_to_delete
-  set_fact:
-    digitalocean_records_to_delete: "{{register_digitalocean_records.json.domain_records | json_query('[?(data==`'~  pd_public_ip ~'` && ( name==`api.'~ cluster_name ~'` || name ==`*.apps.'~ cluster_name ~'` ) )] | [*].id') }}"
+- name: Destroy DNS record at DigitalOcean IPv6
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: absent
+    domain: "{{ digitalocean_zone }}"
+    type: AAAA
+    name: "{{ item }}.{{ cluster_name }}"
+    data: "{{ pd_public_ipv6 }}"
+    force_update: yes
+  with_items:
+  - api
+  - '*.apps'
+  tags:
+    - public_dns
 
-- name: Delete DNS record at DigitalOcean
-  uri:
-    url: "https://dns.digitalocean.com/api/v1/records/{{ item }}"
-    url: "https://api.digitalocean.com/v2/domains/{{ digitalocean_zone }}/records/{{ item }}"
-    method: DELETE
-    headers:
-      Authorization: "Bearer {{ digitalocean_token }}"
-    status_code: 200, 204
-  with_items: "{{digitalocean_records_to_delete}}"
