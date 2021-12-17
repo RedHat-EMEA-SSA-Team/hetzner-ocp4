@@ -1,4 +1,4 @@
-#!/usr/bin/env ansible-playbook 
+#!/usr/bin/env ansible-playbook
 ---
 - hosts: localhost
   connection: local
@@ -25,13 +25,16 @@
       name: "{{ vm_instance_name }}"
     ignore_errors: yes
 
+  - name: Delete directory
+    file:
+      state: absent
+      path: "/var/lib/libvirt/images/{{ vm_instance_name }}"
+
   - name: Delete files of {{ vm_instance_name }}
     file:
       path: "{{ item }}"
       state: absent
     with_items:
       - "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
-      - "/var/lib/libvirt/images/{{ vm_instance_name }}.user-data"
-      - "/var/lib/libvirt/images/{{ vm_instance_name }}.meta-data"
       - "/var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso"
 

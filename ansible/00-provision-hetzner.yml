@@ -10,7 +10,7 @@
   tasks:
   - name: Add hetzner server to inventory
     add_host: 
-      name: "{{ hetzner_hostname }}"
+      name: "{{ hetzner_ip }}"
 
 - name: install hetzner server
   hosts: all
@@ -24,4 +24,3 @@
       name: provision-hetzner
     tags:
       - provision-hetzner
-

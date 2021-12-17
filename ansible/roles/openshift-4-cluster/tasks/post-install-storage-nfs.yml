@@ -36,8 +36,15 @@
     group: root
     mode: 0644
     block: |
+      {% if 'IPv4' in ip_families -%}
       {{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry {{ vn_subnet }}/24(rw,sync,no_root_squash)
       {{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs {{ vn_subnet }}/24(rw,sync,no_root_squash)
+      {% endif -%}
+      {% if 'IPv6' in ip_families -%}
+      {{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry {{ vn_subnet_ipv6 }}::/80(rw,sync,no_root_squash)
+      {{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs {{ vn_subnet_ipv6 }}::/80(rw,sync,no_root_squash)
+      {% endif -%}
+
   tags: exports
 
 - name: Adjust directory permissions
@@ -74,7 +81,7 @@
           storage: 100Gi
         nfs:
           path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-infra-registry"
-          server: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+          server: "host.compute.local"
         persistentVolumeReclaimPolicy: Recycle
 
 - name: Create registry-storage pvc
@@ -277,13 +284,13 @@
                   - name: PROVISIONER_NAME
                     value: redhat-emea-ssa-team/hetzner-ocp4
                   - name: NFS_SERVER
-                    value: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+                    value: "host.compute.local"
                   - name: NFS_PATH
                     value: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs"
             volumes:
               - name: nfs-client-root
                 nfs:
-                  server: "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+                  server: "host.compute.local"
                   path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs"
 
 - name: Storage Class

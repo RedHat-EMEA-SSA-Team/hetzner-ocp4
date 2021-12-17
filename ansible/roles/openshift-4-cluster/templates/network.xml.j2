@@ -8,9 +8,8 @@
             <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
             <hostname>api.{{ vn_public_domain }}</hostname>
-            {% if dns_provider == 'none' %}
             <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
-            {% endif %}
+            <hostname>console-openshift-console.apps.{{ vn_public_domain }}</hostname>
         </host>
         {% endif %}
         {% if 'IPv6' in ip_families  %}
@@ -18,9 +17,8 @@
             <hostname>host.{{ vn_internal_domain }}</hostname>
             <hostname>api-int.{{ vn_public_domain }}</hostname>
             <hostname>api.{{ vn_public_domain }}</hostname>
-            {% if dns_provider == 'none' %}
             <hostname>oauth-openshift.apps.{{ vn_public_domain }}</hostname>
-            {% endif %}
+            <hostname>console-openshift-console.apps.{{ vn_public_domain }}</hostname>
         </host>
         {% endif %}
     </dns>

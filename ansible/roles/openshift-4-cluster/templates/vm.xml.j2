@@ -33,11 +33,21 @@
   </pm>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
+{% if vm_storage_backend is defined and vm_storage_backend == "lvm" %}
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source dev='/dev/{{ vm_storage_backend_location }}/{{ vm_instance_name }}'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+{% else %}
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
       <source file='/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2'/>
       <target dev='vda' bus='virtio'/>
     </disk>
+{% endif %}
+
+
     <controller type="usb" index="0" model="ich9-ehci1"/>
     <controller type="usb" index="0" model="ich9-uhci1">
       <master startport="0"/>

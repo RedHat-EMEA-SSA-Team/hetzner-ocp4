@@ -1,0 +1,12 @@
+---
+
+- name: Destroy DNS record at DigitalOcean
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: absent
+    domain: "{{ digitalocean_zone }}"
+    type: TXT
+    name: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '') }}"
+    data: "{{ item.1 }}"
+    force_update: yes
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"

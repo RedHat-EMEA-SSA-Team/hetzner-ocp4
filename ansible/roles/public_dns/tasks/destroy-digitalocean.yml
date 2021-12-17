@@ -1,0 +1,32 @@
+---
+
+- name: Destroy DNS record at DigitalOcean
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: absent
+    domain: "{{ digitalocean_zone }}"
+    type: A
+    name: "{{ item }}.{{ cluster_name }}"
+    data: "{{ pd_public_ip }}"
+    force_update: yes
+  with_items:
+  - api
+  - '*.apps'
+  tags:
+    - public_dns
+
+- name: Destroy DNS record at DigitalOcean IPv6
+  community.digitalocean.digital_ocean_domain_record:
+    oauth_token: "{{ digitalocean_token }}"
+    state: absent
+    domain: "{{ digitalocean_zone }}"
+    type: AAAA
+    name: "{{ item }}.{{ cluster_name }}"
+    data: "{{ pd_public_ipv6 }}"
+    force_update: yes
+  with_items:
+  - api
+  - '*.apps'
+  tags:
+    - public_dns
+

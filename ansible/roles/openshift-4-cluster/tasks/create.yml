@@ -65,6 +65,9 @@
     le_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
     le_hetzner_zone: "{{ hetzner_zone }}"
 
+    le_digitalocean_token: "{{ digitalocean_token }}"
+    le_digitalocean_zone: "{{ digitalocean_zone }}"
+
   tags: letsencrypt
   when: letsencrypt_disabled == false
 

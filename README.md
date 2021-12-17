@@ -99,16 +99,20 @@ We are now ready to install `libvirt` as our hypervisor, provision VMs and prepa
 
 Here is an example about [_cluster.yml_](cluster-example.yml) file that contains information about the cluster that is going to be installed.
 
-| variable | describtion  |
-|---|---|
-|cluster_name  |Name of the cluster to be installed |
-|public_domain  |Root domain that will be used for your cluster.  |
-|ip_families|Decide whether you want IPv4, IPv6 or dual-stack, detault: "['IPv4']"|
-|public_ip  |Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv4']['address']`. |
-|public_ipv6  |Override for public ip entries. defaults to `hostvars['localhost']['ansible_default_ipv6']['address']`. |
-|dns_provider  |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. |
-|letsencrypt_account_email  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |
-|image_pull_secret|Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned |
+| variable | description  |Default|
+|---|---|---|
+|`cluster_name`               |Name of the cluster to be installed | **Required** |
+|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
+|`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
+|`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
+|`public_domain`              |Root domain that will be used for your cluster.  | **Required** |
+|`ip_families`                |Decide whether you want IPv4, IPv6 or dual-stack. | `['IPv4']` |
+|`listen_address`             |Listen address for the load balancer on your host system.  |`hostvars['localhost']['ansible_default_ipv4']['address']` |
+|`listen_address_ipv6`        |Same as listen_address but for IPv6 |`hostvars['localhost']['ansible_default_ipv6']['address']`|
+|`public_ip`                  |Optional to overwrite public ip, if it is different from `listen_address`. Used for dns records at your dns_provider. | `listen_address` |
+|`public_ipv6`                |Same as `public_ip` but for IPv6 | `listen_address_ipv6` |
+|`masters_schedulable`        |Optional to overwrite masters schedulable| `false` |
+|`sdn_plugin_name`            |Optional to change the SDN plugin between `OVNKubernetes` or `OpenShiftSDN` | `OVNKubernetes` |
 
 ### Cluster design (single node, compact or normal)
 
@@ -152,8 +156,8 @@ masters_schedulable: false
 
 ### Setup public DNS records
 
-Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_, _GCP DNS_ or _none_.
-If you want to use _Route53_, _Cloudflare_ or _GCP_ as your DNS provider, you have to add a few variables. Check the instructions below.
+Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_, _DigitalOcean_, _GCP DNS_ or _none_.
+If you want to use _Route53_, _Cloudflare_, _DigitalOcean_ or _GCP_ as your DNS provider, you have to add a few variables. Check the instructions below.
 
 DNS records are constructed based on _cluster_name_ and _public_domain_ values. With above values DNS records should be
 - api._cluster_name_._public_domain_
@@ -167,11 +171,12 @@ Please configure in `cluster.yml` all necessary credentials:
 
 | DNS provider | Variables  |
 |---|---|
-|CloudFlare|`cloudflare_account_email: john@example.com` <br> Use the global api key here! (API-Token is not supported!) (Details in #86) <br>`cloudflare_account_api_token: 9348234sdsd894.....` <br>  `cloudflare_zone: domain.tld`|
-|Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
-|GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
 |Azure|`azure_client_id: 'client_id'`<br/>`azure_secret: 'key'`<br/>`azure_subscription_id: 'subscription_id'`<br/>`azure_tenant: 'tenant_id'`<br/>`azure_resource_group: 'dns_zone_resource_group'` |
+|CloudFlare|`cloudflare_account_email: john@example.com` <br> Use the global api key here! (API-Token is not supported!) (Details in #86) <br>`cloudflare_account_api_token: 9348234sdsd894.....` <br>  `cloudflare_zone: domain.tld`|
+|DigitalOcean|`digitalocean_token: e7a6f82c3245b65cf4.....` <br>  `digitalocean_zone: domain.tld`|
+|GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
 |Hetzner|`hetzner_account_api_token: 93543ade82AA$73.....` <br>  `hetzner_zone: domain.tld`|
+|Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
 |TransIP|`transip_token: eyJ0eXAiOiJKV....` <br> `transip_zone: domain.tld`|
 |none|With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.|
 
@@ -181,6 +186,8 @@ Please configure in `cluster.yml` all necessary credentials:
 |---|---|---|
 |`storage_nfs`|false|Setup a local NFS server, create a Storage Class (with [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) ) pointing to it, and use that StorageClass for the internal Registry Storage|
 |`vm_autostart`|false|Create cluster VMs with `autostart` enabled|
+|`vm_storage_backend`|`qcow2`|You can choose between default `qcow2` and `lvm` as storage backend.|
+|`vm_storage_backend_location`|empty|Important for vm_storage_backend lvm, please add the volume group for example `vg0`|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
@@ -210,6 +217,7 @@ Please configure in `cluster.yml` all necessary credentials:
 * [Disk management (add disk to vm, wipe node)](docs/disk-management.md)
 * [How to passthrough nvme or gpu (pci-passthrough](docs/pci-passthrough.md)
 * [How to install OKD](docs/how-to-install-okd.md)
+* [Virsh commands cheatsheet to manage KVM guest virtual machines](https://computingforgeeks.com/virsh-commands-cheatsheet/)
 
 # Useful commands
 
@@ -217,3 +225,9 @@ Please configure in `cluster.yml` all necessary credentials:
 |---|---|
 |Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-${cluster_name} ./watch-stats.sh```
 |Start cluster after reboot|```./ansible/04-start-cluster.yml```
+
+
+
+# Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4.svg)](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4)

@@ -1,5 +1,32 @@
 # RELEASE NOTES
 
+## 2021-12-17
+
+ * **Bump OpenShift Version to 4.9.5**
+ * Refactor DigitalOcean DNS provider
+    * Added IPv6 support
+    * Switch to ansible galaxy module
+      Please run `./ansible/setup.yml` or `./ansible/01-prepare-host.yml` to install ansible galaxy module. Or via: `ansible-galaxy collection install community.digitalocean`
+ * Fixed Issue #185 : IPv6 Single Stack - NFS exports only for IPv4 -> installation fail / not completed
+ * Fixed Issue #197 : public_ip & listen_address did not work as expected
+ * Add support for different vm storage backend (lvm & qcow2)
+ * Added api. to /etc/hosts to be more independent from public DNS
+ * Added openshift console and oauth url to internal dns entries
+ * Update documentation
+    * Redesign the variables table
+    * Added link to virt cheatsheet
+ * Bump OKD version to 4.8 & OPM to 1.19 (docs only)
+
+
+## 2021-07-27
+
+ *  **Bump OpenShift version to 4.8.2**
+ * Added TransIP dns provider with #177
+ * Added Rocky basis installation with #181
+ * Added IPv6 support #182
+ * Tested and documented single node installation #176
+ * Fixed NFS provisioning #175
+
 ## 2021-04-09
 
  * Bump OpenShift Version to 4.7.0
