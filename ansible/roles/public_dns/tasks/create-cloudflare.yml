@@ -10,8 +10,8 @@
     account_email: "{{ cloudflare_account_email }}"
     account_api_token: "{{ cloudflare_account_api_token }}"
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
@@ -28,8 +28,8 @@
     account_email: "{{ cloudflare_account_email }}"
     account_api_token: "{{ cloudflare_account_api_token }}"
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)

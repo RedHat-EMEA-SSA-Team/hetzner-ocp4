@@ -36,6 +36,7 @@
   template:
     src: "vm.xml.j2"
     dest: "/tmp/{{ vm_instance_name }}.virt.xml"
+    mode: 0664
 
 - name: Define VirtualMachine {{ vm_instance_name }}
   virt:

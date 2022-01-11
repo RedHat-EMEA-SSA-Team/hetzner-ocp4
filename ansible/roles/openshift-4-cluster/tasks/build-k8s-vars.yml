@@ -4,15 +4,17 @@
   file:
     state: directory
     path: "{{ openshift_install_dir }}/config/"
+    mode: 0755
 
 - name: Copy kubeconfig
   copy:
     src: "{{ openshift_install_dir }}/auth/kubeconfig"
     dest: "{{ openshift_install_dir }}/config/kubeconfig"
+    mode: 0644
 
 - name: Fetch Kubeconfig
   set_fact:
-    kubeconfig: "{{ lookup('file',  openshift_install_dir ~ '/config/kubeconfig' ) | from_yaml}}"
+    kubeconfig: "{{ lookup('file',  openshift_install_dir ~ '/config/kubeconfig' ) | from_yaml }}"
 
 - name: Select cluster & user
   set_fact:
@@ -29,15 +31,18 @@
 
 - name: Create k8s_ca_cert
   copy:
-    content: "{{ cluster['certificate-authority-data'] | b64decode}}"
+    content: "{{ cluster['certificate-authority-data'] | b64decode }}"
     dest: "{{ k8s_ca_cert }}"
+    mode: 0644
 
 - name: Create k8s_client_key
   copy:
-    content: "{{ user['client-key-data'] | b64decode}}"
+    content: "{{ user['client-key-data'] | b64decode }}"
     dest: "{{ k8s_client_key }}"
+    mode: 0644
 
 - name: Create k8s_client_cert
   copy:
-    content: "{{ user['client-certificate-data'] | b64decode}}"
+    content: "{{ user['client-certificate-data'] | b64decode }}"
     dest: "{{ k8s_client_cert }}"
+    mode: 0644

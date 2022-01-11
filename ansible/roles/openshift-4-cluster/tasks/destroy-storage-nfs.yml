@@ -14,6 +14,5 @@
     path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-{{ item }}"
     state: absent
   with_items:
-  - "infra-registry"
-  - "user-pvs"
-
+    - "infra-registry"
+    - "user-pvs"

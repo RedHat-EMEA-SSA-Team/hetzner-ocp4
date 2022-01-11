@@ -6,21 +6,21 @@
   connection: local
   gather_facts: no
   vars_files:
-  - ../cluster.yml
+    - ../cluster.yml
   tasks:
-  - name: Add hetzner server to inventory
-    add_host: 
-      name: "{{ hetzner_ip }}"
+    - name: Add hetzner server to inventory
+      add_host:
+        name: "{{ hetzner_ip }}"
 
 - name: install hetzner server
   hosts: all
   gather_facts: no
   remote_user: root
   vars_files:
-  - ../cluster.yml
+    - ../cluster.yml
   tasks:
-  - name: provision hetzner root server
-    import_role:
-      name: provision-hetzner
-    tags:
-      - provision-hetzner
+    - name: provision hetzner root server
+      import_role:
+        name: provision-hetzner
+      tags:
+        - provision-hetzner

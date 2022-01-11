@@ -90,4 +90,4 @@
     #             - "api.{{ cluster_name }}.{{ public_domain }}"
     #             servingCertificate:
     #               name: letsencrypt-certs
-  when: crt.stat.exists == True and key.stat.exists == True
+  when: crt.stat.exists and key.stat.exists

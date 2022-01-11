@@ -13,11 +13,12 @@
   tags:
     - public_dns
 
-- set_fact:
-    #hetzner_zone_id:  "{{ register_hetzner_zone_id.json.zones | json_query('[?name==`'~ hetzner_zone ~'`] | [0].id')  }}"
-    # You don't need the name == .. because of the body above.
-    # https://dns.hetzner.com/api-docs#operation/GetZones
-    hetzner_zone_id:  "{{ register_hetzner_zone_id.json.zones[0].id }}"
+- name: Set hetzner_zone_id
+  set_fact:
+    # hetzner_zone_id:  "{{ register_hetzner_zone_id.json.zones | json_query('[?name==`'~ hetzner_zone ~'`] | [0].id')  }}"
+    #   You don't need the name == .. because of the body above.
+    #   https://dns.hetzner.com/api-docs#operation/GetZones
+    hetzner_zone_id: "{{ register_hetzner_zone_id.json.zones[0].id }}"
 
 - name: Get all DNS records
   uri:
@@ -32,8 +33,10 @@
     - public_dns
 
 - name: Define hetzner_records_to_delete
+  # yamllint disable rule:line-length
   set_fact:
-    available_records: "{{register_hetzner_records.json.records | json_query('[?(value==`'~  pd_public_ip ~'` && ( name==`api.'~ cluster_name ~'` || name ==`*.apps.'~ cluster_name ~'` ) )] | [*].name') }}"
+    available_records: "{{ register_hetzner_records.json.records | json_query('[?(value==`'~  pd_public_ip ~'` && ( name==`api.'~ cluster_name ~'` || name ==`*.apps.'~ cluster_name ~'` ) )] | [*].name') }}"
+  # yamllint enable rule:line-length
 
 - name: Create DNS record at Hetzner
   uri:
@@ -51,9 +54,8 @@
       Auth-API-Token: "{{ hetzner_account_api_token }}"
       Content-Type: 'application/json'
   with_items:
-  - api
-  - '*.apps'
-  when: item + '.' + cluster_name not in available_records
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
@@ -74,10 +76,8 @@
       Auth-API-Token: "{{ hetzner_account_api_token }}"
       Content-Type: 'application/json'
   with_items:
-  - api
-  - '*.apps'
-  when: item + '.' + cluster_name not in available_records
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)
-

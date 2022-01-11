@@ -2,13 +2,13 @@
 - name: Install Azure Ansible pip dependencies
   pip:
     name:
-    - packaging
-    - msrest
-    - msrestazure
-    - azure.common
-    - azure.mgmt
-    - azure.storage
-    - azure.mgmt.automation
+      - packaging
+      - msrest
+      - msrestazure
+      - azure.common
+      - azure.mgmt
+      - azure.storage
+      - azure.mgmt.automation
 
 - name: Create DNS record at Azure
   azure_rm_dnsrecordset:
@@ -22,15 +22,14 @@
     zone_name: "{{ public_domain }}"
     record_type: A
     records:
-    - entry: "{{ pd_public_ip }}"
+      - entry: "{{ pd_public_ip }}"
     state: present
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
-
 
 - name: Create IPv6 DNS record at Azure
   azure_rm_dnsrecordset:
@@ -44,11 +43,11 @@
     zone_name: "{{ public_domain }}"
     record_type: AAAA
     records:
-    - entry: "{{ pd_public_ipv6 }}"
+      - entry: "{{ pd_public_ipv6 }}"
     state: present
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)

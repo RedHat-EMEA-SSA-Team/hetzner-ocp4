@@ -8,7 +8,9 @@
 
 - name: "Check amount of entitlement"
   fail:
-    msg: "To many entitlements, please specify one if the entitlement ids via entitlement_id: {{ files.files | map(attribute='path') | map('regex_replace','^/etc/pki/entitlement/([0-9]+)-key.pem$', '\\1') | join(', ')  }}"
+    msg:
+      - "To many entitlements, please specify one if the entitlement ids via entitlement_id: "
+      - "  {{ files.files | map(attribute='path') | map('regex_replace','^/etc/pki/entitlement/([0-9]+)-key.pem$', '\\1') | join(', ')  }}"
   when: entitlement_id is not defined and files.matched > 1
 
 # /etc/pki/entitlement/4988695409571740307-key.pem
@@ -20,10 +22,12 @@
     entitlement_id: "{{ files.files[0].path | regex_replace('^/etc/pki/entitlement/([0-9]+)-key.pem$', '\\1') }}"
   when: entitlement_id is not defined and files.matched == 1
 
-- shell: "cat /etc/pki/entitlement/{{ entitlement_id }}-key.pem | base64 -w0"
+- name: Create base64 of entitlement-key
+  shell: "set -o pipefail && cat /etc/pki/entitlement/{{ entitlement_id }}-key.pem | base64 -w0"
   register: register_entitlement_key_base64
 
-- shell: "cat /etc/pki/entitlement/{{ entitlement_id }}.pem | base64 -w0"
+- name: Create base64 of entitlement-key
+  shell: "set -o pipefail && cat /etc/pki/entitlement/{{ entitlement_id }}.pem | base64 -w0"
   register: register_entitlement_base64
 
 - name: Apply entitle machineconfig
@@ -44,5 +48,3 @@
     - worker
   loop_control:
     loop_var: loop_role
-
-

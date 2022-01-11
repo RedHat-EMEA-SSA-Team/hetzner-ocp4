@@ -1,11 +1,11 @@
 ---
-hetzner_webservice_username: # see Hetzner Robot -> Settings -> Webservice
+hetzner_webservice_username:    # see Hetzner Robot -> Settings -> Webservice
 hetzner_webservice_password:
-hetzner_hostname: # needed for Hetzner server computer name
-hetzner_ip: # needed for Hetzner Web UI and Ansible
+hetzner_hostname:               # needed for Hetzner server computer name
+hetzner_ip:                     # needed for Hetzner Web UI and Ansible
 hetzner_autosetup_file: templates/autosetup
 hetzner_disk1: sda
 hetzner_disk2: sdb
 hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-84-64-minimal.tar.gz"
 hetzner_image_ignore_errors: false
-ansible_python_interpreter: /usr/bin/python3 # target host python interpreter
+ansible_python_interpreter: /usr/bin/python3  # target host python interpreter

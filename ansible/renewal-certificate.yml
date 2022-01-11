@@ -13,5 +13,3 @@
       name: openshift-4-cluster
       tasks_from: certificate-install.yml
     when: letsencrypt_disabled == false
-
-

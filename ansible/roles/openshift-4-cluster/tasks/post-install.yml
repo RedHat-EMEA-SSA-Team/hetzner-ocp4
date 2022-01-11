@@ -2,7 +2,7 @@
   debug:
     msg:
       - "If you like to follow the installation run 'tail -f  {{ openshift_install_dir }}/.openshift_install.log' in a second terminal."
-      - "For more details, connect to the bootstrap node: ssh -l core {{ vn_subnet.split('.')[:3] | join('.')}}.2"
+      - "For more details, connect to the bootstrap node: ssh -l core {{ vn_subnet.split('.')[:3] | join('.') }}.2"
 
 - name: Waiting for bootstrap to complete
   command: "/opt/openshift-install-{{ openshift_version }}/openshift-install wait-for bootstrap-complete --dir {{ openshift_install_dir }} --log-level debug"
@@ -19,7 +19,9 @@
 - name: Start background node approver process
   async: 1800   #   30 minutes
   poll: 0
+  # yamllint disable rule:line-length
   shell: |
+    set -o pipefail
     while true
     do
       /opt/openshift-client-{{ openshift_version }}/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" get csr --no-headers | \
@@ -27,6 +29,7 @@
         xargs --no-run-if-empty /opt/openshift-client-{{ openshift_version }}/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
       sleep 1
     done
+  # yamllint enable rule:line-length
 
 - name: Build k8s variables
   import_tasks: build-k8s-vars.yml
@@ -41,16 +44,19 @@
 
 - name: Provision nfs storage
   import_tasks: post-install-storage-nfs.yml
-  when: storage_nfs == true
+  when: storage_nfs
   tags: storage
 
 - name: Set image registry managementState from Removed to Managed
+  # yamllint disable rule:line-length
+  # noqa var-spacing
   command: "/opt/openshift-client-{{ openshift_version }}/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig"
+  # yamllint enable rule:line-length
   register: registry_status
   retries: 60
   delay: 30
   until: registry_status.rc == 0
-  when: storage_nfs == true
+  when: storage_nfs
   tags: storage
 
 - name: Waiting installation to complete
@@ -72,7 +78,8 @@
 ###########################################################################################
 # Configure authentication
 ###########################################################################################
-- tags:
+- name: Init identity_providers
+  tags:
     - post-install
     - idp
   set_fact:
@@ -208,17 +215,15 @@
     client_cert: "{{ k8s_client_cert }}"
     client_key: "{{ k8s_client_key }}"
     definition:
-        apiVersion: config.openshift.io/v1
-        kind: OAuth
-        metadata:
-          name: cluster
-        spec:
-          identityProviders: "{{ identity_providers }}"
+      apiVersion: config.openshift.io/v1
+      kind: OAuth
+      metadata:
+        name: cluster
+      spec:
+        identityProviders: "{{ identity_providers }}"
   tags:
     - post-install
     - idp
-
-
 
 ###########################################################################################
 # Configure cluster role bindings
@@ -238,9 +243,9 @@
       metadata:
         name: "{{ item.name }}-{{ item.cluster_role }}"
       subjects:
-      - apiGroup: rbac.authorization.k8s.io
-        kind: User
-        name: "{{ item.name }}"
+        - apiGroup: rbac.authorization.k8s.io
+          kind: User
+          name: "{{ item.name }}"
       roleRef:
         kind: ClusterRole
         name: "{{ item.cluster_role }}"
@@ -274,7 +279,7 @@
       - " - *.apps.{{ cluster_name }}.{{ public_domain }} => {{ public_ip | default(listen_address) }}"
   when: dns_provider == 'none'
   tags:
-  - lastmessage
+    - lastmessage
 
 - name: Cluster informations
   debug:
@@ -282,4 +287,3 @@
   tags:
     - post-install
     - lastmessage
-

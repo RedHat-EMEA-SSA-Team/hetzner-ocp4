@@ -14,7 +14,7 @@
     state: restarted
 
 - name: Verify KVM module is loaded
-  shell: "lsmod | grep -i kvm"
+  shell: "set -o pipefail && lsmod | grep -i kvm"
   register: result
   failed_when: "result.rc != 0"
 
@@ -37,7 +37,7 @@
     line: 'IPForward=ipv4'
     insertafter: '^\[Network\]'
     regexp: '^IPForward='
-  when: stat_result.stat.exists == True
+  when: stat_result.stat.exists
 
 # Install ansible collection for digitalocean dns provider
 - name: Ansible collection community.digitalocean

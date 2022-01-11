@@ -1,4 +1,4 @@
-#!/usr/bin/env ansible-playbook 
+#!/usr/bin/env ansible-playbook
 ---
 # If you like to play: ./ansible/create.yml --skip-tags public_dns,letsencrypt
 - hosts: localhost
@@ -6,10 +6,10 @@
   # gather_facts true because we need the public ip address
   gather_facts: true
   vars_files:
-  - ../cluster.yml
+    - ../cluster.yml
 
   tasks:
-  - name: Deploy cluster
-    import_role: 
-      name: openshift-4-cluster
-      tasks_from: create.yml
+    - name: Deploy cluster
+      import_role:
+        name: openshift-4-cluster
+        tasks_from: create.yml

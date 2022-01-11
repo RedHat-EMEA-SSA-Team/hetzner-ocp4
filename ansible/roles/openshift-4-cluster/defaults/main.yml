@@ -60,8 +60,8 @@ opm_dest: "/opt/openshift-client-{{ openshift_client_version }}/"
 
 # reference to coreos qcow file
 coreos_version: 4.9.0
-coreos_download_url: "{{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/{{ coreos_version.split('.')[:2]|join('.') }}/{{ coreos_version }}/rhcos-{{coreos_version}}-x86_64-qemu.x86_64.qcow2.gz"
-coreos_csum_url: "{{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/{{ coreos_version.split('.')[:2]|join('.') }}/{{ coreos_version }}/sha256sum.txt"
+coreos_download_url: "{{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/{{ coreos_version.split('.')[:2]|join('.') }}/{{ coreos_version }}/rhcos-{{coreos_version}}-x86_64-qemu.x86_64.qcow2.gz"  # noqa line-length
+coreos_csum_url: "{{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/{{ coreos_version.split('.')[:2]|join('.') }}/{{ coreos_version }}/sha256sum.txt"  # noqa line-length
 
 # you can check available version numbers from here:
 # {{ openshift_mirror }}/pub/openshift-v4/dependencies/rhcos/

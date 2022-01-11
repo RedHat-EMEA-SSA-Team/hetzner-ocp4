@@ -1,6 +1,6 @@
 ---
 - name: Delete DNS record at Hetzner
-  uri:
+  uri:  # noqa no-handler
     url: "https://dns.hetzner.com/api/v1/records/{{ item.json.record.id }}"
     method: DELETE
     headers:

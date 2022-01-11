@@ -3,42 +3,40 @@
   gcp_dns_resource_record_set:
     name: "{{ item }}.{{ pd_public_domain }}."
     managed_zone:
-        name: "{{ gcp_managed_zone_name }}"
-        dnsName: "{{ gcp_managed_zone_domain }}"
+      name: "{{ gcp_managed_zone_name }}"
+      dnsName: "{{ gcp_managed_zone_domain }}"
     type: A
     ttl: 120
     target:
-    - "{{ pd_public_ip }}"
+      - "{{ pd_public_ip }}"
     project: "{{ gcp_project }}"
     auth_kind: serviceaccount
     service_account_file: "{{ gcp_serviceaccount_file }}"
     state: present
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
-
-
 
 - name: Create IPv6 DNS record at GCP
   gcp_dns_resource_record_set:
     name: "{{ item }}.{{ pd_public_domain }}."
     managed_zone:
-        name: "{{ gcp_managed_zone_name }}"
-        dnsName: "{{ gcp_managed_zone_domain }}"
+      name: "{{ gcp_managed_zone_name }}"
+      dnsName: "{{ gcp_managed_zone_domain }}"
     type: AAAA
     ttl: 120
     target:
-    - "{{ pd_public_ipv6 }}"
+      - "{{ pd_public_ipv6 }}"
     project: "{{ gcp_project }}"
     auth_kind: serviceaccount
     service_account_file: "{{ gcp_serviceaccount_file }}"
     state: present
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)

@@ -13,19 +13,19 @@
 
 - name: Build IPv6 subnet
   set_fact:
-    vn_subnet_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
+    vn_subnet_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string }}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
     ipv6_listen_public:
       - "{{ listen_address_ipv6 }}"
     ipv6_listen_private:
-      - "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string}}:{{ '%x' % vn_subnet.split('.')[2] | int }}::1"
+      - "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string }}:{{ '%x' % vn_subnet.split('.')[2] | int }}::1"
   when: "'IPv6' in ip_families"
   tags: always
 
 - name: Build IPv4 subnet
   set_fact:
-    vn_subnet_ipv4:  "{{ vn_subnet.split('.')[:3] | join('.') }}"
+    vn_subnet_ipv4: "{{ vn_subnet.split('.')[:3] | join('.') }}"
     ipv4_listen_private:
-      - "{{ vn_subnet.split('.')[:3] | join('.')}}.1"
+      - "{{ vn_subnet.split('.')[:3] | join('.') }}.1"
     ipv4_listen_public:
       - "{{ listen_address }}"
   when: "'IPv4' in ip_families"

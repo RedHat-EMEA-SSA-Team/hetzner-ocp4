@@ -24,7 +24,7 @@
   service:
     name: firewalld
     state: started
-    enabled: True
+    enabled: true
 
 - name: Allow NFS traffic from VM's to Host
   firewalld:
@@ -38,7 +38,6 @@
     - rpc-bind
   notify: 'reload firewalld'
 
-#
 - name: Allow OpenShift traffic from VM's to Host
   firewalld:
     zone: libvirt
@@ -66,4 +65,3 @@
 
 - name: firewalld reload
   command: firewall-cmd --reload
-
