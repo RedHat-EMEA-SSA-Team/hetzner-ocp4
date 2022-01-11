@@ -1,4 +1,11 @@
 ---
+
+- name: Enable EPEL release
+  yum:
+    name:
+      - epel-release.noarch
+    state: present
+
 - name: Installing KVM Packages
   yum:
     name:
@@ -13,6 +20,8 @@
       - python3-requests-oauthlib
       # Need's epel - is enabled by default on hetzner
       - python3-openshift
+      # It looks like firewalld is not installed in CentOS Stream
+      - firewalld
     state: present
 
 - name: Upgrade all packages
