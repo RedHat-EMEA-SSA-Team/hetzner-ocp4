@@ -20,11 +20,15 @@
     lv: "{{ vm_instance_name }}"
     state: present
     size: "{{ vm_root_disk_size }}"
-  when: vm_storage_backend == "lvm"
+  when:
+    - vm_storage_backend == "lvm"
+    - ansible_lvm['lvs'][ vm_instance_name ] is not defined
 
 - name: Copy/dd coreos into device
   command: "dd if={{ coreos_image_location }}.raw of=/dev/{{ vm_storage_backend_location }}/{{ vm_instance_name }} bs=4M"
-  when: vm_storage_backend == "lvm"
+  when:
+    - vm_storage_backend == "lvm"
+    - ansible_lvm['lvs'][ vm_instance_name ] is not defined
 
 - name: Copy ignition {{ vm_instance_name }}
   copy:
