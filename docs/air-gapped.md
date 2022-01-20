@@ -15,6 +15,24 @@ into `cluster.yml` and setup the network:
 
 ## Setup mirror registry on kvm-host
 
+### via Office quay mirror registry
+
+https://docs.openshift.com/container-platform/4.9/installing/installing-mirroring-installation-images.html#mirror-registry
+
+```
+./docs/air-gapped/setup-registry.yam
+
+./mirror-registry install \
+  --quayHostname host.compute.local:5000 \
+  --quayRoot /var/lib/libvirt/images/mirror-registry/quay/ \
+  --ssh-key /root/.ssh/id_rsa \
+  --sslKey /var/lib/libvirt/images/mirror-registry/certs/registry.key \
+  --sslCert /var/lib/libvirt/images/mirror-registry/certs/registry.crt \
+  --initPassword r3dh4t\!1
+```
+
+### via Docker registry
+
 ```
 ./docs/air-gapped/setup-registry.yaml
 ```
@@ -119,13 +137,15 @@ oc adm release extract -a pullsecret.json --command=openshift-install "${LOCAL_R
 Check openshift-install version:
 ```
 # ./openshift-install version
-./openshift-install 4.6.8
-built from commit f5ba6239853f0904704c04d8b1c04c78172f1141
-release image host.compute.local:5000/ocp4/openshift4@sha256:6ddbf56b7f9776c0498f23a54b65a06b3b846c1012200c5609c4bb716b6bdcdf```
+./openshift-install 4.9.11
+built from commit 4ee186bb88bf6aeef8ccffd0b5d4e98e9ddd895f
+release image host.compute.local:5000/ocp4/openshift4@sha256:0f72e150329db15279a1aeda1286c9495258a4892bc5bf1bf5bb89942cd432de
+release architecture amd64
+```
 
 ## Update cluster.yml
 
-Add install_config_additionalTrustBundle and install_config_imageContentSources into cluster.yml.
+Add `install_config_additionalTrustBundle` and `install_config_imageContentSources` into cluster.yml.
 
 ```
 # Path to extracted openshift-install command
@@ -180,8 +200,20 @@ image_pull_secret: |
 
 Not all operators support disconnected environments: [Red Hat Operators Supported in Disconnected Mode](https://access.redhat.com/articles/4740011)
 
-How to sync operators with OpenShift 4.3: [official documentation](https://docs.openshift.com/container-platform/4.3/operators/olm-restricted-networks.html)
+How to sync operators with OpenShift 4.8: [official documentation](https://docs.openshift.com/container-platform/4.8/operators/admin/olm-restricted-networks.html)
 
+
+### run index
+
+```
+podman run -p50051:50051 \
+  --authfile $LOCAL_SECRET_JSON \
+  registry.redhat.io/redhat/redhat-operator-index:v4.8
+```
+
+### Export names
+
+grpcurl -plaintext localhost:50051 api.Registry/ListPackages > packages.out
 
 ## Sync image for `oc debug node/`
 
@@ -220,7 +252,7 @@ oc debug node/compute-0 --image=${LOCAL_REGISTRY}/rhel7/support-tools:latest
 
 ## Sample operator
 
-Documentation: [Using Samples Operator imagestreams with alternate or mirrored registries](https://docs.openshift.com/container-platform/4.3/openshift_images/samples-operator-alt-registry.html#installation-restricted-network-samples_samples-operator-alt-registry)
+Documentation: [Using Samples Operator imagestreams with alternate or mirrored registries](https://docs.openshift.com/container-platform/4.9/openshift_images/samples-operator-alt-registry.html#installation-restricted-network-samples_samples-operator-alt-registry)
 
 Warning: Sync all examples takes a while!
 
@@ -459,7 +491,7 @@ for i in $IMAGES ; do
   ${LOCAL_REGISTRY}/${i//registry.redhat.io\/}
 done;
 
-oc create configmap registry-config --from-file=${LOCAL_REGISTRY/:/..}=/var/lib/libvirt/images/mirror-registry/certs/domain.crt -n openshift-config
+oc create configmap registry-config --from-file=${LOCAL_REGISTRY/:/..}=/var/lib/libvirt/images/mirror-registry/certs/ca.crt -n openshift-config
 
 oc patch image.config.openshift.io/cluster --patch '{"spec":{"additionalTrustedCA":{"name":"registry-config"}}}' --type=merge
 

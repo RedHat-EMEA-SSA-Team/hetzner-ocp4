@@ -1,0 +1,133 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  connection: local
+  # gather_facts true because we need the public ip address
+  gather_facts: false
+  tags:
+    - vm
+  vars_files:
+    - ../../cluster.yml
+  vars:
+    registry_hostname: host.compute.local
+    certs_dir: /var/lib/libvirt/images/mirror-registry/certs
+    root_ca_passphrase: r3dh4t!1
+
+  tasks:
+    - name: Add host.compute.local to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: 'host.compute.local$'
+        line: "{{ vn_subnet.split('.')[:3] | join('.')}}.1 host.compute.local"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install podman & httpd-tools
+      yum:
+        name:
+          - podman
+          - httpd-tools
+        state: latest
+
+    - name: Generate registry directories
+      file:
+        path: "/var/lib/libvirt/images/mirror-registry/{{ item }}"
+        state: directory
+      with_items:
+        - certs
+        - auth
+        - quay
+
+    - name: Certificates block
+      tags:
+        - certs
+      block:
+        - name: Create openssl.root-ca.conf
+          template:
+            dest: "{{ certs_dir }}/{{ item }}"
+            src: "{{ item }}.j2"
+          with_items:
+            - openssl.root-ca.conf
+            - openssl.certificate.conf
+
+        - name: Generate RootCA key
+          command: |
+            openssl genrsa -aes256 \
+            -passout pass:{{ root_ca_passphrase }} \
+            -out {{certs_dir}}/ca.key \
+            2048
+          args:
+            creates: "{{certs_dir}}/ca.key"
+
+        - name: Generate RootCA Cert
+          command: |
+            openssl req \
+              -config {{certs_dir}}/openssl.root-ca.conf \
+              -new -x509 -days 7300 \
+              -key {{certs_dir}}/ca.key \
+              -passin 'pass:{{ root_ca_passphrase }}' \
+              -sha256 \
+              -extensions v3_ca \
+              -batch \
+              -out {{certs_dir}}/ca.crt
+          args:
+            creates: "{{certs_dir}}/ca.crt"
+
+        - name: Generate registry key
+          command: |
+            openssl genrsa \
+            -out {{certs_dir}}/registry.key \
+            2048
+          args:
+            creates: "{{certs_dir}}/registry.key"
+
+        - name: Generate registry request
+          command: |
+            openssl req \
+              -config {{certs_dir}}/openssl.certificate.conf \
+              -sha256 \
+              -new \
+              -key {{certs_dir}}/registry.key \
+              -batch \
+              -out {{certs_dir}}/registry.csr
+          args:
+            creates: "{{certs_dir}}/registry.csr"
+
+        - name: Sign request
+          command: |
+            openssl x509 -sha256 -req \
+              -in {{certs_dir}}/registry.csr \
+              -CA {{certs_dir}}/ca.crt \
+              -CAkey {{certs_dir}}/ca.key \
+              -passin 'pass:{{ root_ca_passphrase }}' \
+              -CAcreateserial \
+              -extfile {{certs_dir}}/openssl.certificate.conf \
+              -extensions 'v3_req' \
+              -out {{certs_dir}}/registry.crt -days 7300 \
+          args:
+            creates: "{{certs_dir}}/registry.crt"
+
+        - name: Install root ca
+          copy:
+            src: "{{certs_dir}}/ca.crt"
+            dest: /etc/pki/ca-trust/source/anchors/
+
+        - name: Update ca trust
+          shell: |
+            update-ca-trust enable;
+            update-ca-trust extract;
+
+# Add mirror registry
+
+    - name: Allow OpenShift traffic from VM's to Host
+      firewalld:
+        zone: libvirt
+        state: enabled
+        permanent: yes
+        port: "{{ item }}"
+      with_items:
+        - 5000/tcp
+
+    - name: reload firewalld
+      command: 'firewall-cmd --reload'
