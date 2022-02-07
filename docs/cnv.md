@@ -25,7 +25,7 @@ compute_special_cpu: "<cpu mode='host-passthrough'></cpu>"
 master_special_cpu: "<cpu mode='host-passthrough'></cpu>"
 ```
 
-If you want to install the Advanced Cluster Security for Kubernetes you must also set the cpu mode `host-passthrough`. Otherwise, with the default vm settings, the central container will start with the error that the SSE 4.2 instruction set is not available.
+If you want to use Advanced Cluster Security for Kubernetes you must also set the cpu mode `host-passthrough`. Otherwise, with the default vm settings, the central container will start with the error that the SSE 4.2 instruction set is not available.
 
 ## Install CNV via OperatorHub
 
