@@ -1,4 +1,4 @@
-# Container-native virtualization 
+# Container-native virtualization
 ## Check nested  virtualization at kvm-host (intel)
 
 ```
@@ -24,6 +24,8 @@ master_vcpu: 8
 compute_special_cpu: "<cpu mode='host-passthrough'></cpu>"
 master_special_cpu: "<cpu mode='host-passthrough'></cpu>"
 ```
+
+If you want to use Advanced Cluster Security for Kubernetes you must also set the cpu mode `host-passthrough`. Otherwise, with the default vm settings, the central container will start with the error that the SSE 4.2 instruction set is not available.
 
 ## Install CNV via OperatorHub
 
