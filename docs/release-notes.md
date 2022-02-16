@@ -1,5 +1,14 @@
 # RELEASE NOTES
 
+## 2022-02-16
+
+ * Introduce ansible-lint pre-commit hook and fix eveything
+ * Remove CentOS 8 support and add CentOS Stream 8 - updated docs too
+ * Fixed issue #200 - added -F to qemu-img cmd
+ * Double check lvm device for instance (idempotent)
+ * Update air-gapped docs (added mirror registry)
+ * Update doc: add vm config notice for acs install
+
 ## 2021-12-17
 
  * **Bump OpenShift Version to 4.9.5**
