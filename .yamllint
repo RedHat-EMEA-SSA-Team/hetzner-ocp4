@@ -1,0 +1,14 @@
+---
+extends: default
+
+rules:
+  comments-indentation: false
+  document-start: disable
+  line-length:
+    max: 180
+    level: warning
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']
+  braces:
+    level: warning
+    max-spaces-inside: 1

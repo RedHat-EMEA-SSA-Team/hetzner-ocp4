@@ -30,7 +30,8 @@
     letsencrypt_disabled: true
   when: dns_provider == 'none'
 
-- import_role:
+- name: Import letsencrypt
+  import_role:
     name: letsencrypt
   vars:
     le_dns_provider: "{{ dns_provider }}"
@@ -41,9 +42,9 @@
     #   https://letsencrypt.org/docs/rate-limits/
     le_acme_directory: "{{ letsencrypt_directory }}"
 
-    le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email)}}"
+    le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email) }}"
 
-    le_cloudflare_account_email: "{{ cloudflare_account_email | default(letsencrypt_account_email)}}"
+    le_cloudflare_account_email: "{{ cloudflare_account_email | default(letsencrypt_account_email) }}"
     le_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
     le_cloudflare_zone: "{{ cloudflare_zone }}"
 
@@ -60,7 +61,7 @@
     le_azure_secret: "{{ azure_secret }}"
     le_azure_subscription_id: "{{ azure_subscription_id }}"
     le_azure_tenant: "{{ azure_tenant }}"
-    le_azure_resource_group:  "{{ azure_resource_group }}"
+    le_azure_resource_group: "{{ azure_resource_group }}"
 
     le_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
     le_hetzner_zone: "{{ hetzner_zone }}"
@@ -69,7 +70,7 @@
     le_digitalocean_zone: "{{ digitalocean_zone }}"
 
   tags: letsencrypt
-  when: letsencrypt_disabled == false
+  when: not letsencrypt_disabled
 
 - name: Download OpenShift Artifacts
   include: download-openshift-artifacts.yml
@@ -113,7 +114,7 @@
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
     vm_network: "{{ cluster_name }}"
     vm_ignition_file: "{{ openshift_install_dir }}/worker-extra.ign"
-    vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + item|int) }}"
+    vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + item|int) }}"     # noqa line-length
     vm_vcpu: "{{ compute_vcpu }}"
     vm_special_cpu: "{{ compute_special_cpu | default('') }}"
     vm_memory_size: "{{ compute_memory_size }}"

@@ -3,20 +3,23 @@
   file:
     path: "{{ openshift_install_dir }}"
     state: directory
+    mode: 0755
 
 - name: Create install config
   template:
     src: install-config.yaml.j2
     dest: "{{ openshift_install_dir }}/install-config.yaml"
+    mode: 0644
 
 - name: Save install-config from deletion
   copy:
     dest: "{{ openshift_install_dir }}/install-config.yaml.original"
     src: "{{ openshift_install_dir }}/install-config.yaml"
+    mode: 0644
 
 - name: Create manifest files
   command: "{{ openshift_install_command }} create manifests --dir={{ openshift_install_dir }}"
-  when: masters_schedulable != true
+  when: not masters_schedulable
 
 - name: Make Master nodes unschedulable
   lineinfile:
@@ -24,7 +27,7 @@
     regexp: '^(.*)mastersSchedulable(.*)$'
     line: '  masterSchedulable: False'
     backrefs: yes
-  when: masters_schedulable != true
+  when: not masters_schedulable
 
 - name: Create ignition files
   command: "{{ openshift_install_command }} --dir={{ openshift_install_dir }} create ignition-configs"
@@ -36,6 +39,7 @@
 - name: Create RHCOS Config
   copy:
     dest: "{{ openshift_install_dir }}/{{ item }}.rcc"
+    mode: 0644
     content: |
       variant: rhcos
       version: 0.1.0
@@ -53,17 +57,17 @@
               name: root
             overwrite: true
   with_items:
-  - bootstrap
-  - master
-  - worker
+    - bootstrap
+    - master
+    - worker
 
 - name: Mangle ignition config
   command: |
     /opt/openshift-client-{{ openshift_version }}/butane \
       --files-dir {{ openshift_install_dir }} \
-      --output {{openshift_install_dir}}/{{ item }}-extra.ign \
-      {{openshift_install_dir}}/{{ item }}.rcc
+      --output {{ openshift_install_dir }}/{{ item }}-extra.ign \
+      {{ openshift_install_dir }}/{{ item }}.rcc
   with_items:
-  - bootstrap
-  - master
-  - worker
+    - bootstrap
+    - master
+    - worker

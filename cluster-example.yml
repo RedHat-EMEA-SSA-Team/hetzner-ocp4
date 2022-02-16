@@ -32,7 +32,7 @@ azure_secret: key
 azure_subscription_id: subscription_id
 azure_tenant: tenant_id
 azure_resource_group: dns_zone_resource_group
-#Hetzner
+# Hetzner
 hetzner_account_api_token: 3543ade82AA$73.....
 hetzner_zone: example.com
 
@@ -42,8 +42,8 @@ auth_htpasswd:
   - admin:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
   - local:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
 
-storage_nfs: true # Default is false
-masters_schedulable: false # Default is false
+storage_nfs: true            # Default is false
+masters_schedulable: false   # Default is false
 
 auth_redhatsso:
   client_id: "xxxxx.apps.googleusercontent.com"

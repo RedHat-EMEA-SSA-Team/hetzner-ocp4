@@ -13,8 +13,8 @@
         content: "{{ pd_public_ip }}"
     status_code: 204
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip | length > 0)
@@ -34,10 +34,8 @@
         content: "{{ pd_public_ipv6 }}"
     status_code: 204
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)
-
-

@@ -1,0 +1,8 @@
+exclude_paths:
+  - pipeline/
+
+skip_list:
+  - role-name
+  - ignore-errors   # Should be fixed
+  - no-changed-when  # Should be fixed
+  - package-latest

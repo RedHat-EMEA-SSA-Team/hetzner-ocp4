@@ -1,5 +1,6 @@
 ---
-- import_role:
+- name: Import letsencrypt
+  import_role:
     name: letsencrypt
   vars:
     le_dns_provider: "{{ dns_provider }}"
@@ -10,9 +11,9 @@
     #   https://letsencrypt.org/docs/rate-limits/
     le_acme_directory: "{{ letsencrypt_directory }}"
 
-    le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email)}}"
+    le_letsencrypt_account_email: "{{ letsencrypt_account_email | default(cloudflare_account_email) }}"
 
-    le_cloudflare_account_email: "{{ cloudflare_account_email | default(letsencrypt_account_email)}}"
+    le_cloudflare_account_email: "{{ cloudflare_account_email | default(letsencrypt_account_email) }}"
     le_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
     le_cloudflare_zone: "{{ cloudflare_zone }}"
 
@@ -28,4 +29,4 @@
     le_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
     le_hetzner_zone: "{{ hetzner_zone }}"
   tags: letsencrypt
-  when: letsencrypt_disabled == false
+  when: not letsencrypt_disabled

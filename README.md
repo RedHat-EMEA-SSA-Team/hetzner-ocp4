@@ -27,7 +27,7 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 **NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)
 
 ** Supported root server operating systems: **
-- CentOS 8
+- CentOS Stream 8
 - RHEL 8 - How to install RHEL8: https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
 
 ## Infra providers
@@ -72,7 +72,7 @@ subscription-manager repos \
     --enable=openstack-15-for-rhel-8-x86_64-rpms
 ```
 
-## In case of Centos 8
+## In case of CentOS Stream 8
 
 Enable ansible repo:
 ```
@@ -81,16 +81,16 @@ yum install -y centos-release-ansible-29.noarch
 
 ## Initialize tools
 
-Install ansible (min version 2.8) and git
+Install ansible (min version 2.9) and git
 
 ```
-[root@server ~]# yum install -y ansible git
+yum install -y ansible git
 ```
 
 You are now ready to clone this project to your CentOS system.
 
 ```
-[root@server ~]# git clone https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4.git
+git clone https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4.git
 ```
 
 We are now ready to install `libvirt` as our hypervisor, provision VMs and prepare those for OCP.

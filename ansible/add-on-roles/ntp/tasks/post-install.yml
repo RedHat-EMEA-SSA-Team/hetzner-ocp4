@@ -1,8 +1,10 @@
 ---
-- set_fact:
+- name: Chrony conf
+  set_fact:
     chrony_conf: "{{ lookup('template', 'templates/chrony.conf.j2') | b64encode }}"
 
-- shell: "echo {{ chrony_conf }} | base64 -w0"
+- name: Create base64
+  shell: "set -o pipefail && echo {{ chrony_conf }} | base64 -w0"
   register: register_encoded_chrony_conf
 
 - name: Apply NTP machineconfig

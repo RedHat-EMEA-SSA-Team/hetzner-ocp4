@@ -17,13 +17,13 @@
     virt:
       command: destroy
       name: "{{ vm_instance_name }}"
-    ignore_errors: yes
+    ignore_errors: true
 
   - name: Undefine VM {{ vm_instance_name }}
     virt:
       command: undefine
       name: "{{ vm_instance_name }}"
-    ignore_errors: yes
+    ignore_errors: true
 
   - name: Delete directory
     file:
@@ -37,4 +37,3 @@
     with_items:
       - "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
       - "/var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso"
-

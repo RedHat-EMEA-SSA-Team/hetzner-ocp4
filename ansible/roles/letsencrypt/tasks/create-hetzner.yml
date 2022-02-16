@@ -12,7 +12,7 @@
       Content-Type: 'application/json'
   register: le_hetzner_zone_id
 
-- name: Create DNS record at Hetzner
+- name: Create letsencrypt DNS record at Hetzner
   uri:
     url: "https://dns.hetzner.com/api/v1/records"
     method: POST

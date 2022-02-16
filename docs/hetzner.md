@@ -60,7 +60,6 @@ The guest VM setup uses a "root" vg0 volume group for guest. So leave as much as
 The `installimage` tool is used to install CentOS. It takes instructions from a text file.
 
 If you like to install Red Hat Enterprise Linux, create your own RHEL Image.  Follow the instructions of how you create an RHEL image for Hetzner:
-* [Red Hat Enterprise Linux 7](http://boernig.de/wordpress/2018/07/03/running-rhel-on-hetzner-hosted-servers/)
 * [Red Hat Enterprise Linux 8](https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/)
 
 
@@ -89,7 +88,7 @@ LV vg0   var    /var ext4 50G
 LV vg0   libvirt /var/lib/libvirt/images xfs all
 
 
-IMAGE /root/.oldroot/nfs/images/CentOS-80-64-minimal.tar.gz
+IMAGE /root/.oldroot/nfs/install/../images/CentOS-80-stream-amd64-base.tar.gz
 ```
 
 

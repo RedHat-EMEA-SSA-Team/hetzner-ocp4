@@ -18,8 +18,8 @@
     aws_access_key: "{{ pd_aws_access_key }}"
     aws_secret_key: "{{ pd_aws_secret_key }}"
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
@@ -36,8 +36,8 @@
     aws_access_key: "{{ pd_aws_access_key }}"
     aws_secret_key: "{{ pd_aws_secret_key }}"
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)

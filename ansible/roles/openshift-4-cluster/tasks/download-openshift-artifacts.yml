@@ -5,7 +5,8 @@
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
 
-- set_fact:
+- name: Init check_urls
+  set_fact:
     check_urls:
       - "{{ coreos_download_url }}"
       - "{{ tmp_openshift_install_download_url }}"
@@ -14,7 +15,8 @@
       - "{{ helm_cli_location }}"
       - "{{ butane_cli_location }}"
 
-- set_fact:
+- name: Add coreos_csum_url to check_urls
+  set_fact:
     check_urls: "{{ check_urls + [coreos_csum_url] }}"
   when: coreos_csum_str is not defined
 
@@ -52,7 +54,7 @@
     #   fix not shipped yet
     - name: Findout exactly sha256
       set_fact:
-        coreos_csum_str: "{{ lookup('url', coreos_csum_url,  split_lines=False ).split('\n') |map('regex_search','.*' + coreos_download_url | basename + '$') | select('string') | first | regex_search('^([a-z0-9])+')}}"
+        coreos_csum_str: "{{ lookup('url', coreos_csum_url,  split_lines=False ).split('\n') |map('regex_search','.*' + coreos_download_url | basename + '$') | select('string') | first | regex_search('^([a-z0-9])+') }}"  # noqa line-length
       when: coreos_csum_str is not defined
 
     - name: download coreos
@@ -93,6 +95,7 @@
       copy:
         dest: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
         content: "{{ coreos_csum.stat.checksum }}  {{ coreos_file }}\n"
+        mode: 0644
 
   when: >
     (not coreos_old_image.stat.exists) or
@@ -105,9 +108,9 @@
     state: directory
     mode: u+rwx,g+rx,o+rx
   with_items:
-  - "/opt/openshift-install-{{ openshift_version }}"
-  - "/opt/openshift-client-{{ openshift_version }}"
-  - "{{ opm_dest }}"
+    - "/opt/openshift-install-{{ openshift_version }}"
+    - "/opt/openshift-client-{{ openshift_version }}"
+    - "{{ opm_dest }}"
 
 - name: Download Openshift installer
   unarchive:
@@ -118,7 +121,7 @@
     owner: root
     group: root
     exclude:
-    - 'README.md'
+      - 'README.md'
     creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
 
 - name: Download Openshift client
@@ -130,7 +133,7 @@
     owner: root
     group: root
     exclude:
-    - 'README.md'
+      - 'README.md'
     creates: "/opt/openshift-client-{{ openshift_version }}/oc"
 
 - name: Download OPM (gz)
@@ -142,7 +145,7 @@
     owner: root
     group: root
     exclude:
-    - 'README.md'
+      - 'README.md'
     creates: "{{ opm_dest }}/opm"
   when: opm_download_url | regex_search("^(.*)\.tar\.gz$")
 

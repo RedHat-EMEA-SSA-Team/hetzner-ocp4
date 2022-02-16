@@ -1,4 +1,4 @@
-#!/usr/bin/env ansible-playbook 
+#!/usr/bin/env ansible-playbook
 ---
 # If you like to play: ./ansible/destroy.yml --skip-tags public_dns,letsencrypt
 
@@ -6,9 +6,9 @@
   connection: local
   gather_facts: true
   vars_files:
-  - ../cluster.yml
+    - ../cluster.yml
   tasks:
-  - name: Destroy cluster
-    import_role:
-      name: openshift-4-cluster
-      tasks_from: destroy.yml
+    - name: Destroy cluster
+      import_role:
+        name: openshift-4-cluster
+        tasks_from: destroy.yml

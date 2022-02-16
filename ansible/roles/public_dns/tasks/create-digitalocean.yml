@@ -1,5 +1,4 @@
 ---
-
 - name: Create DNS record at DigitalOcean
   community.digitalocean.digital_ocean_domain_record:
     oauth_token: "{{ digitalocean_token }}"
@@ -10,8 +9,8 @@
     data: "{{ pd_public_ip }}"
     force_update: yes
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
 
@@ -25,8 +24,7 @@
     data: "{{ pd_public_ipv6 }}"
     force_update: yes
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
-

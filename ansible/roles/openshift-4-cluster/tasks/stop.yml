@@ -4,15 +4,18 @@
 #   vars:
 #     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
-- set_fact:
+- name: Init empty vms
+  set_fact:
     vms: "[]"
 
-- set_fact:
-    vms: "{{ vms }} + [ '{{ cluster_name }}-master-{{item}}' ]"
+- name: Add masters to vms
+  set_fact:
+    vms: "{{ vms }} + [ '{{ cluster_name }}-master-{{ item }}' ]"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
-- set_fact:
-    vms: "{{ vms }} + [ '{{ cluster_name }}-compute-{{item}}' ]"
+- name: Add compute to vms
+  set_fact:
+    vms: "{{ vms }} + [ '{{ cluster_name }}-compute-{{ item }}' ]"
   with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
   when: compute_count > 0
 

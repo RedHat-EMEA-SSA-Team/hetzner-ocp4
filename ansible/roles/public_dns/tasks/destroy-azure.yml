@@ -11,8 +11,8 @@
     record_type: A
     state: absent
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns
 
@@ -28,7 +28,7 @@
     record_type: AAAA
     state: absent
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   tags:
     - public_dns

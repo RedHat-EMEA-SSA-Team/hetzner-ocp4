@@ -3,7 +3,7 @@
 # # /var/lib/libvirt/images/rhcos42.qcow2
 # # /var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud.qcow2
 - name: Create disk for {{ vm_instance_name }}
-  command: "qemu-img create -f qcow2 -b {{ coreos_image_location }} /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2 {{ vm_root_disk_size }}"
+  command: "qemu-img create -f qcow2 -F qcow2 -b {{ coreos_image_location }} /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2 {{ vm_root_disk_size }}"
   args:
     creates: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
   when: vm_storage_backend == "qcow2"
@@ -20,11 +20,15 @@
     lv: "{{ vm_instance_name }}"
     state: present
     size: "{{ vm_root_disk_size }}"
-  when: vm_storage_backend == "lvm"
+  when:
+    - vm_storage_backend == "lvm"
+    - ansible_lvm['lvs'][ vm_instance_name ] is not defined
 
 - name: Copy/dd coreos into device
   command: "dd if={{ coreos_image_location }}.raw of=/dev/{{ vm_storage_backend_location }}/{{ vm_instance_name }} bs=4M"
-  when: vm_storage_backend == "lvm"
+  when:
+    - vm_storage_backend == "lvm"
+    - ansible_lvm['lvs'][ vm_instance_name ] is not defined
 
 - name: Copy ignition {{ vm_instance_name }}
   copy:
@@ -36,6 +40,7 @@
   template:
     src: "vm.xml.j2"
     dest: "/tmp/{{ vm_instance_name }}.virt.xml"
+    mode: 0664
 
 - name: Define VirtualMachine {{ vm_instance_name }}
   virt:

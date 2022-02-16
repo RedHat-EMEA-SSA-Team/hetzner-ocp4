@@ -1,5 +1,5 @@
 ---
-- name: Retrieve first public key fingerprint 
+- name: Retrieve first public key fingerprint
   uri:
     url: https://robot-ws.your-server.de/key
     return_content: yes
@@ -27,7 +27,7 @@
   delegate_to: localhost
 
 - name: Activate rescue mode
-  when:  rescue.json.rescue.active == false
+  when: not rescue.json.rescue.active
   uri:
     url: "https://robot-ws.your-server.de/boot/{{ hetzner_ip }}/rescue"
     method: POST
@@ -55,10 +55,11 @@
   delegate_to: localhost
 
 - name: Remove server from local known_hosts file
-  local_action:
-    module: command
-    cmd: "/usr/bin/ssh-keygen -R {{ inventory_hostname }}"
-  ignore_errors: yes
+  delegate_to: localhost
+  command: "/usr/bin/ssh-keygen -R {{ inventory_hostname }}"
+  register: output
+  failed_when: output.rc != 0
+  changed_when: '"updated" in output.stdout'
 
 - name: Pause a bit for the hardware reset to kick in
   pause: seconds=15
@@ -84,14 +85,16 @@
     group: root
     mode: 0644
 
-- name: Run installimage 
+- name: Run installimage
   command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup"
   environment:
     TERM: "vt100"
-  ignore_errors: true
   register: result
+  changed_when: true
+  failed_when: false
 
-- debug:
+- name: Print installimage output with -v
+  debug:
     var: result
     verbosity: 1
 
@@ -100,24 +103,28 @@
     msg: "Something want wrong at installimage: {{ result.stderr_lines | join('\n') }}"
   when:
     - result.stderr_lines | length > 0
-    - hetzner_image_ignore_errors == false
+    - not hetzner_image_ignore_errors
 
 - name: Check stdout from installimage
   fail:
     msg: "Something want wrong at installimage: {{ result.stdout_lines | join('\n') }}"
   when:
     - result.stdout is search('An error occured while installing the new system!')
-    - hetzner_image_ignore_errors == false
+    - not etzner_image_ignore_errors
 
 - name: Reboot server
   shell: sleep 2 && shutdown -r now
   async: 1
   poll: 0
-  ignore_errors: yes
+  changed_when: true
+  failed_when: false
 
 - name: Remove server from local known_hosts file
-  local_action: command  /usr/bin/ssh-keygen -R {{ inventory_hostname }}
-  ignore_errors: yes
+  delegate_to: localhost
+  command: "/usr/bin/ssh-keygen -R {{ inventory_hostname }}"
+  register: output
+  failed_when: output.rc != 0
+  changed_when: '"updated" in output.stdout'
 
 - name: Wait 300 seconds for port 22 to become open
   wait_for:
@@ -135,7 +142,7 @@
 - name: Set ansible_python_interpreter to /usr/libexec/platform-python (RHEL 8)
   set_fact:
     ansible_python_interpreter: /usr/libexec/platform-python
-  when: rc.failed == true
+  when: rc.failed
 
 - name: Disable password authentication
   lineinfile:

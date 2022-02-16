@@ -19,5 +19,6 @@
     - "/etc/sysconfig/{{ lb_name }}.env"
     - "/etc/systemd/system/{{ lb_name }}.service"
 
-- debug:
+- name: Podman will stay in the Host, Play with it! ;-)
+  debug:
     msg: "Podman will stay in the Host, Play with it! ;-)"

@@ -37,7 +37,7 @@
       with_items:
         - certs
         - auth
-        - data
+        - quay
 
     - name: Certificates block
       tags:
@@ -118,62 +118,7 @@
             update-ca-trust enable;
             update-ca-trust extract;
 
-    # htpasswd need passlib
-    # - name: Add a admin user to htpasswd
-    #   htpasswd:
-    #     path: /var/lib/libvirt/images/mirror-registry/auth/htpasswd
-    #     name: admin
-    #     password: 'r3dh4t!1'
-    #     crypt_scheme: md5_crypt
-    - name: Add a admin user to htpasswd
-      command: |
-        htpasswd -bBc \
-        /var/lib/libvirt/images/mirror-registry/auth/htpasswd \
-        admin r3dh4t!1
-
-    - name: Create mirror-registry.service
-      copy:
-        dest: /etc/systemd/system/mirror-registry.service
-        content: |
-          [Unit]
-          Description=Mirror registry (mirror-registry)
-          After=network.target
-
-          [Service]
-          Type=simple
-          TimeoutStartSec=5m
-
-          ExecStartPre=-/usr/bin/podman rm "mirror-registry"
-          ExecStartPre=/usr/bin/podman pull quay.io/redhat-emea-ssa-team/registry:2
-          ExecStart=/usr/bin/podman run --name mirror-registry --net host \
-            -v /var/lib/libvirt/images/mirror-registry/data:/var/lib/registry:z \
-            -v /var/lib/libvirt/images/mirror-registry/auth:/auth:z \
-            -e "REGISTRY_AUTH=htpasswd" \
-            -e "REGISTRY_HTTP_ADDR={{ vn_subnet.split('.')[:3] | join('.')}}.1:5000" \
-            -e "REGISTRY_AUTH_HTPASSWD_REALM=registry-realm" \
-            -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
-            -e "REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=TRUE" \
-            -v /var/lib/libvirt/images/mirror-registry/certs:/certs:z \
-            -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt \
-            -e REGISTRY_HTTP_TLS_KEY=/certs/registry.key \
-            -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
-            quay.io/redhat-emea-ssa-team/registry:2
-
-          ExecReload=-/usr/bin/podman stop "mirror-registry"
-          ExecReload=-/usr/bin/podman rm "mirror-registry"
-          ExecStop=-/usr/bin/podman stop "mirror-registry"
-          Restart=always
-          RestartSec=30
-
-          [Install]
-          WantedBy=multi-user.target
-
-
-    - name: Enable mirror-registry
-      systemd:
-        name: mirror-registry.service
-        enabled: yes
-        state: started
+# Add mirror registry
 
     - name: Allow OpenShift traffic from VM's to Host
       firewalld:

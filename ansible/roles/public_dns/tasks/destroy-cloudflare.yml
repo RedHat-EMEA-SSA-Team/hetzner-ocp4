@@ -12,8 +12,8 @@
     account_email: "{{ cloudflare_account_email }}"
     account_api_token: "{{ cloudflare_account_api_token }}"
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
 
 - name: Delete IPv6 DNS record at CloudFlare
   cloudflare_dns:
@@ -27,6 +27,6 @@
     account_email: "{{ cloudflare_account_email }}"
     account_api_token: "{{ cloudflare_account_api_token }}"
   with_items:
-  - api
-  - '*.apps'
+    - api
+    - '*.apps'
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)
