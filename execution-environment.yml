@@ -1,0 +1,20 @@
+---
+version: 1
+
+# build_arg_defaults:
+  # EE_BASE_IMAGE: 'quay.io/ansible/ansible-runner:latest'
+
+# ansible_config: 'ansible.cfg'
+
+dependencies:
+  galaxy: ee-requirements.yml
+  python: ee-python-requirements.txt
+  system: ee-bindep.txt
+
+# additional_build_steps:
+#   prepend: |
+#     RUN whoami
+#     RUN cat /etc/os-release
+#   append:
+#     - RUN echo This is a post-install command!
+#     - RUN ls -la /etc

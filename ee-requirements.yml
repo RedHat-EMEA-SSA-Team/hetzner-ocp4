@@ -1,0 +1,9 @@
+---
+collections:
+ - community.libvirt
+ - community.crypto
+ - community.general
+ - community.aws
+ - google.cloud
+ - community.azure
+ - kubernetes.core
