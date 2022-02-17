@@ -1,8 +1,9 @@
+### 🚨 Warning: Installation on Centos 8 Stream might fail due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
+
 # Disclaimer
 This environment has been created for the sole purpose of providing an easy to deploy and consume a Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
 
-This install will create a 'Minimal Viable Setup', which anyone can extend to
-their needs and purpose.
+This install will create a 'Minimal Viable Setup', which anyone can extend to their needs and purpose.
 
 Recent tests shows that SSD storage on the Server might be required for any persistent deployment to work correctly.
 
@@ -72,7 +73,7 @@ subscription-manager repos \
     --enable=openstack-15-for-rhel-8-x86_64-rpms
 ```
 
-## In case of CentOS Stream 8
+## In case of CentOS Stream 8 🚨 currently broken due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
 
 Enable ansible repo:
 ```
