@@ -1,7 +1,7 @@
 ---
 
 openshift_install_dir: "{{ playbook_dir }}/../{{ cluster_name }}"
-ssh_public_key_location: /root/.ssh/id_rsa
+ssh_public_key_location: ~/.ssh/id_rsa
 
 vn_subnet: "192.168.50.0"
 vn_name: "openshift-4-cluster"
@@ -12,8 +12,8 @@ vn_public_domain: "h42.openshift.pub"
 ip_families:
   - IPv4
 
-listen_address: "{{ hostvars['localhost']['ansible_default_ipv4']['address'] | default('') }}"
-listen_address_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'] | default('') }}"
+listen_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] | default('') }}"
+listen_address_ipv6: "{{ hostvars[inventory_hostname]['ansible_default_ipv6']['address'] | default('') }}"
 
 # Default: qcow2
 # For more performance use LVM
