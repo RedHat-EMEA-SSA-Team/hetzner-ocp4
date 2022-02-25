@@ -73,17 +73,17 @@
   when: not letsencrypt_disabled
 
 - name: Download OpenShift Artifacts
-  include: download-openshift-artifacts.yml
+  include_tasks: download-openshift-artifacts.yml
   tags: download-openshift-artifacts
 
 - name: Create ignition files
-  include: create-ignition.yml
+  include_tasks: create-ignition.yml
   vars:
     ssh_public_key: "{{ lookup('file', '{{ ssh_public_key_location }}.pub') }}"
   tags: ignition
 
 - name: Create bootstrap node
-  include: create-vm.yml
+  include_tasks: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
     vm_network: "{{ cluster_name }}"
@@ -95,7 +95,7 @@
     vm_root_disk_size: '120G'
 
 - name: Create master nodes
-  include: create-vm.yml
+  include_tasks: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
     vm_network: "{{ cluster_name }}"
@@ -109,7 +109,7 @@
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
 - name: Create compute node
-  include: create-vm.yml
+  include_tasks: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
     vm_network: "{{ cluster_name }}"
@@ -124,5 +124,5 @@
   when: compute_count > 0
 
 - name: Include post installation tasks
-  include: post-install.yml
+  include_tasks: post-install.yml
   tags: post-install
