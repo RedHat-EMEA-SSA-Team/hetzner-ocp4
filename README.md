@@ -29,7 +29,7 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 
 ** Supported root server operating systems: **
 - CentOS Stream 8
-- RHEL 8 - How to install RHEL8: https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
+- RHEL 8 - How to install RHEL8: <del>https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/</del> (defunct, latest available version at archive.org: https://web.archive.org/web/20210422225153/https://keithtenzer.com/2019/10/24/how-to-create-a-rhel-8-image-for-hetzner-root-servers/)
 
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
