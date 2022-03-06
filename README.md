@@ -57,9 +57,12 @@ Here an example Hetzner firewall configuration:
 
 ## In case of Red Hat Enterprise Linux 8
 
-Subscrip your RHEL Host:
+Subscribe your RHEL host:
 ```
 subscription-manager register
+
+# get pool id via:
+# subscription-manager list --available
 
 subscription-manager attach --pool=...
 
