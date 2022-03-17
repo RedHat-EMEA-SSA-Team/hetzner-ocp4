@@ -48,7 +48,7 @@ ansible-navigator:
 #         KEY1: VALUE1
 #         KEY2: VALUE2
 #         KEY3: VALUE3
-    image:  quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
+    image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
 #     pull:
 #       arguments:
 #         - "--tls-verify=false"
@@ -76,7 +76,7 @@ ansible-navigator:
 #     - ansible_connection
 #
   logging:
-      level: critical
+    level: critical
       #     append: False
       #     file: /tmp/log.txt
       #
