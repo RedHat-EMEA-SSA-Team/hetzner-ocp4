@@ -72,8 +72,7 @@ subscription-manager repos \
     --enable=rhel-8-for-x86_64-baseos-rpms \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
-    --enable=ansible-2.9-for-rhel-8-x86_64-rpms \
-    --enable=openstack-15-for-rhel-8-x86_64-rpms
+    --enable=ansible-automation-platform-2.1-for-rhel-8-x86_64-rpms
 ```
 
 ## In case of CentOS Stream 8 🚨 currently broken due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
@@ -88,7 +87,7 @@ yum install -y centos-release-ansible-29.noarch
 Install ansible (min version 2.9) and git
 
 ```
-yum install -y ansible git
+yum install -y ansible-navigator git
 ```
 
 You are now ready to clone this project to your CentOS system.
@@ -207,7 +206,7 @@ Please configure in `cluster.yml` all necessary credentials:
 
 ```
 [root@server ~]# cd hetzner-ocp4
-[root@server ~]# ansible-playbook ./ansible/setup.yml
+[root@server ~]# ansible-navigator run -m stdout ./ansible/setup.yml
 ```
 
 # Additional documentation
@@ -228,7 +227,7 @@ Please configure in `cluster.yml` all necessary credentials:
 | Problem | Command |
 |---|---|
 |Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-${cluster_name} ./watch-stats.sh```
-|Start cluster after reboot|```./ansible/04-start-cluster.yml```
+|Start cluster after reboot|```ansible-navigator run -m stdout ./ansible/04-start-cluster.yml```
 
 
 
