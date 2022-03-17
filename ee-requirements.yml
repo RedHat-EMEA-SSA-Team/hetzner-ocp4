@@ -10,3 +10,4 @@ collections:
  - ansible.posix
  - community.azure
  - community.aws
+ - community.digitalocean
