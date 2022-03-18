@@ -9,16 +9,16 @@
     msg: "Letsencrypt certifcates stays...."
   tags: letsencrypt
 
-- include: destroy-vm.yml
+- include_tasks: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
-- include: destroy-vm.yml
+- include_tasks: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
-- include: destroy-vm.yml
+- include_tasks: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
   with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1

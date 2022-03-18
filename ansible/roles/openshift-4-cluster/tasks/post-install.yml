@@ -12,7 +12,7 @@
   until: bootstrap_status.rc == 0
 
 - name: Destroy bootstrap node
-  include: destroy-vm.yml
+  include_tasks: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
@@ -71,7 +71,7 @@
 ###########################################################################################
 # Install letsencrypt certificates
 ###########################################################################################
-- include: certificate-install.yml
+- include_tasks: certificate-install.yml
   when: letsencrypt_disabled == false
   tags:
     - post-install
@@ -267,7 +267,7 @@
 ###########################################################################################
 
 - name: Include post-install-add-ons
-  include: post-install-add-ons.yml
+  include_tasks: post-install-add-ons.yml
   when: add_ons_enabled
   tags:
     - post-install

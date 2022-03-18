@@ -1,6 +1,6 @@
 ---
 - name: Include OS specific part
-  include: "prepare-host-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+  include_tasks: "prepare-host-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
 - name: Enable and Start libvirtd
   systemd:
