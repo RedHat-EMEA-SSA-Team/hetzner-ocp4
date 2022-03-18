@@ -63,7 +63,8 @@
 
 
 - name: Create infra-registry pv
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -86,7 +87,8 @@
         persistentVolumeReclaimPolicy: Recycle
 
 - name: Create registry-storage pvc
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -129,7 +131,8 @@
     - "user-pvs"
 
 - name: Create Namespace
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -143,7 +146,8 @@
         name: "{{ storage_nfs_target_namespace }}"
 
 - name: Create ServiceAccount
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -158,7 +162,8 @@
         namespace: "{{ storage_nfs_target_namespace }}"
 
 - name: Create ClusteRole nfs-client-provisioner-runner
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -185,7 +190,8 @@
           verbs: ["create", "update", "patch"]
 
 - name: Create ClusterRoleBinding nfs-client-provisioner-runner <-> nfs-client-provisioner
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -207,7 +213,8 @@
         apiGroup: rbac.authorization.k8s.io
 
 - name: Create Role nfs-client-provisioner
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -230,7 +237,8 @@
           verbs: ["use"]
 
 - name: Create RoleBinding nfs-client-provisioner <-> nfs-client-provisioner
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -252,7 +260,8 @@
         apiGroup: rbac.authorization.k8s.io
 
 - name: Deploy nfs-provisioner
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -298,7 +307,8 @@
                   path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-user-pvs"
 
 - name: Storage Class
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"

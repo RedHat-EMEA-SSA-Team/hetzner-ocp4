@@ -11,3 +11,4 @@ collections:
  - community.azure
  - community.aws
  - community.digitalocean
+ - community.kubernetes

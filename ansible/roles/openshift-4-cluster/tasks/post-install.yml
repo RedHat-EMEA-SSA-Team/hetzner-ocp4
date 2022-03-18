@@ -88,7 +88,8 @@
 - name: Handle auth_htpasswd
   block:
     - name: Create htpasswd secret
-      k8s:
+      delegate_to: localhost
+      kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ k8s_kubeconfig }}"
         host: "{{ k8s_host }}"
@@ -124,7 +125,8 @@
 - name: Handle auth_redhatsso
   block:
     - name: Create google secret secret
-      k8s:
+      delegate_to: localhost
+      kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ k8s_kubeconfig }}"
         host: "{{ k8s_host }}"
@@ -170,7 +172,8 @@
         msg: "Only one of auth_github.organizations or auth_github.teams must be defined (at least one must be defined)"
       when: (auth_github.organizations is defined) and (auth_github.teams is defined)
     - name: Create GitHub secret
-      k8s:
+      delegate_to: localhost
+      kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ k8s_kubeconfig }}"
         host: "{{ k8s_host }}"
@@ -207,7 +210,8 @@
     - idp
 
 - name: Configure identity providers
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -230,7 +234,8 @@
 ###########################################################################################
 
 - name: Setup cluster role bindings
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"

@@ -25,7 +25,8 @@
       register: tls_key
 
     - name: Create secret with certificates for openshift-ingress
-      k8s:
+      delegate_to: localhost
+      kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ k8s_kubeconfig }}"
         host: "{{ k8s_host }}"
@@ -43,7 +44,8 @@
             namespace: openshift-ingress
           type: kubernetes.io/tls
     - name: Patch ingresscontroller/default
-      k8s:
+      delegate_to: localhost
+      kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ k8s_kubeconfig }}"
         host: "{{ k8s_host }}"
@@ -63,7 +65,8 @@
     # Hot fix, remove of openshift api cert installation because of
     #          https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/117
     # - name: Create secret with certificates for openshift api
-    #   k8s:
+    #   delegate_to: localhost
+    #   kubernetes.core.k8s
     #     state: present
     #     kubeconfig: "{{ k8s_kubeconfig }}"
     #     host: "{{ k8s_host }}"
@@ -81,7 +84,8 @@
     #         namespace: openshift-config
     #       type: kubernetes.io/tls
     # - name: Patch api server config
-    #   k8s:
+    #   delegate_to: localhost
+    #   kubernetes.core.k8s:
     #     state: present
     #     kubeconfig: "{{ k8s_kubeconfig }}"
     #     host: "{{ k8s_host }}"

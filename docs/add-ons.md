@@ -55,7 +55,8 @@ Here an example of tasks/main.yml
 ---
 # tasks file for hetzner-ocp4-add-on-example
 - name: Create namespace
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
@@ -69,7 +70,8 @@ Here an example of tasks/main.yml
         name: hetzner-ocp4-add-on-example
 
 - name: Create Deployment
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"
