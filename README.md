@@ -63,8 +63,7 @@ subscription-manager register
 
 # get pool id via:
 # subscription-manager list --available
-
-subscription-manager attach --pool=...
+subscription-manager attach [--auto] --pool=...
 
 subscription-manager repos --disable=*
 
@@ -84,10 +83,15 @@ yum install -y centos-release-ansible-29.noarch
 
 ## Initialize tools
 
-Install ansible (min version 2.9) and git
+Install ansible-navigator, git and podman
 
 ```
-yum install -y ansible-navigator git
+yum install -y ansible-navigator git podman
+```
+
+```
+ssh-keygen
+cat ~/.ssh/*.pub >> ~/.ssh/authorized_keys
 ```
 
 You are now ready to clone this project to your CentOS system.
@@ -230,7 +234,19 @@ Please configure in `cluster.yml` all necessary credentials:
 |Start cluster after reboot|```ansible-navigator run -m stdout ./ansible/04-start-cluster.yml```
 
 
+# Build / Development
+
+## Build ansible execution enviorment
+
+```bash
+ansible-builder build \
+    --container-runtime podman \
+    --tag quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
+
+podman push quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
+```
 
 # Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4.svg)](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4)
+
