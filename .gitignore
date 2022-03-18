@@ -2,3 +2,4 @@ cluster.yml
 .DS_Store
 certificate/
 ansible-navigator.log
+context/
