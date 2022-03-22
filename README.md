@@ -78,7 +78,7 @@ yum install -y ansible-navigator git podman
 
 ```
 
-## In case of Rocky Linux 8
+## In case of Rocky Linux 8 or Centos 8
 
 Ansible navigator installation based on the upstream [documentation](https://ansible-navigator.readthedocs.io/en/latest/installation/#install-ansible-navigator).
 
@@ -88,13 +88,6 @@ python3 -m pip install ansible-navigator --user
 echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.profile
 source ~/.profile
 
-```
-
-## In case of CentOS Stream 8 🚨 currently broken due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
-
-Enable ansible repo:
-```
-yum install -y centos-release-ansible-29.noarch
 ```
 
 ## Initialize tools
