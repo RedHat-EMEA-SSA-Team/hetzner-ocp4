@@ -213,8 +213,8 @@ Please configure in `cluster.yml` all necessary credentials:
 ## Prepare kvm-host and install OpenShift
 
 ```
-[root@server ~]# cd hetzner-ocp4
-[root@server ~]# ansible-navigator run -m stdout ./ansible/setup.yml
+cd hetzner-ocp4
+ansible-navigator run -m stdout ./ansible/setup.yml
 ```
 
 # Additional documentation
