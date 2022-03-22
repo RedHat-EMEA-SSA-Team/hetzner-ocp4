@@ -72,6 +72,22 @@ subscription-manager repos \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
     --enable=ansible-automation-platform-2.1-for-rhel-8-x86_64-rpms
+
+
+yum install -y ansible-navigator git podman
+
+```
+
+## In case of Rocky Linux 8
+
+Ansible navigator installation based on the upstream [documentation](https://ansible-navigator.readthedocs.io/en/latest/installation/#install-ansible-navigator).
+
+```bash
+dnf install -y python3-pip podman git
+python3 -m pip install ansible-navigator --user
+echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.profile
+source ~/.profile
+
 ```
 
 ## In case of CentOS Stream 8 🚨 currently broken due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
@@ -83,11 +99,6 @@ yum install -y centos-release-ansible-29.noarch
 
 ## Initialize tools
 
-Install ansible-navigator, git and podman
-
-```
-yum install -y ansible-navigator git podman
-```
 
 ```
 ssh-keygen
