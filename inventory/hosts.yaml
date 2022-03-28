@@ -1,5 +1,5 @@
 ---
-host:
+all:
   hosts:
     host:
       ansible_host: localhost
