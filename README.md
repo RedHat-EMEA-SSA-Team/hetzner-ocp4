@@ -1,5 +1,3 @@
-### 🚨 Warning: Installation on Centos 8 Stream might fail due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
-
 # Disclaimer
 This environment has been created for the sole purpose of providing an easy to deploy and consume a Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
 
