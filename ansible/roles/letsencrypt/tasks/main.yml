@@ -150,7 +150,6 @@
   when: sample_com_challenge is changed
 
 - name: Include DNS provider
-  delegate_to: localhost
   include_tasks: "create-{{ le_dns_provider }}.yml"
   when:
     - le_dns_provider in ['hetzner', 'digitalocean']
@@ -262,7 +261,6 @@
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
 - name: Include DNS provider
-  delegate_to: localhost
   include_tasks: "destroy-{{ le_dns_provider }}.yml"
   when:
     - le_dns_provider in ['hetzner', 'digitalocean']

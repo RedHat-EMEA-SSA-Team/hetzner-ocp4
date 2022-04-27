@@ -1,6 +1,7 @@
 ---
 
 - name: Create DNS record at DigitalOcean
+  delegate_to: localhost
   community.digitalocean.digital_ocean_domain_record:
     oauth_token: "{{ digitalocean_token }}"
     state: present
