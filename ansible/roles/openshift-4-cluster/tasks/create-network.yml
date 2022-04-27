@@ -136,6 +136,7 @@
 # Public DNS
 #
 - name: Create public dns entries
+  delegate_to: localhost
   import_role:
     name: public_dns
     tasks_from: create.yml

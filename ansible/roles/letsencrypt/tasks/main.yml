@@ -56,6 +56,7 @@
   when: sample_com_challenge is changed
 
 - name: Create DNS record at CloudFlare
+  delegate_to: localhost
   cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
@@ -70,6 +71,7 @@
   when: le_dns_provider == "cloudflare" and sample_com_challenge is changed
 
 - name: Create DNS record at Route53
+  delegate_to: localhost
   route53:
     state: present
     zone: "{{ le_aws_zone }}"
@@ -85,6 +87,7 @@
   when: le_dns_provider == "route53" and sample_com_challenge is changed
 
 - name: Create DNS record at GCP
+  delegate_to: localhost
   gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
     type: TXT
@@ -103,6 +106,7 @@
   when: le_dns_provider == "gcp" and sample_com_challenge is changed
 
 - name: Create DNS record at Azure
+  delegate_to: localhost
   azure_rm_dnsrecordset:
     client_id: "{{ le_azure_client_id }}"
     secret: "{{ le_azure_secret }}"
@@ -121,6 +125,7 @@
   when: le_dns_provider == "azure" and sample_com_challenge is changed
 
 - name: Create DNS record at TransIP
+  delegate_to: localhost
   uri:
     url: "https://api.transip.nl/v6/domains/{{ transip_zone }}/dns"
     method: POST
@@ -145,6 +150,7 @@
   when: sample_com_challenge is changed
 
 - name: Include DNS provider
+  delegate_to: localhost
   include_tasks: "create-{{ le_dns_provider }}.yml"
   when:
     - le_dns_provider in ['hetzner', 'digitalocean']
@@ -171,6 +177,7 @@
   when: sample_com_challenge is changed
 
 - name: Delete DNS record at CloudFlare
+  delegate_to: localhost
   cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
@@ -185,6 +192,7 @@
   when: le_dns_provider == "cloudflare" and sample_com_challenge is changed
 
 - name: Delete DNS record at Route53
+  delegate_to: localhost
   route53:
     state: absent
     zone: "{{ le_aws_zone }}"
@@ -200,6 +208,7 @@
   when: le_dns_provider == "route53" and sample_com_challenge is changed
 
 - name: Delete DNS record at GCP
+  delegate_to: localhost
   gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
     managed_zone:
@@ -218,6 +227,7 @@
   when: le_dns_provider == "gcp" and sample_com_challenge is changed
 
 - name: Delete DNS record at Azure
+  delegate_to: localhost
   azure_rm_dnsrecordset:
     client_id: "{{ le_azure_client_id }}"
     secret: "{{ le_azure_secret }}"
@@ -233,6 +243,7 @@
   when: le_dns_provider == "azure" and sample_com_challenge is changed
 
 - name: Delete DNS record at TransIP
+  delegate_to: localhost
   uri:
     url: "https://api.transip.nl/v6/domains/{{ transip_zone }}/dns"
     method: DELETE
@@ -251,6 +262,7 @@
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
 - name: Include DNS provider
+  delegate_to: localhost
   include_tasks: "destroy-{{ le_dns_provider }}.yml"
   when:
     - le_dns_provider in ['hetzner', 'digitalocean']
