@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: host
   vars_files:
   - ../cluster.yml
   tasks:

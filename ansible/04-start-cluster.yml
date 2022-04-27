@@ -1,7 +1,6 @@
 ---
 # If you like to play: ./ansible/create.yml --skip-tags public_dns,letsencrypt
-- hosts: localhost
-  connection: local
+- hosts: host
   # gather_facts true because we need the public ip address
   gather_facts: true
   vars_files:
