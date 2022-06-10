@@ -260,7 +260,7 @@ oc adm catalog mirror \
 1) Copy nfs-client-provisioner image
     ```bash
     oc image mirror -a ${LOCAL_SECRET_JSON} \
-      quay.io/external_storage/nfs-client-provisioner:latest \
+      k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2 \
       ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:nfs-client-provisioner-latest
     ```
 
