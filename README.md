@@ -80,7 +80,7 @@ subscription-manager repos \
 
 Enable ansible repo:
 ```
-yum install -y centos-release-ansible-29.noarch
+dnf install -y centos-release-ansible-29.noarch
 ```
 
 ## Initialize tools
@@ -88,7 +88,7 @@ yum install -y centos-release-ansible-29.noarch
 Install ansible (min version 2.9) and git
 
 ```
-yum install -y ansible git
+dnf install -y ansible git
 ```
 
 You are now ready to clone this project to your CentOS system.
