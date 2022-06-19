@@ -9,18 +9,21 @@ Create only the network, important to install and start the mirror registry add
 network_forward_mode: "route"
 ```
 into `cluster.yml` and setup the network:
-```
-./ansible/02-create-cluster.yml --tags network
+
+```bash
+# ansible-navigator run ./ansible/02-create-cluster.yml \
+  [-e @cluster-air-gapped.yml \]
+  --tags network
 ```
 
 ## Setup mirror registry on kvm-host
 
 ### via Office quay mirror registry
 
-https://docs.openshift.com/container-platform/4.9/installing/installing-mirroring-installation-images.html#mirror-registry
+https://docs.openshift.com/container-platform/latest/installing/disconnected_install/installing-mirroring-creating-registry.html
 
 ```
-./docs/air-gapped/setup-registry.yam
+ansible-navigator run ./docs/air-gapped/prep-mirror-registry.yaml [-e @cluster-air-gapped.yml]
 
 ./mirror-registry install \
   --quayHostname host.compute.local:5000 \
@@ -29,9 +32,13 @@ https://docs.openshift.com/container-platform/4.9/installing/installing-mirrorin
   --sslKey /var/lib/libvirt/images/mirror-registry/certs/registry.key \
   --sslCert /var/lib/libvirt/images/mirror-registry/certs/registry.crt \
   --initPassword r3dh4t\!1
+
+podman login --username init --password r3dh4t\!1 \
+  --authfile mirror-registry-pullsecret.json \
+  host.compute.local:5000
 ```
 
-### via Docker registry
+### via Docker registry - deprecated
 
 ```
 ./docs/air-gapped/setup-registry.yaml
@@ -64,7 +71,9 @@ jq -s '{"auths": ( .[0].auths + .[1].auths ) }' mirror-registry-pullsecret.json 
 
 Install oc client
 ```
-./ansible/02-create-cluster.yml --tags download-openshift-artifacts
+# ansible-navigator run ./ansible/02-create-cluster.yml \
+  [-e @cluster-air-gapped.yml \]
+  --tags network
 ```
 
 Mirror images:
@@ -193,15 +202,21 @@ image_pull_secret: |
 ## Install cluster
 
 ```
-./ansible/02-create-cluster.yml
+# ansible-navigator run ./ansible/02-create-cluster.yml [-e @cluster-air-gapped.yml \]
 ```
 
 ## Sync Operatorhub
 
 Not all operators support disconnected environments: [Red Hat Operators Supported in Disconnected Mode](https://access.redhat.com/articles/4740011)
 
-How to sync operators with OpenShift 4.8: [official documentation](https://docs.openshift.com/container-platform/4.8/operators/admin/olm-restricted-networks.html)
+How to sync operators with OpenShift 4.8: [official documentation](https://docs.openshift.com/container-platform/latest/operators/admin/olm-restricted-networks.html)
 
+### Disable default catalog source
+
+```
+oc patch OperatorHub cluster --type json \
+  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+```
 
 ### run index
 
@@ -213,25 +228,39 @@ podman run -p50051:50051 \
 
 ### Export names
 
+Install grpcurl <https://github.com/fullstorydev/grpcurl/releases>
+```
 grpcurl -plaintext localhost:50051 api.Registry/ListPackages > packages.out
-
-## Sync image for `oc debug node/`
-
-```
-oc image mirror -a ${LOCAL_SECRET_JSON} \
-  registry.redhat.io/rhel7/support-tools:latest \
-  ${LOCAL_REGISTRY}/rhel7/support-tools:latest
-
-oc debug node/compute-0 --image=${LOCAL_REGISTRY}/rhel7/support-tools:latest
 ```
 
+### Sync Index
+
+```bash
+
+opm index prune \
+    -f registry.redhat.io/redhat/redhat-operator-index:v4.10 \
+    -p codeready-workspaces2 \
+    -t ${LOCAL_REGISTRY}/olm/redhat-operator-index:v4.10
+
+
+podman push ${LOCAL_REGISTRY}/olm/redhat-operator-index:v4.10
+
+```
+
+```
+oc adm catalog mirror \
+  ${LOCAL_REGISTRY}/olm/redhat-operator-index:v4.10 \
+  ${LOCAL_REGISTRY}/olm \
+  --manifests-only \
+  -a ${LOCAL_SECRET_JSON}
+```
 
 ## If `storage_nfs: true`
 
 1) Copy nfs-client-provisioner image
     ```bash
     oc image mirror -a ${LOCAL_SECRET_JSON} \
-      quay.io/external_storage/nfs-client-provisioner:latest \
+      k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2 \
       ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}:nfs-client-provisioner-latest
     ```
 

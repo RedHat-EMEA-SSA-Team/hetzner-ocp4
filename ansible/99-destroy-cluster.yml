@@ -1,9 +1,7 @@
-#!/usr/bin/env ansible-playbook
 ---
 # If you like to play: ./ansible/destroy.yml --skip-tags public_dns,letsencrypt
 
-- hosts: localhost
-  connection: local
+- hosts: host
   gather_facts: true
   vars_files:
     - ../cluster.yml

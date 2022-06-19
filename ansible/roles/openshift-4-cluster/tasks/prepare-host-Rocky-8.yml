@@ -8,11 +8,7 @@
       - "@virtualization-tools"
       # ansible virt need lxml
       - python3-lxml
-      - python3-pip
-      # Important for python3-openshift
-      - python3-requests-oauthlib
-      # Need's epel - is enabled by default on hetzner
-      - python3-openshift
+      - firewalld
     state: present
 
 - name: Upgrade all packages

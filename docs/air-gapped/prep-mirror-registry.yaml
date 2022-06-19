@@ -1,7 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: localhost
-  connection: local
+- hosts: host
   # gather_facts true because we need the public ip address
   gather_facts: false
   tags:
@@ -112,6 +111,7 @@
           copy:
             src: "{{certs_dir}}/ca.crt"
             dest: /etc/pki/ca-trust/source/anchors/
+            remote_src: true
 
         - name: Update ca trust
           shell: |

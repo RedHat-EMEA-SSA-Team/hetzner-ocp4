@@ -34,6 +34,7 @@
   copy:
     src: "{{ vm_ignition_file }}"
     dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.ign"
+    remote_src: true
     mode: '0644'
 
 - name: Debug - create /tmp/{{ vm_instance_name }}.virt.xml

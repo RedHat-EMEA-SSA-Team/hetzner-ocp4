@@ -1,5 +1,3 @@
-### 🚨 Warning: Installation on Centos 8 Stream might fail due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
-
 # Disclaimer
 This environment has been created for the sole purpose of providing an easy to deploy and consume a Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
 
@@ -63,8 +61,7 @@ subscription-manager register
 
 # get pool id via:
 # subscription-manager list --available
-
-subscription-manager attach --pool=...
+subscription-manager attach [--auto] --pool=...
 
 subscription-manager repos --disable=*
 
@@ -72,23 +69,31 @@ subscription-manager repos \
     --enable=rhel-8-for-x86_64-baseos-rpms \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
-    --enable=ansible-2.9-for-rhel-8-x86_64-rpms \
-    --enable=openstack-15-for-rhel-8-x86_64-rpms
+    --enable=ansible-automation-platform-2.1-for-rhel-8-x86_64-rpms
+
+
+yum install -y ansible-navigator git podman
+
 ```
 
-## In case of CentOS Stream 8 🚨 currently broken due to issue [#205](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/205)
+## In case of Rocky Linux 8 or Centos 8
 
-Enable ansible repo:
-```
-yum install -y centos-release-ansible-29.noarch
+Ansible navigator installation based on the upstream [documentation](https://ansible-navigator.readthedocs.io/en/latest/installation/#install-ansible-navigator).
+
+```bash
+dnf install -y python3-pip podman git
+python3 -m pip install ansible-navigator --user
+echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.profile
+source ~/.profile
+
 ```
 
 ## Initialize tools
 
-Install ansible (min version 2.9) and git
 
 ```
-yum install -y ansible git
+ssh-keygen
+cat ~/.ssh/*.pub >> ~/.ssh/authorized_keys
 ```
 
 You are now ready to clone this project to your CentOS system.
@@ -206,8 +211,8 @@ Please configure in `cluster.yml` all necessary credentials:
 ## Prepare kvm-host and install OpenShift
 
 ```
-[root@server ~]# cd hetzner-ocp4
-[root@server ~]# ansible-playbook ./ansible/setup.yml
+cd hetzner-ocp4
+ansible-navigator run -m stdout ./ansible/setup.yml
 ```
 
 # Additional documentation
@@ -228,10 +233,22 @@ Please configure in `cluster.yml` all necessary credentials:
 | Problem | Command |
 |---|---|
 |Check haproxy connections| ```podman exec -ti openshift-4-loadbalancer-${cluster_name} ./watch-stats.sh```
-|Start cluster after reboot|```./ansible/04-start-cluster.yml```
+|Start cluster after reboot|```ansible-navigator run -m stdout ./ansible/04-start-cluster.yml```
 
 
+# Build / Development
+
+## Build ansible execution enviorment
+
+```bash
+ansible-builder build \
+    --container-runtime podman \
+    --tag quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
+
+podman push quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
+```
 
 # Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4.svg)](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4)
+

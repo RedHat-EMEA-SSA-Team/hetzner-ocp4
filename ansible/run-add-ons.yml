@@ -1,8 +1,7 @@
-#!/usr/bin/env ansible-playbook
 ---
 
 - name: Test
-  hosts: localhost
+  hosts: host
   connection: local
   # gather_facts: no
   vars_files:

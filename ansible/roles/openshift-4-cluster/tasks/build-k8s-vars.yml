@@ -10,11 +10,21 @@
   copy:
     src: "{{ openshift_install_dir }}/auth/kubeconfig"
     dest: "{{ openshift_install_dir }}/config/kubeconfig"
+    remote_src: yes
     mode: 0644
 
-- name: Fetch Kubeconfig
+- name: Slurp kubeconfig
+  ansible.builtin.slurp:
+    src: "{{ openshift_install_dir }}/config/kubeconfig"
+  register: kubeconfig_raw
+
+- name: Copy content into kubeconfig
   set_fact:
-    kubeconfig: "{{ lookup('file',  openshift_install_dir ~ '/config/kubeconfig' ) | from_yaml }}"
+    kubeconfig: "{{ kubeconfig_raw['content'] | b64decode | from_yaml }}"
+
+# - name: Fetch Kubeconfig
+#   set_fact:
+#     kubeconfig: "{{ lookup('file',  openshift_install_dir ~ '/config/kubeconfig' ) | from_yaml }}"
 
 - name: Select cluster & user
   set_fact:

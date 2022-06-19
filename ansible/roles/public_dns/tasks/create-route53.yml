@@ -1,11 +1,4 @@
 ---
-- name: Install boto on RHEL/CentOS 8 via pip
-  # RPM / Package python3-boto3.noarch (The AWS SDK for Python) did not  work
-  pip:
-    name:
-      - boto
-    state: present
-
 - name: Create DNS record at Route53
   route53:
     state: present

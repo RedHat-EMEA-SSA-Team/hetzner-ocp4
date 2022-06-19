@@ -1,6 +1,7 @@
 ---
 
 - name: Get DNS zone id at Hetzner
+  delegate_to: localhost
   uri:
     url: "https://dns.hetzner.com/api/v1/zones"
     body_format: json
@@ -13,6 +14,7 @@
   register: le_hetzner_zone_id
 
 - name: Create letsencrypt DNS record at Hetzner
+  delegate_to: localhost
   uri:
     url: "https://dns.hetzner.com/api/v1/records"
     method: POST

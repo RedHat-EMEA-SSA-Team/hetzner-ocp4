@@ -1,4 +1,4 @@
 ---
 
 - name: Include DNS provider
-  include: "destroy-{{ pd_provider }}.yml"
+  include_tasks: "destroy-{{ pd_provider }}.yml"

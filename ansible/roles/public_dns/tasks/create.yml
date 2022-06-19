@@ -1,3 +1,3 @@
 ---
 - name: Include DNS provider
-  include: "create-{{ pd_provider }}.yml"
+  include_tasks: "create-{{ pd_provider }}.yml"

@@ -13,8 +13,20 @@
 
 - name: Install certificates
   block:
+
+    - name: Slurp certficate_fullchain
+      ansible.builtin.slurp:
+        src: "{{ certficate_fullchain }}"
+      register: tls_crt
+
+    - name: Slurp certficate_key
+      ansible.builtin.slurp:
+        src: "{{ certficate_key }}"
+      register: tls_key
+
     - name: Create secret with certificates for openshift-ingress
-      k8s:
+      delegate_to: localhost
+      kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ k8s_kubeconfig }}"
         host: "{{ k8s_host }}"
@@ -25,14 +37,15 @@
           apiVersion: v1
           kind: Secret
           data:
-            tls.crt: "{{  lookup('file',certficate_fullchain, rstrip=false) | b64encode }}"
-            tls.key: "{{  lookup('file',certficate_key, rstrip=false)  | b64encode }}"
+            tls.crt: "{{ tls_crt['content'] }}"
+            tls.key: "{{ tls_key['content'] }}"
           metadata:
             name: letsencrypt-router-certs
             namespace: openshift-ingress
           type: kubernetes.io/tls
     - name: Patch ingresscontroller/default
-      k8s:
+      delegate_to: localhost
+      kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ k8s_kubeconfig }}"
         host: "{{ k8s_host }}"
@@ -52,7 +65,8 @@
     # Hot fix, remove of openshift api cert installation because of
     #          https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/117
     # - name: Create secret with certificates for openshift api
-    #   k8s:
+    #   delegate_to: localhost
+    #   kubernetes.core.k8s
     #     state: present
     #     kubeconfig: "{{ k8s_kubeconfig }}"
     #     host: "{{ k8s_host }}"
@@ -70,7 +84,8 @@
     #         namespace: openshift-config
     #       type: kubernetes.io/tls
     # - name: Patch api server config
-    #   k8s:
+    #   delegate_to: localhost
+    #   kubernetes.core.k8s:
     #     state: present
     #     kubeconfig: "{{ k8s_kubeconfig }}"
     #     host: "{{ k8s_host }}"
