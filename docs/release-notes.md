@@ -1,5 +1,20 @@
 # RELEASE NOTES
 
+## 2022-06-19
+
+ * Bump OpenShift Version to 4.10
+ * Rewrite playbooks to run in ansible-navigator
+   New useage:
+
+    * Install ansible navigator & configure ssh
+      *  [RHEL](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/tree/master#in-case-of-red-hat-enterprise-linux-8)
+      *  [Rocky/Centos](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/tree/master#in-case-of-rocky-linux-8-or-centos-8)
+
+    * Run playbooks: `ansible-navigator run -m stdout ./ansible/setup.yml`
+
+ * Build ansible execution environment:
+    quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:master
+
 ## 2022-02-16
 
  * Introduce ansible-lint pre-commit hook and fix eveything
