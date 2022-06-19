@@ -73,7 +73,10 @@
   when: not letsencrypt_disabled
 
 - name: Download OpenShift Artifacts
-  include_tasks: download-openshift-artifacts.yml
+  # Work-a-round: tags inheritance don't work without a block.
+  # https://github.com/ansible/ansible/issues/41540#issuecomment-419433375
+  block:
+    - include_tasks: download-openshift-artifacts.yml
   tags: download-openshift-artifacts
 
 - name: Create ignition files
