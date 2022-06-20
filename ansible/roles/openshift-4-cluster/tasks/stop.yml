@@ -1,6 +1,6 @@
 ---
 # Should be stopped / destroyed
-# - include: stop-vm.yml
+# - include_tasks: stop-vm.yml
 #   vars:
 #     vm_instance_name: "{{ cluster_name }}-bootstrap"
 

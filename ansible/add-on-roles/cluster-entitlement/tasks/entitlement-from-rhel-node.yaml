@@ -31,7 +31,8 @@
   register: register_entitlement_base64
 
 - name: Apply entitle machineconfig
-  k8s:
+  delegate_to: localhost
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ k8s_kubeconfig }}"
     host: "{{ k8s_host }}"

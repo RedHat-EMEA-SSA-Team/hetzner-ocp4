@@ -1,5 +1,6 @@
 ---
 - name: Destroy public dns entries
+  delegate_to: localhost
   import_role:
     name: public_dns
     tasks_from: destroy.yml

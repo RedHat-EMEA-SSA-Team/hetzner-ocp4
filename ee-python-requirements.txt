@@ -1,0 +1,11 @@
+libvirt-python
+# Azure should be covert by collection: community.azure
+# packaging
+# msrest
+# msrestazure
+# azure.common
+# azure.mgmt
+# azure.storage
+# azure.mgmt.automation
+# AWS should be covert by collection: community.aws
+# boto

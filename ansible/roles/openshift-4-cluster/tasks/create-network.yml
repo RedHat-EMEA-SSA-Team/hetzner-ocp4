@@ -9,15 +9,15 @@
     msg: "IPv6 is enabled via ip_families but your Host system do not have a public IPv6 subnet configured."
   when:
     - "'IPv6' in ip_families"
-    - hostvars['localhost']['ansible_default_ipv6'] | length == 0
+    - ansible_default_ipv6 | length == 0
 
 - name: Build IPv6 subnet
   set_fact:
-    vn_subnet_ipv6: "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string }}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
+    vn_subnet_ipv6: "{{ ansible_default_ipv6['address'].split(':')[:4] | join(':') | string }}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
     ipv6_listen_public:
       - "{{ listen_address_ipv6 }}"
     ipv6_listen_private:
-      - "{{ hostvars['localhost']['ansible_default_ipv6']['address'].split(':')[:4] | join(':') | string }}:{{ '%x' % vn_subnet.split('.')[2] | int }}::1"
+      - "{{ ansible_default_ipv6['address'].split(':')[:4] | join(':') | string }}:{{ '%x' % vn_subnet.split('.')[2] | int }}::1"
   when: "'IPv6' in ip_families"
   tags: always
 
@@ -136,6 +136,7 @@
 # Public DNS
 #
 - name: Create public dns entries
+  delegate_to: localhost
   import_role:
     name: public_dns
     tasks_from: create.yml

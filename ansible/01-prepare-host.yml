@@ -1,6 +1,5 @@
-#!/usr/bin/env ansible-playbook
 ---
-- hosts: localhost
+- hosts: host
   vars_files:
   - ../cluster.yml
   tasks:

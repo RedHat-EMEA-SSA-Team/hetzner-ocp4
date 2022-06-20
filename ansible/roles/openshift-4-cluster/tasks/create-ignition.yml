@@ -15,6 +15,7 @@
   copy:
     dest: "{{ openshift_install_dir }}/install-config.yaml.original"
     src: "{{ openshift_install_dir }}/install-config.yaml"
+    remote_src: yes
     mode: 0644
 
 - name: Create manifest files
