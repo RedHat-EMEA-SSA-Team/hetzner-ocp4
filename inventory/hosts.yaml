@@ -2,5 +2,3 @@
 all:
   hosts:
     host:
-      ansible_host: localhost
-      ansible_private_key_file: ~/.ssh/id_rsa
