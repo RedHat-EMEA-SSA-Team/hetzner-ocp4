@@ -4,13 +4,13 @@ SWRAID 1
 SWRAIDLEVEL 0
 BOOTLOADER grub
 HOSTNAME {{ hetzner_hostname }}
-PART /boot ext3 512M
+PART /boot ext3 1024M
 PART lvm vg0 all
 
-LV vg0 root / ext4 50G
+LV vg0 root / xfs 50G
 LV vg0 swap swap swap 8G
-LV vg0 home   /home   ext4      40G
-LV vg0 var    /var ext4 50G
+LV vg0 home   /home   xfs      10G
+LV vg0 var    /var xfs 50G
 LV vg0 libvirt /var/lib/libvirt/images xfs all
 
 IMAGE {{ hetzner_image }}

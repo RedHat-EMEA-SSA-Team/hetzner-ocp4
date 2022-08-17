@@ -1,0 +1,174 @@
+---
+- name: Retrieve first public key fingerprint
+  uri:
+    url: "{{ robot_base }}/key"
+    return_content: yes
+    method: GET
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  register: key
+  delegate_to: localhost
+
+### todo: add mechanism to check FP of key with the one give by hetzner_ssh_private_id parameter
+- name: Set authorized_key fact
+  set_fact:
+    authorized_key: "{{ key.json[0].key.fingerprint }}"
+
+- name: "Retrieve server number from IP {{ hetzner_ip }}"
+  uri:
+    url: "{{ robot_base }}/server"
+    return_content: yes
+    method: GET
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  register: servers
+  delegate_to: localhost
+
+- name: Query enabled and ready servers for matching ipv4 or ipv6
+  set_fact:
+    query_ready: "[?cancelled == false && status == \"ready\"].{number: server.server_number, ipv4: server.server_ip, ipv6: server.server_ipv6_net, status: server.status, cancelled: server.cancelled}"
+    query: "[] | [?contains(\'{{ public_ipv6 }}\', ipv6) || contains(ipv4, \'{{ hetzner_ip }}\')].{number: number, ipv4: ipv4, ipv6: ipv6}"
+
+# - debug: msg="{{ servers.json }}"
+
+### todo: clean this up!!
+- name: Set server_id fact
+  set_fact:
+    server_id: "{{ servers.json | to_json | from_json | community.general.json_query(query_ready) | community.general.json_query(query) | community.general.json_query('[].number | [0]') | int }}"
+  delegate_to: localhost
+
+- name: Check rescue mode
+  uri:
+    url: "{{ robot_base }}/boot/{{ server_id }}/rescue"
+    method: GET
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  register: rescue
+  delegate_to: localhost
+
+- name: Activate rescue mode
+  uri:
+    url: "{{ robot_base }}/boot/{{ server_id }}/rescue"
+    method: POST
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    body: "os=linux&arch=64&authorized_key={{ authorized_key }}"
+    status_code: 200
+    headers:
+      Content_Type: "application/x-www-form-urlencoded"
+  register: activated
+  delegate_to: localhost
+  when: not rescue.json.rescue.active
+
+# - debug: msg="{{ activated }}"
+
+- name: Pause a bit to allow rescue mode to settle
+  pause: seconds=5
+
+- name: Execute hardware reset
+  uri:
+    url: "{{ robot_base }}/reset/{{ server_id }}"
+    method: POST
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    body: "type=hw"
+    status_code: 200
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+  register: reset
+  delegate_to: localhost
+
+- name: Remove server from local known_hosts file
+  command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
+  register: output
+  failed_when: output.rc != 0
+  changed_when: '"updated" in output.stdout'
+  delegate_to: localhost
+
+- name: Pause a bit for the hardware reset to kick in
+  pause: seconds=5
+
+- name: Wait 600 seconds for port 22 to become open
+  wait_for:
+    port: 22
+    host: '{{ hetzner_ip }}'
+    delay: 10
+    timeout: 600
+  connection: local
+
+- name: Copy autosetup configuration file
+  template:
+    src: "{{ hetzner_autosetup_file }}"
+    dest: /root/autosetup.ansible
+    owner: root
+    group: root
+    mode: 0644
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: Run installimage
+  command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup.ansible"
+  environment:
+    TERM: "vt100"
+  register: result
+  changed_when: true
+  failed_when: false
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: Print installimage output with -v
+  debug:
+    var: result.stdout_lines
+    verbosity: 1
+  delegate_to: localhost
+
+- name: Check stderr from installimage
+  debug:
+    msg: "Something want wrong at installimage: {{ result.stderr_lines | join('\n') }}"
+  when:
+    - result.stderr_lines | length > 0
+    - not hetzner_image_ignore_errors
+  delegate_to: localhost
+
+### todo: add pulling of debug.log which is created by the installer for further analysis
+- name: Check stdout from installimage
+  fail:
+    msg: "Installation failed, check log: {{ result.stdout_lines | join('\n') }}"
+  when:
+    - result.stdout is search('An error occured while installing the new system')
+    - not hetzner_image_ignore_errors
+  delegate_to: localhost
+
+- name: Reboot server
+  shell: sync && sleep 2 && shutdown -r now
+  async: 1
+  poll: 0
+  changed_when: true
+  failed_when: false
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: Remove server from local known_hosts file
+  command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
+  register: output
+  failed_when: output.rc != 0
+  changed_when: '"updated" in output.stdout'
+  delegate_to: localhost
+
+- name: Wait 600 seconds for port 22 to become open
+  wait_for:
+    port: 22
+    host: '{{ hetzner_ip }}'
+    delay: 10
+    timeout: 600
+  connection: local
+
+- name: "Refresh information after re-install of {{ hetzner_ip }}"
+  ansible.builtin.gather_facts:
+  register: host_facts
+  delegate_to: "{{ hetzner_ip }}"
