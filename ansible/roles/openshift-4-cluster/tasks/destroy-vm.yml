@@ -1,18 +1,18 @@
 ---
 - name: Destroy VM {{ vm_instance_name }}
-  virt:
+  community.libvirt.virt:
     command: destroy
     name: "{{ vm_instance_name }}"
   ignore_errors: yes
 
 - name: Undefine VM {{ vm_instance_name }}
-  virt:
+  community.libvirt.virt:
     command: undefine
     name: "{{ vm_instance_name }}"
   ignore_errors: yes
 
 - name: Delete logical volume
-  lvol:
+  community.general.system.lvol:
     vg: "{{ vm_storage_backend_location }}"
     lv: "{{ vm_instance_name }}"
     state: absent
@@ -20,12 +20,12 @@
   when: vm_storage_backend == "lvm"
 
 - name: Delete disk {{ vm_instance_name }}
-  file:
+  ansible.builtin.file:
     path: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
     state: absent
   when: vm_storage_backend == "qcow2"
 
 - name: Delete ignition {{ vm_instance_name }}
-  file:
+  ansible.builtin.file:
     path: "/var/lib/libvirt/images/{{ vm_instance_name }}.ign"
     state: absent
