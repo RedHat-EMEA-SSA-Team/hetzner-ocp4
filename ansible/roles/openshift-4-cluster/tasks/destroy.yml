@@ -1,36 +1,36 @@
 ---
-- import_tasks: destroy-network.yml
+- ansible.builtin.import_tasks: destroy-network.yml
   vars:
     vn_name: "{{ cluster_name }}"
   tags: network
 
 - name: Destroy letsencrypt
-  debug:
+  ansible.builtin.debug:
     msg: "Letsencrypt certifcates stays...."
   tags: letsencrypt
 
-- include_tasks: destroy-vm.yml
+- ansible.builtin.include_tasks: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
-- include_tasks: destroy-vm.yml
+- ansible.builtin.include_tasks: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
-- include_tasks: destroy-vm.yml
+- ansible.builtin.include_tasks: destroy-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
   with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
   when: compute_count > 0
 
 - name: Destroy storage-nfs
-  import_tasks: destroy-storage-nfs.yml
+  ansible.builtin.import_tasks: destroy-storage-nfs.yml
   when: storage_nfs == true
   tags: storage
 
 - name: Clean OpenShift install directory
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ openshift_install_dir }}/"
   tags: ignition
