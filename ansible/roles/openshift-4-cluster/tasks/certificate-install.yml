@@ -1,13 +1,13 @@
 ---
 - name: Build k8s variables
-  import_tasks: build-k8s-vars.yml
+  ansible.builtin.import_tasks: build-k8s-vars.yml
 
 - name: Check certificates exist
-  stat:
+  ansible.builtin.stat:
     path: "{{ certficate_fullchain }}"
   register: crt
 - name: Check ssl key exist
-  stat:
+  ansible.builtin.stat:
     path: "{{ certficate_key }}"
   register: key
 

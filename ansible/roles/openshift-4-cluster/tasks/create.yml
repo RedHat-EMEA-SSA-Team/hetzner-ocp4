@@ -1,7 +1,7 @@
 ---
 
 - name: Check add-ons.yml
-  stat:
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../add-ons.yml"
   register: add_ons_yml
   tags:
@@ -10,7 +10,7 @@
     - post-install-add-ons
 
 - name: Enable add-ons
-  set_fact:
+  ansible.builtin.set_fact:
     add_ons_enabled: true
   when: add_ons_yml.stat.exists
   tags:
@@ -18,7 +18,7 @@
     - add-ons
     - post-install-add-ons
 
-- import_tasks: create-network.yml
+- ansible.builtin.import_tasks: create-network.yml
   vars:
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
     vn_master_count: "{{ master_count }}"
@@ -26,12 +26,12 @@
   tags: network
 
 - name: Disable letsencrypt if dns_provider is none
-  set_fact:
+  ansible.builtin.set_fact:
     letsencrypt_disabled: true
   when: dns_provider == 'none'
 
 - name: Import letsencrypt
-  import_role:
+  ansible.builtin.import_role:
     name: letsencrypt
   vars:
     le_dns_provider: "{{ dns_provider }}"
@@ -76,17 +76,17 @@
   # Work-a-round: tags inheritance don't work without a block.
   # https://github.com/ansible/ansible/issues/41540#issuecomment-419433375
   block:
-    - include_tasks: download-openshift-artifacts.yml
+    - ansible.builtin.include_tasks: download-openshift-artifacts.yml
   tags: download-openshift-artifacts
 
 - name: Create ignition files
-  include_tasks: create-ignition.yml
+  ansible.builtin.include_tasks: create-ignition.yml
   vars:
     ssh_public_key: "{{ lookup('file', '{{ ssh_public_key_location }}.pub') }}"
   tags: ignition
 
 - name: Create bootstrap node
-  include_tasks: create-vm.yml
+  ansible.builtin.include_tasks: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
     vm_network: "{{ cluster_name }}"
@@ -98,7 +98,7 @@
     vm_root_disk_size: '120G'
 
 - name: Create master nodes
-  include_tasks: create-vm.yml
+  ansible.builtin.include_tasks: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
     vm_network: "{{ cluster_name }}"
@@ -112,7 +112,7 @@
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
 - name: Create compute node
-  include_tasks: create-vm.yml
+  ansible.builtin.include_tasks: create-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
     vm_network: "{{ cluster_name }}"
@@ -127,5 +127,5 @@
   when: compute_count > 0
 
 - name: Include post installation tasks
-  include_tasks: post-install.yml
+  ansible.builtin.include_tasks: post-install.yml
   tags: post-install

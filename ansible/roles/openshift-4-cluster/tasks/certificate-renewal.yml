@@ -1,6 +1,6 @@
 ---
 - name: Import letsencrypt
-  import_role:
+  ansible.builtin.import_role:
     name: letsencrypt
   vars:
     le_dns_provider: "{{ dns_provider }}"

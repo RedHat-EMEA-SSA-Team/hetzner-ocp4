@@ -3,19 +3,19 @@
 # # /var/lib/libvirt/images/rhcos42.qcow2
 # # /var/lib/libvirt/images/CentOS-7-x86_64-GenericCloud.qcow2
 - name: Create disk for {{ vm_instance_name }}
-  command: "qemu-img create -f qcow2 -F qcow2 -b {{ coreos_image_location }} /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2 {{ vm_root_disk_size }}"
+  ansible.builtin.command: "qemu-img create -f qcow2 -F qcow2 -b {{ coreos_image_location }} /var/lib/libvirt/images/{{ vm_instance_name }}.qcow2 {{ vm_root_disk_size }}"
   args:
     creates: "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
   when: vm_storage_backend == "qcow2"
 
 - name: Convert coreos qcow into raw image
-  command: "qemu-img convert {{ coreos_image_location }} -O raw {{ coreos_image_location }}.raw "
+  ansible.builtin.command: "qemu-img convert {{ coreos_image_location }} -O raw {{ coreos_image_location }}.raw "
   args:
     creates: "{{ coreos_image_location }}.raw"
   when: vm_storage_backend == "lvm"
 
 - name: Create logical volume
-  lvol:
+  community.general.system.lvol:
     vg: "{{ vm_storage_backend_location }}"
     lv: "{{ vm_instance_name }}"
     state: present
@@ -25,32 +25,32 @@
     - ansible_lvm['lvs'][ vm_instance_name ] is not defined
 
 - name: Copy/dd coreos into device
-  command: "dd if={{ coreos_image_location }}.raw of=/dev/{{ vm_storage_backend_location }}/{{ vm_instance_name }} bs=4M"
+  ansible.builtin.command: "dd if={{ coreos_image_location }}.raw of=/dev/{{ vm_storage_backend_location }}/{{ vm_instance_name }} bs=4M"
   when:
     - vm_storage_backend == "lvm"
     - ansible_lvm['lvs'][ vm_instance_name ] is not defined
 
 - name: Copy ignition {{ vm_instance_name }}
-  copy:
+  ansible.builtin.copy:
     src: "{{ vm_ignition_file }}"
     dest: "/var/lib/libvirt/images/{{ vm_instance_name }}.ign"
     remote_src: true
     mode: '0644'
 
 - name: Debug - create /tmp/{{ vm_instance_name }}.virt.xml
-  template:
+  ansible.builtin.template:
     src: "vm.xml.j2"
     dest: "/tmp/{{ vm_instance_name }}.virt.xml"
     mode: 0664
 
 - name: Define VirtualMachine {{ vm_instance_name }}
-  virt:
+  community.libvirt.virt:
     name: "{{ vm_instance_name }}"
     command: define
     xml: "{{ lookup('template', 'templates/vm.xml.j2') }}"
 
 - name: Start VirtualMachine {{ vm_instance_name }}
-  virt:
+  community.libvirt.virt:
     name: "{{ vm_instance_name }}"
     state: running
     autostart: "{{ vm_autostart }}"

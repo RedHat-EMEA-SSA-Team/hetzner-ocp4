@@ -1,38 +1,38 @@
 ---
 - name: Check variables
-  import_tasks: check-variables.yml
+  ansible.builtin.import_tasks: check-variables.yml
 
 - name: Create certificates dir
-  file:
+  ansible.builtin.file:
     path: "{{ le_certificates_dir }}/{{ le_public_domain }}"
     state: directory
     mode: 0755
 
 - name: Create account-key
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ le_certificates_dir }}/account.key"
     type: RSA
     size: 4096
 
 - name: Fetch letsencrypt root ca
-  get_url:
+  ansible.builtin.get_url:
     url: https://letsencrypt.org/certs/isrgrootx1.pem.txt
     dest: "{{ le_certificates_dir }}/isrgrootx1.pem"
 
 - name: Create {{ le_public_domain }}.key
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ le_certificates_dir }}/{{ le_public_domain }}/cert.key"
     type: RSA
     size: 4096
 
 - name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ le_certificates_dir }}/{{ le_public_domain }}/cert.csr"
     privatekey_path: "{{ le_certificates_dir }}/{{ le_public_domain }}/cert.key"
     subject_alt_name: "DNS:*.apps.{{ le_public_domain }},DNS:api.{{ le_public_domain }}"
 
 - name: Create a challenge for {{ le_public_domain }} using a account key file.
-  acme_certificate:
+  community.crypto.acme_certificate:
     account_key_src: "{{ le_certificates_dir }}/account.key"
     account_email: "{{ le_letsencrypt_account_email }}"
     src: "{{ le_certificates_dir }}/{{ le_public_domain }}/cert.csr"
@@ -46,18 +46,18 @@
   register: sample_com_challenge
 
 - name: Debug var only with -vv
-  debug:
+  ansible.builtin.debug:
     var: sample_com_challenge
     verbosity: 2
 
 - name: Set challenge_data_dns
-  set_fact:  # noqa no-handler
+  ansible.builtin.set_fact:  # noqa no-handler
     challenge_data_dns: "{{ sample_com_challenge.challenge_data_dns }}"
   when: sample_com_challenge is changed
 
 - name: Create DNS record at CloudFlare
   delegate_to: localhost
-  cloudflare_dns:
+  community.general.net_tools.cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
     # 1 for automatic
@@ -72,7 +72,7 @@
 
 - name: Create DNS record at Route53
   delegate_to: localhost
-  route53:
+  community.aws.route53:
     state: present
     zone: "{{ le_aws_zone }}"
     record: "{{ item.0.key }}"
@@ -88,7 +88,7 @@
 
 - name: Create DNS record at GCP
   delegate_to: localhost
-  gcp_dns_resource_record_set:
+  google.cloud.gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
     type: TXT
     ttl: 60
@@ -107,7 +107,7 @@
 
 - name: Create DNS record at Azure
   delegate_to: localhost
-  azure_rm_dnsrecordset:
+  azure.azcollection.azure_rm_dnsrecordset:
     client_id: "{{ le_azure_client_id }}"
     secret: "{{ le_azure_secret }}"
     subscription_id: "{{ le_azure_subscription_id }}"
@@ -126,7 +126,7 @@
 
 - name: Create DNS record at TransIP
   delegate_to: localhost
-  uri:
+  ansible.builtin.uri:
     url: "https://api.transip.nl/v6/domains/{{ transip_zone }}/dns"
     method: POST
     headers:
@@ -144,24 +144,24 @@
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
 - name: DNS record info
-  debug:    # noqa no-handler
+  ansible.builtin.debug:    # noqa no-handler
     msg: "{{ item.0.key }} TXT {{ item.1 }}"
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: sample_com_challenge is changed
 
 - name: Include DNS provider
-  include_tasks: "create-{{ le_dns_provider }}.yml"
+  ansible.builtin.include_tasks: "create-{{ le_dns_provider }}.yml"
   when:
     - le_dns_provider in ['hetzner', 'digitalocean']
     - sample_com_challenge is changed
 
 - name: Pause, wait for DNS changes
-  pause:   # noqa no-handler
+  ansible.builtin.pause:   # noqa no-handler
     seconds: 120
   when: sample_com_challenge is changed
 
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
-  acme_certificate:  # noqa no-handler
+  community.crypto.acme_certificate:  # noqa no-handler
     account_key_src: "{{ le_certificates_dir }}/account.key"
     account_email: "{{ le_letsencrypt_account_email }}"
     src: "{{ le_certificates_dir }}/{{ le_public_domain }}/cert.csr"
@@ -177,7 +177,7 @@
 
 - name: Delete DNS record at CloudFlare
   delegate_to: localhost
-  cloudflare_dns:
+  community.general.net_tools.cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
     # 1 for automatic
@@ -192,7 +192,7 @@
 
 - name: Delete DNS record at Route53
   delegate_to: localhost
-  route53:
+  community.aws.route53:
     state: absent
     zone: "{{ le_aws_zone }}"
     record: "{{ item.0.key }}"
@@ -208,7 +208,7 @@
 
 - name: Delete DNS record at GCP
   delegate_to: localhost
-  gcp_dns_resource_record_set:
+  google.cloud.gcp_dns_resource_record_set:
     name: "{{ item.0.key }}."
     managed_zone:
       name: "{{ le_gcp_managed_zone_name }}"
@@ -227,7 +227,7 @@
 
 - name: Delete DNS record at Azure
   delegate_to: localhost
-  azure_rm_dnsrecordset:
+  azure.azcollection.azure_rm_dnsrecordset:
     client_id: "{{ le_azure_client_id }}"
     secret: "{{ le_azure_secret }}"
     subscription_id: "{{ le_azure_subscription_id }}"
@@ -243,7 +243,7 @@
 
 - name: Delete DNS record at TransIP
   delegate_to: localhost
-  uri:
+  ansible.builtin.uri:
     url: "https://api.transip.nl/v6/domains/{{ transip_zone }}/dns"
     method: DELETE
     headers:
@@ -261,12 +261,12 @@
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
 - name: Include DNS provider
-  include_tasks: "destroy-{{ le_dns_provider }}.yml"
+  ansible.builtin.include_tasks: "destroy-{{ le_dns_provider }}.yml"
   when:
     - le_dns_provider in ['hetzner', 'digitalocean']
     - sample_com_challenge is changed
 
 - name: concat root ca and intermediate
-  shell: "cat {{ le_certificates_dir }}/isrgrootx1.pem {{ le_certificates_dir }}/{{ le_public_domain }}/intermediate.crt >> {{ le_certificates_dir }}/{{ le_public_domain }}/ca-bundle.pem"   # noqa line-length
+  ansible.builtin.shell: "cat {{ le_certificates_dir }}/isrgrootx1.pem {{ le_certificates_dir }}/{{ le_public_domain }}/intermediate.crt >> {{ le_certificates_dir }}/{{ le_public_domain }}/ca-bundle.pem"   # noqa line-length
   args:
     creates: "{{ le_certificates_dir }}/{{ le_public_domain }}/ca-bundle.pem"
