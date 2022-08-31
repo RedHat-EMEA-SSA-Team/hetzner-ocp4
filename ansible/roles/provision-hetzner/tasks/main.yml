@@ -35,6 +35,7 @@
     path: /etc/ssh/sshd_config
     regexp: '^PasswordAuthentication yes'
     line: 'PasswordAuthentication no'
+    mode: 0600
   delegate_to: "{{ hetzner_ip }}"
   notify:
     - Restart SSH daemon
@@ -60,4 +61,8 @@
       - policycoreutils-python-utils
       - bind-utils
     state: latest
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: "Retrieve current setup of {{ hetzner_ip }}"
+  ansible.builtin.gather_facts:
   delegate_to: "{{ hetzner_ip }}"

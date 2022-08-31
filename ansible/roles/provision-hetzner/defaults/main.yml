@@ -3,9 +3,12 @@ hetzner_webservice_username:    # see Hetzner Robot -> Settings -> Webservice
 hetzner_webservice_password:
 hetzner_hostname:               # needed for Hetzner server computer name
 hetzner_ip:                     # needed for Hetzner Web UI and Ansible
+hetzner_force_provisioning:     # true or false, enforce provisioning or based on rescue-mode status
 hetzner_autosetup_file: templates/autosetup
 hetzner_disk1: sda
 hetzner_disk2: sdb
+hetzner_disk1_id:               # disk-by-id device name (as installimage is not able to handle those)
+hetzner_disk2_id:               # - same for disk2, both alternatives to "hetzner_disk*" values
 hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-80-stream-amd64-base.tar.gz"
 hetzner_image_ignore_errors: false
 ansible_python_interpreter: /usr/bin/python3  # target host python interpreter
