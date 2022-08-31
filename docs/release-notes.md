@@ -1,4 +1,11 @@
 # RELEASE NOTES
+## 2022-08-31
+* Improve Hetzner deployment
+    * add option to force deployment
+    * add options to allow usage of disk-by-id during installation
+        * lacking that option caused a lot of issues if there are 3 disks (2 SSD + 1 HDD) which should be part of a single software-raid
+    * added local storage for cluster credentials ($PWD/config/<clustername>)
+    * changed ansible-module names to comply to new standard of fully-qualified module names
 
 ## 2022-06-19
 

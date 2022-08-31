@@ -4,9 +4,14 @@ ansible-navigator:
     container-options:
     - --net=host
     image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:master
+    volume-mounts:
+      - src: "./config"
+        dest: "/config"
+        options: "Z"
   logging:
     level: info
   mode: stdout
   playbook-artifact:
     enable: true
     save-as: /tmp/hetzner-ocp4-{playbook_name}-artifact-{ts_utc}.json
+  collection-doc-cache-path: /tmp/hetzner-ocp4-ansible-runner.db

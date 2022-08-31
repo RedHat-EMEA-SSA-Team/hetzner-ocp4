@@ -22,6 +22,8 @@
       ansible.builtin.add_host:
         name: "{{ hetzner_ip }}"
         ansible_ssh_private_key_file: '{{ hetzner_ssh_private_id }}'
+      tags:
+        - always
 
     - name: provision hetzner root server
       import_role:

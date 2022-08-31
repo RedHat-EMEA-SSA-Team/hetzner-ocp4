@@ -1,5 +1,4 @@
 ---
-
 - name: Create own kubeconfig directory
   ansible.builtin.file:
     state: directory
@@ -15,12 +14,21 @@
 
 - name: Slurp kubeconfig
   ansible.builtin.slurp:
-    src: "{{ openshift_install_dir }}/config/kubeconfig"
+    src: "{{ openshift_install_dir }}/auth/kubeconfig"
   register: kubeconfig_raw
 
 - name: Copy content into kubeconfig
   ansible.builtin.set_fact:
     kubeconfig: "{{ kubeconfig_raw['content'] | b64decode | from_yaml }}"
+
+- name: Slurp kubeadmin-password
+  ansible.builtin.slurp:
+    src: "{{ openshift_install_dir }}/auth/kubeadmin-password"
+  register: kubeadminpassword_raw
+
+- name: Copy content into kubeadmin_password
+  ansible.builtin.set_fact:
+    kubeadmin_password: "{{ kubeadminpassword_raw['content'] | b64decode }}"
 
 # - name: Fetch Kubeconfig
 #   set_fact:
@@ -56,3 +64,54 @@
     content: "{{ user['client-certificate-data'] | b64decode }}"
     dest: "{{ k8s_client_cert }}"
     mode: 0644
+
+- name: Set kube variables
+  ansible.builtin.set_fact:
+    k8s_kubeconfig: "/config/{{ cluster_name }}/kubeconfig"
+    k8s_host: "{{ cluster.server }}"
+    k8s_ca_cert: "/config/{{ cluster_name }}/ca.crt"
+    k8s_client_key: "/config/{{ cluster_name }}/client.key"
+    k8s_client_cert: "/config/{{ cluster_name }}/client.crt"
+
+- name: Create local configuration directory
+  delegate_to: localhost
+  ansible.builtin.file:
+    state: directory
+    path: "{{ k8s_kubeconfig | dirname }}"
+    mode: 0755
+
+- name: Create local kubeconfig
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ kubeconfig_raw['content'] | b64decode }}"
+    dest: "{{ k8s_kubeconfig }}"
+    mode: 0640
+
+- name: Create local kubeadmin-password
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ kubeadmin_password }}"
+    dest: "{{ k8s_kubeconfig | dirname }}/kubeadmin-password"
+    mode: 0640
+
+- name: Create local k8s_ca_cert
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ cluster['certificate-authority-data'] | b64decode }}"
+    dest: "{{ k8s_ca_cert }}"
+    mode: 0644
+
+- name: Create local k8s_client_key
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ user['client-key-data'] | b64decode }}"
+    dest: "{{ k8s_client_key }}"
+    mode: 0600
+
+- name: Create local k8s_client_cert
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ user['client-certificate-data'] | b64decode }}"
+    dest: "{{ k8s_client_cert }}"
+    mode: 0644
+

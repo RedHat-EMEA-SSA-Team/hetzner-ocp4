@@ -1,6 +1,6 @@
 ---
 - name: Retrieve first public key fingerprint
-  uri:
+  ansible.builtin.uri:
     url: "{{ robot_base }}/key"
     return_content: yes
     method: GET
@@ -13,11 +13,11 @@
 
 ### todo: add mechanism to check FP of key with the one give by hetzner_ssh_private_id parameter
 - name: Set authorized_key fact
-  set_fact:
+  ansible.builtin.set_fact:
     authorized_key: "{{ key.json[0].key.fingerprint }}"
 
 - name: "Retrieve server number from IP {{ hetzner_ip }}"
-  uri:
+  ansible.builtin.uri:
     url: "{{ robot_base }}/server"
     return_content: yes
     method: GET
@@ -29,7 +29,7 @@
   delegate_to: localhost
 
 - name: Query enabled and ready servers for matching ipv4 or ipv6
-  set_fact:
+  ansible.builtin.set_fact:
     query_ready: "[?cancelled == false && status == \"ready\"].{number: server.server_number, ipv4: server.server_ip, ipv6: server.server_ipv6_net, status: server.status, cancelled: server.cancelled}"
     query: "[] | [?contains(\'{{ public_ipv6 }}\', ipv6) || contains(ipv4, \'{{ hetzner_ip }}\')].{number: number, ipv4: ipv4, ipv6: ipv6}"
 
@@ -37,12 +37,12 @@
 
 ### todo: clean this up!!
 - name: Set server_id fact
-  set_fact:
+  ansible.builtin.set_fact:
     server_id: "{{ servers.json | to_json | from_json | community.general.json_query(query_ready) | community.general.json_query(query) | community.general.json_query('[].number | [0]') | int }}"
   delegate_to: localhost
 
 - name: Check rescue mode
-  uri:
+  ansible.builtin.uri:
     url: "{{ robot_base }}/boot/{{ server_id }}/rescue"
     method: GET
     user: "{{ hetzner_webservice_username }}"
@@ -53,7 +53,7 @@
   delegate_to: localhost
 
 - name: Activate rescue mode
-  uri:
+  ansible.builtin.uri:
     url: "{{ robot_base }}/boot/{{ server_id }}/rescue"
     method: POST
     user: "{{ hetzner_webservice_username }}"
@@ -70,10 +70,10 @@
 # - debug: msg="{{ activated }}"
 
 - name: Pause a bit to allow rescue mode to settle
-  pause: seconds=5
+  ansible.builtin.pause: seconds=5
 
 - name: Execute hardware reset
-  uri:
+  ansible.builtin.uri:
     url: "{{ robot_base }}/reset/{{ server_id }}"
     method: POST
     user: "{{ hetzner_webservice_username }}"
@@ -87,25 +87,45 @@
   delegate_to: localhost
 
 - name: Remove server from local known_hosts file
-  command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
+  ansible.builtin.command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
   register: output
   failed_when: output.rc != 0
   changed_when: '"updated" in output.stdout'
   delegate_to: localhost
 
 - name: Pause a bit for the hardware reset to kick in
-  pause: seconds=5
+  ansible.builtin.pause: seconds=5
 
 - name: Wait 600 seconds for port 22 to become open
-  wait_for:
+  ansible.builtin.wait_for:
     port: 22
     host: '{{ hetzner_ip }}'
     delay: 10
     timeout: 600
   connection: local
 
+- ansible.builtin.gather_facts:
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: Adjust DRIVE1 assignment based on current status
+  ansible.builtin.set_fact:
+    hetzner_disk1: "{{ item.key }}"
+  with_dict: "{{ ansible_devices }}"
+  when:
+    - hetzner_disk1_id is defined
+    - "(item.value.links.ids[0] | default()) == hetzner_disk1_id"
+
+- name: Adjust DRIVE2 assignment based on current status
+  ansible.builtin.set_fact:
+    hetzner_disk2: "{{ item.key }}"
+  with_dict: "{{ ansible_devices }}"
+  when:
+    - hetzner_disk2_id is defined
+    - "(item.value.links.ids[0] | default()) == hetzner_disk2_id"
+
+
 - name: Copy autosetup configuration file
-  template:
+  ansible.builtin.template:
     src: "{{ hetzner_autosetup_file }}"
     dest: /root/autosetup.ansible
     owner: root
@@ -114,7 +134,7 @@
   delegate_to: "{{ hetzner_ip }}"
 
 - name: Run installimage
-  command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup.ansible"
+  ansible.builtin.command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup.ansible"
   environment:
     TERM: "vt100"
   register: result
@@ -123,13 +143,13 @@
   delegate_to: "{{ hetzner_ip }}"
 
 - name: Print installimage output with -v
-  debug:
+  ansible.builtin.debug:
     var: result.stdout_lines
     verbosity: 1
   delegate_to: localhost
 
 - name: Check stderr from installimage
-  debug:
+  ansible.builtin.debug:
     msg: "Something want wrong at installimage: {{ result.stderr_lines | join('\n') }}"
   when:
     - result.stderr_lines | length > 0
@@ -138,7 +158,7 @@
 
 ### todo: add pulling of debug.log which is created by the installer for further analysis
 - name: Check stdout from installimage
-  fail:
+  ansible.builtin.fail:
     msg: "Installation failed, check log: {{ result.stdout_lines | join('\n') }}"
   when:
     - result.stdout is search('An error occured while installing the new system')
@@ -146,7 +166,7 @@
   delegate_to: localhost
 
 - name: Reboot server
-  shell: sync && sleep 2 && shutdown -r now
+  ansible.builtin.shell: sync && sleep 2 && shutdown -r now
   async: 1
   poll: 0
   changed_when: true
@@ -154,14 +174,14 @@
   delegate_to: "{{ hetzner_ip }}"
 
 - name: Remove server from local known_hosts file
-  command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
+  ansible.builtin.command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
   register: output
   failed_when: output.rc != 0
   changed_when: '"updated" in output.stdout'
   delegate_to: localhost
 
 - name: Wait 600 seconds for port 22 to become open
-  wait_for:
+  ansible.builtin.wait_for:
     port: 22
     host: '{{ hetzner_ip }}'
     delay: 10
@@ -170,5 +190,4 @@
 
 - name: "Refresh information after re-install of {{ hetzner_ip }}"
   ansible.builtin.gather_facts:
-  register: host_facts
   delegate_to: "{{ hetzner_ip }}"

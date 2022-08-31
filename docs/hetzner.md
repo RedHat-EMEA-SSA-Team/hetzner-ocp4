@@ -128,7 +128,16 @@ If you do not want to do the above steps by hand: use Ansible! :-)
    hetzner_webservice_password: "PASSWORD"
    hetzner_hostname: "HOSTNAME"
    hetzner_ip: "IP_ADDRESS"
+   hetzner_ssh_private_id: "path_to_private_ssh_key"
+   hetzner_force_provisioning: [true|false] - enforce provisioning of system (will be triggered when system is in rescue mode otherwise)
+   hetzner_disk1: <device-name for DISK1, omiting the /dev/ part>
+   hetzner_disk2: <device-name for DISK2, omiting the /dev/ part>
+   hetzner_disk1_id: </dev/disk/by-id/ devicename as alternative to "random" assignment based on sd[a-z]>
+   hetzner_disk2_id: </dev/disk/by-id/ devicename as alternative to "random" assignment based on sd[a-z]>
+   hetzner_image: <Image to be used for installation>
     ```
+
+   a) It's probably a better idea to protect credentials in a `ansible-vault`. When using `ansible-navigator`, [special considerations](https://ansible-navigator.readthedocs.io/en/latest/faq/#how-can-i-use-a-vault-password-with-ansible-navigator) need to be taken to allow access to this vault from a container.
 
    More detailed information about the configurable parameters can be found in the [defaults variable file](../ansible/roles/provision-hetzner/defaults/main.yml)
 
