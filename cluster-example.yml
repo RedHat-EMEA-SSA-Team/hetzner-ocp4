@@ -1,0 +1,69 @@
+---
+cluster_name: ocp4
+public_domain: example.com
+
+# DualStack:
+ip_families:
+  - IPv4
+  - IPv6
+
+# set custom public ip for DNS entries. Defaults to: hostvars['localhost']['ansible_default_ipv4']['address']
+# public_ip: 92.100.42.2
+dns_provider: [route53|cloudflare|gcp|azure|hetzner]
+letsencrypt_account_email: name@example.com
+# Depending on the dns provider:
+# CloudFlare
+cloudflare_account_email: john@example.com
+# Use the global api key! - (API-Token is not supported!) (Details in #86)
+cloudflare_account_api_token: 9348234sdsd894.....
+cloudflare_zone: example.com
+# Route53
+aws_access_key: key
+aws_secret_key: secret
+aws_zone: example.com
+# GCP
+gcp_project: project-name
+gcp_managed_zone_name: 'zone-name'
+gcp_managed_zone_domain: 'example.com.'
+gcp_serviceaccount_file: ../gcp_service_account.json
+# Azure
+azure_client_id: client_id
+azure_secret: key
+azure_subscription_id: subscription_id
+azure_tenant: tenant_id
+azure_resource_group: dns_zone_resource_group
+# Hetzner
+hetzner_account_api_token: 3543ade82AA$73.....
+hetzner_zone: example.com
+
+# Created with: htpasswd -nb admin openshift
+# Example password is openshift
+auth_htpasswd:
+  - admin:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
+  - local:$apr1$k5WdDLwM$TzqDd.juwTiotMbctaxJt.
+
+storage_nfs: true            # Default is false
+masters_schedulable: false   # Default is false
+
+auth_redhatsso:
+  client_id: "xxxxx.apps.googleusercontent.com"
+  client_secret: "xxxxxxx"
+
+auth_github:
+  client_id: "yourverysecretclientid"
+  client_secret: "xxxxxxx"
+  # Please be sure to define *either* (but at least *one*) of auth_github.organizations OR auth_github.teams
+  organizations:
+    - "sa-mw-dach"
+  # teams:
+  #  - "@sa-mw-dach/hetzner-users"
+
+cluster_role_bindings:
+  - cluster_role: sudoer
+    name: login@redhat.com
+  - cluster_role: cluster-admin
+    name: admin
+
+
+image_pull_secret: |-
+  asdfghfdsa
