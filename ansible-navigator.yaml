@@ -9,4 +9,4 @@ ansible-navigator:
   mode: stdout
   playbook-artifact:
     enable: true
-    save-as: /tmp/hetzner-ocp4-{playbook_name}-artifact-{ts_utc}.json
+    save-as: /tmp/hetzner-ocp4-{playbook_name}-artifact-{time_stamp}.json
