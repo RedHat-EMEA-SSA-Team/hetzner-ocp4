@@ -28,6 +28,7 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 ** Supported root server operating systems: **
 - CentOS Stream 8
 - RHEL 8 - How to install RHEL8: https://keithtenzer.com/cloud/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
+- RHEL 9 - leapp update from RHEL 8
 
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
@@ -69,10 +70,10 @@ subscription-manager repos \
     --enable=rhel-8-for-x86_64-baseos-rpms \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
-    --enable=ansible-automation-platform-2.1-for-rhel-8-x86_64-rpms
+    --enable=ansible-automation-platform-2.2-for-rhel-8-x86_64-rpms
 
 
-yum install -y ansible-navigator git podman
+dnf install -y ansible-navigator git podman
 
 ```
 
@@ -85,7 +86,6 @@ dnf install -y python3-pip podman git
 python3 -m pip install ansible-navigator --user
 echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.profile
 source ~/.profile
-
 ```
 
 ## Initialize tools
@@ -111,7 +111,7 @@ Here is an example about [_cluster.yml_](cluster-example.yml) file that contains
 | variable | description  |Default|
 |---|---|---|
 |`cluster_name`               |Name of the cluster to be installed | **Required** |
-|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
+|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_, _hetzner_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
 |`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
 |`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
 |`public_domain`              |Root domain that will be used for your cluster.  | **Required** |

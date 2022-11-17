@@ -8,10 +8,11 @@ ansible-navigator:
       - src: "./config"
         dest: "/config"
         options: "Z"
+  # in case NFS home share would cause issues executing ansible-navigator:
+  #collection-doc-cache-path: /tmp/hetzner-ocp4-ansible-runner.db
   logging:
     level: info
   mode: stdout
   playbook-artifact:
     enable: true
-    save-as: /tmp/hetzner-ocp4-{playbook_name}-artifact-{ts_utc}.json
-  collection-doc-cache-path: /tmp/hetzner-ocp4-ansible-runner.db
+    save-as: /tmp/hetzner-ocp4-{playbook_name}-artifact-{time_stamp}.json

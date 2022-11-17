@@ -75,7 +75,7 @@
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
       register: unzip
-      when: coreos_stat.stat.mimetype == 'application/x-gzip'
+      when: coreos_stat.stat.mimetype == 'application/x-gzip' or coreos_stat.stat.mimetype == 'application/gzip'
 
     - name: unxz the coreos
       ansible.builtin.command: "unxz {{ coreos_path }}/{{ coreos_download_url | basename }}"
