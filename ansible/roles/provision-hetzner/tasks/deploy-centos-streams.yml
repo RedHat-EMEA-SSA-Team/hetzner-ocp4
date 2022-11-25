@@ -161,7 +161,7 @@
   ansible.builtin.fail:
     msg: "Installation failed, check log: {{ result.stdout_lines | join('\n') }}"
   when:
-    - result.stdout is search('An error occured while installing the new system')
+    - result.stdout is search('An error occured while installing the new system') or result.stdout is search('Cancelled')
     - not hetzner_image_ignore_errors
   delegate_to: localhost
 
