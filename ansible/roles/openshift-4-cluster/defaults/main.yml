@@ -43,7 +43,6 @@ vm_autostart: false
 
 # reference to OpenShift version
 openshift_version: 4.11.12
-openshift_install_command: "/root/hetzner-ocp4/openshift-install"
 openshift_install_command: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
 # dev-pre:
 # {{ openshift_mirror }}/pub/openshift-v4/clients/ocp-dev-preview
