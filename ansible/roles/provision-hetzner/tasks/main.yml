@@ -16,7 +16,7 @@
   delegate_to: localhost
 
 - name: Provision server
-  include_tasks: deploy-centos-streams.yml
+  include_tasks: provision-server.yml
   when: needs_reprovision == True
 
 - name: Check ansible_python_interpreter
