@@ -71,11 +71,13 @@
 ###########################################################################################
 # Install letsencrypt certificates
 ###########################################################################################
-- ansible.builtin.include_tasks: certificate-install.yml
+- name: Install certificate
+  ansible.builtin.include_tasks: certificate-install.yml
   when: letsencrypt_disabled == false
   tags:
     - post-install
     - certificates
+    - skip_ansible_lint
 
 ###########################################################################################
 # Configure authentication

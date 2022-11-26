@@ -50,7 +50,9 @@
 - name: Filter server by IPv4 or IPv6
   delegate_to: localhost
   set_fact:
+    # yamllint disable rule:line-length
     server_id_list: "{{ servers.json | to_json | from_json | community.general.json_query('[?cancelled == false && status == \"ready\" && ( server.server_ip ==  `'~ hetzner_ip ~'` || contains(`'~ hetzner_ip ~'`, server.server_ipv6_net) ) ].server.server_number')  }}"
+    # yamllint enable rule:line-length
 
 - name: Check server_id
   delegate_to: localhost

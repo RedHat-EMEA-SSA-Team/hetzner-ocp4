@@ -18,7 +18,8 @@
     - add-ons
     - post-install-add-ons
 
-- ansible.builtin.import_tasks: create-network.yml
+- name: Create network
+  ansible.builtin.import_tasks: create-network.yml
   vars:
     vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
     vn_master_count: "{{ master_count }}"
@@ -76,7 +77,8 @@
   # Work-a-round: tags inheritance don't work without a block.
   # https://github.com/ansible/ansible/issues/41540#issuecomment-419433375
   block:
-    - ansible.builtin.include_tasks: download-openshift-artifacts.yml
+    - name: Include tasks
+      ansible.builtin.include_tasks: download-openshift-artifacts.yml
   tags: download-openshift-artifacts
 
 - name: Slurp ssh public key

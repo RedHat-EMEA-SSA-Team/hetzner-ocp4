@@ -4,12 +4,14 @@
 #   vars:
 #     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
-- ansible.builtin.include_tasks: start-vm.yml
+- name: Start master VM's
+  ansible.builtin.include_tasks: start-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
-- ansible.builtin.include_tasks: start-vm.yml
+- name: Start compute VM's
+  ansible.builtin.include_tasks: start-vm.yml
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
   with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
