@@ -39,26 +39,3 @@
   delegate_to: "{{ hetzner_ip }}"
   notify:
     - Restart SSH daemon
-
-- name: Update all packages
-  ansible.builtin.package:
-    name: "*"
-    state: latest
-  delegate_to: "{{ hetzner_ip }}"
-
-- name: Install libvirtd
-  ansible.builtin.package:
-    name:
-      - libvirt-client
-      - libvirt
-    state: latest
-  delegate_to: "{{ hetzner_ip }}"
-
-- name: Install base-tooling
-  ansible.builtin.package:
-    name:
-      - firewalld
-      - policycoreutils-python-utils
-      - bind-utils
-    state: latest
-  delegate_to: "{{ hetzner_ip }}"
