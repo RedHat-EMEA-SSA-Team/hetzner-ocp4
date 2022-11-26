@@ -79,10 +79,15 @@
     - ansible.builtin.include_tasks: download-openshift-artifacts.yml
   tags: download-openshift-artifacts
 
+- name: Slurp ssh public key
+  ansible.builtin.slurp:
+    src: "{{ ssh_public_key_location }}.pub"
+  register: slurped_ssh_public_key
+
 - name: Create ignition files
   ansible.builtin.include_tasks: create-ignition.yml
   vars:
-    ssh_public_key: "{{ lookup('file', '{{ ssh_public_key_location }}.pub') }}"
+    ssh_public_key: "{{ slurped_ssh_public_key['content'] | b64decode }}"
   tags: ignition
 
 - name: Create bootstrap node
