@@ -1,8 +1,4 @@
 ---
-- name: define base uri
-  ansible.builtin.set_fact:
-    robot_base: https://robot-ws.your-server.de/
-    needs_reprovision: False
 
 - name: "Retrieve current setup of {{ hetzner_ip }}"
   ansible.builtin.gather_facts:
