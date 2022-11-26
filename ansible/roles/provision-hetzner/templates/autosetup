@@ -11,6 +11,6 @@ LV vg0 root / xfs 50G
 LV vg0 swap swap swap 8G
 LV vg0 home   /home   xfs      10G
 LV vg0 var    /var xfs 50G
-LV vg0 libvirt /var/lib/libvirt/images xfs all
+LV vg0 libvirt /var/lib/libvirt/images xfs {{ hetzner_size_of_libvirt_images }}
 
 IMAGE {{ hetzner_image }}
