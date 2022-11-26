@@ -6,7 +6,7 @@ ssh_public_key_location: ~/.ssh/id_rsa
 vn_subnet: "192.168.50.0"
 vn_name: "openshift-4-cluster"
 vn_internal_domain: "compute.local"
-vn_public_domain: "h42.openshift.pub"
+vn_public_domain: "{{ cluster_name }}.{{ public_domain }}"
 
 #
 ip_families:
