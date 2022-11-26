@@ -1,16 +1,5 @@
 ---
 
-# - name: Build inventory
-#   hosts: localhost
-#   connection: local
-#   gather_facts: no
-#   vars_files:
-#     - ../cluster.yml
-#   tasks:
-#     - name: Add hetzner server to inventory
-#       add_host:
-#         name: "{{ hetzner_ip }}"
-# 
 - name: install hetzner server
   hosts: all
   gather_facts: no
