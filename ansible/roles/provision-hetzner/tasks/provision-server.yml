@@ -12,6 +12,25 @@
   delegate_to: localhost
 
 ### todo: add mechanism to check FP of key with the one give by hetzner_ssh_private_id parameter
+# Sadly, Hetzner provided fingerprint in:
+# "key": {
+#     "created_at": "2020-12-18T14:59:49.000Z",
+#     "data": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAOfl+764UFbDkkxpsQYjET7ZAWoVApSf4I64L1KImoc rbohne@redhat.com",
+#     "fingerprint": "cb:fc:61:a3:de:48:2a:fc:5e:75:14:b6:0a:36:d9:1f",
+#     "name": "AA-ed25519",
+#     "size": 256,
+#     "type": "ED25519"
+# }
+# Ansible module community.crypto.openssh_keypair in SHA356
+#   - name: Check OpenSSH private key
+#     community.crypto.openssh_keypair:
+#       regenerate: never
+#       path: "{{ hetzner_ssh_private_id }}"
+#     register: ssh_private_key
+#   - debug:
+#       var: ssh_private_key
+# =>  "fingerprint": "SHA256:MV6mnlC44jtntBj327ya7mump58SUJQDzzAmlJxnMkM",
+
 - name: Set authorized_key fact
   set_fact:
     authorized_key: "{{ key.json[0].key.fingerprint }}"
