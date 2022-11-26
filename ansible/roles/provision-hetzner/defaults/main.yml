@@ -8,4 +8,3 @@ hetzner_disk1: sda
 hetzner_disk2: sdb
 hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-80-stream-amd64-base.tar.gz"
 hetzner_image_ignore_errors: false
-ansible_python_interpreter: /usr/bin/python3  # target host python interpreter
