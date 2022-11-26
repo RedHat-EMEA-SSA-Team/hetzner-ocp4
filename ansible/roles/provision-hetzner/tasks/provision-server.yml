@@ -28,6 +28,7 @@
   register: servers
   delegate_to: localhost
 
+### ToDo: public_ipv6 could be empty or not set, by default public_ipv6 is gathered.
 - name: Query enabled and ready servers for matching ipv4 or ipv6
   set_fact:
     query_ready: "[?cancelled == false && status == \"ready\"].{number: server.server_number, ipv4: server.server_ip, ipv6: server.server_ipv6_net, status: server.status, cancelled: server.cancelled}"
@@ -141,7 +142,9 @@
   fail:
     msg: "Installation failed, check log: {{ result.stdout_lines | join('\n') }}"
   when:
-    - result.stdout is search('An error occured while installing the new system')
+    - >
+      result.stdout is search('An error occured while installing the new system') or
+      result.stdout is search('Cancelled')
     - not hetzner_image_ignore_errors
   delegate_to: localhost
 
