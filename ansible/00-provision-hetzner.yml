@@ -7,11 +7,6 @@
   vars_files:
     - ../cluster.yml
   tasks:
-    - name: Add hetzner server to inventory
-      ansible.builtin.add_host:
-        name: "{{ hetzner_ip }}"
-        ansible_ssh_private_key_file: '{{ hetzner_ssh_private_id }}'
-
     - name: provision hetzner root server
       import_role:
         name: provision-hetzner
