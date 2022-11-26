@@ -9,10 +9,11 @@
   register: host_facts
   delegate_to: "{{ hetzner_ip }}"
 
-- ansible.builtin.set_fact:
+- name: Check Boot image and hetzner_force_provisioning
+  ansible.builtin.set_fact:
     needs_reprovision: True
   when:
-    - host_facts.ansible_facts.ansible_cmdline.BOOT_IMAGE is match("rescue") or (hetzner_force_provisioning is defined and hetzner_force_provisioning == true) 
+    - host_facts.ansible_facts.ansible_cmdline.BOOT_IMAGE is match("rescue") or (hetzner_force_provisioning is defined and hetzner_force_provisioning )
   delegate_to: localhost
 
 - name: Provision server
