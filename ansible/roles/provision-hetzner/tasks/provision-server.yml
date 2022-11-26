@@ -28,19 +28,21 @@
   register: servers
   delegate_to: localhost
 
-### ToDo: public_ipv6 could be empty or not set, by default public_ipv6 is gathered.
-- name: Query enabled and ready servers for matching ipv4 or ipv6
-  set_fact:
-    query_ready: "[?cancelled == false && status == \"ready\"].{number: server.server_number, ipv4: server.server_ip, ipv6: server.server_ipv6_net, status: server.status, cancelled: server.cancelled}"
-    query: "[] | [?contains(\'{{ public_ipv6 }}\', ipv6) || contains(ipv4, \'{{ hetzner_ip }}\')].{number: number, ipv4: ipv4, ipv6: ipv6}"
-
-# - debug: msg="{{ servers.json }}"
-
-### todo: clean this up!!
-- name: Set server_id fact
-  set_fact:
-    server_id: "{{ servers.json | to_json | from_json | community.general.json_query(query_ready) | community.general.json_query(query) | community.general.json_query('[].number | [0]') | int }}"
+- name: Filter server by IPv4 or IPv6
   delegate_to: localhost
+  set_fact:
+    server_id_list: "{{ servers.json | to_json | from_json | community.general.json_query('[?cancelled == false && status == \"ready\" && ( server.server_ip ==  `'~ hetzner_ip ~'` || contains(`'~ hetzner_ip ~'`, server.server_ipv6_net) ) ].server.server_number')  }}"
+
+- name: Check server_id
+  delegate_to: localhost
+  ansible.builtin.fail:
+    msg: "Can NOT find Hetzner Server Id, to many or no matching server found."
+  when: server_id_list|length != 1
+
+- name: Filter server by IPv4 or IPv6
+  delegate_to: localhost
+  set_fact:
+    server_id: "{{ server_id_list | first }}"
 
 - name: Check rescue mode
   uri:
