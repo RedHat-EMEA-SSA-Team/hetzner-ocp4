@@ -7,20 +7,22 @@
 
 - name: Check Boot image and hetzner_force_provisioning
   ansible.builtin.set_fact:
-    needs_reprovision: True
+    needs_reprovision: true
   when:
     - host_facts.ansible_facts.ansible_cmdline.BOOT_IMAGE is match("rescue") or (hetzner_force_provisioning is defined and hetzner_force_provisioning )
   delegate_to: localhost
 
 - name: Provision server
   include_tasks: provision-server.yml
-  when: needs_reprovision == True
+  when: needs_reprovision == true
 
 - name: Check ansible_python_interpreter
   ansible.builtin.shell: "which python3"
   register: rc
   ignore_errors: true
   delegate_to: "{{ hetzner_ip }}"
+  tags:
+    - skip_ansible_lint
 
 - name: Set ansible_python_interpreter to /usr/libexec/platform-python (RHEL 8)
   set_fact:
