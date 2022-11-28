@@ -26,6 +26,16 @@
   ansible.builtin.package:
     name: '*'
     state: latest
+  register: update
+
+- name: Check if new kernel has been installed and local execution
+  ansible.builtin.set_fact:
+    hetzner_ocp4_prepare_host_reboot_needed: true
+  when:
+    - update.changed
+    - update.results | select('match','Installed:.*kernel.*') | length > 0
+  tags:
+    - skip_ansible_lint
 
 - name: Allow NFS traffic from VM's to Host
   ansible.posix.firewalld:
