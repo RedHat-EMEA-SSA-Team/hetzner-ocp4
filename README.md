@@ -227,6 +227,7 @@ ansible-navigator run -m stdout ./ansible/setup.yml
 * [How to passthrough nvme or gpu (pci-passthrough](docs/pci-passthrough.md)
 * [How to install OKD](docs/how-to-install-okd.md)
 * [Virsh commands cheatsheet to manage KVM guest virtual machines](https://computingforgeeks.com/virsh-commands-cheatsheet/)
+* [Remote execution, run the playbooks on your laptop](docs/remote-execution.md)
 
 # Useful commands
 

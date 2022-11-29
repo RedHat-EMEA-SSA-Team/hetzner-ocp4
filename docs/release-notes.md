@@ -1,5 +1,17 @@
 # RELEASE NOTES
 
+## 2022-xx-xx
+
+ * Fixed problem with `ansible_python_interpreter` during `00-provision-hetzner.yml`
+ * Added new option `hetzner_size_of_libvirt_images`
+ * Added new option `redhat_subscription_activationkey`, `redhat_subscription_org_id`, `redhat_subscription_pool` to handle Red Hat entitlement during `01-prepare-host.yml`
+ * Introduce `artifacts_dir`
+ * Change ssh public key and kubeconfig handling to support remote execution
+ * Handling reboot after new kernel is installed
+ * [Added support for remote execution (execute playbooks on your laptop)](remote-execution.md)
+
+
+
 ## 2022-06-19
 
  * Bump OpenShift Version to 4.10
