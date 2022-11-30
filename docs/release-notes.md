@@ -2,6 +2,7 @@
 
 ## 2022-xx-xx
 
+ * Bump openshift version to 4.11.12
  * Fixed problem with `ansible_python_interpreter` during `00-provision-hetzner.yml`
  * Added new option `hetzner_size_of_libvirt_images`
  * Added new option `redhat_subscription_activationkey`, `redhat_subscription_org_id`, `redhat_subscription_pool` to handle Red Hat entitlement during `01-prepare-host.yml`
