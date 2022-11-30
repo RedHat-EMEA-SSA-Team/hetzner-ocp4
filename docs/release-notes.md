@@ -11,6 +11,7 @@
  * Change ssh public key and kubeconfig handling to support remote execution
  * Handling reboot after new kernel is installed
  * [Added support for remote execution (execute playbooks on your laptop)](remote-execution.md)
+ * Added `install_config_capabilities` configuration
 
 
 
