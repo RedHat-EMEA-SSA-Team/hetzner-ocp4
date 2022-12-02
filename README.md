@@ -230,6 +230,21 @@ ansible-navigator run -m stdout ./ansible/setup.yml
 * [Virsh commands cheatsheet to manage KVM guest virtual machines](https://computingforgeeks.com/virsh-commands-cheatsheet/)
 * [Remote execution, run the playbooks on your laptop](docs/remote-execution.md)
 
+
+# Playbook overview
+
+| Playbook | Description |
+|---|---|
+|`ansible/00-provision-hetzner.yml`|Automated operating system of your Hetzner bare-metal server. detail documentation: [docs/hetzner.md](docs/hetzner.md)|
+|`ansible/01-prepare-host.yml`|Install all dependencies like kvm & co on your Hetzner bare-metal server.|
+|`ansible/02-create-cluster.yml`|Installation of your OpenShift 4 Cluster|
+|`ansible/03-stop-cluster.yml`|Stop all virtual machines related to your OpenShift 4 Cluster|
+|`ansible/04-start-cluster.yml`|Start all virtual machines related to your OpenShift 4 Cluster|
+|`ansible/99-destroy-cluster.yml`|Delete everything what is created via `ansible/02-create-cluster.yml`|
+|`ansible/renewal-certificate.yml`|Renewal your Let's encrypt certificate and replace everything in your OpenShift 4 Cluster. There is no automatically renew process, please run renew on your own behalf.|
+|`ansible/run-add-ons.yml`|Run all enabled add-ons agains your OpenShift 4 cluster|
+|`ansible/setup.yml`|One shot cluster installation, including operating system installation and configuration of your Hetzner bare-metal server.|
+
 # Useful commands
 
 | Problem | Command |
