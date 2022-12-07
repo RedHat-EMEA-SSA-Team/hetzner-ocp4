@@ -65,6 +65,16 @@
     - le_hetzner_zone
   when: le_dns_provider == "hetzner"
 
+- name: Check required Gandi variables
+  ansible.builtin.assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_gandi_api_key
+    - le_gandi_zone
+  when: le_dns_provider == "gandi"
+
 - name: Debug var only with -vv CloudFlare
   ansible.builtin.debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
@@ -133,3 +143,12 @@
     - le_hetzner_account_api_token
     - le_hetzner_zone
   when: le_dns_provider == "hetzner"
+
+- name: Debug var only with -vv for Gandi
+  ansible.builtin.debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_gandi_api_key
+    - le_gandi_zone
+  when: le_dns_provider == "gandi"

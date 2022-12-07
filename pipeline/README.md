@@ -93,6 +93,16 @@ hetzner_account_api_token: xxxxx
 hetzner_zone: example.com
 ```
 
+#### gandi-cluster.yml
+```yaml
+cluster_name: test
+public_domain: gandi.ci.example.com
+dns_provider: gandi
+
+gandi_api_key: xxxxx
+gandi_zone: example.com
+```
+
 ## Install pipeline
 
 ```

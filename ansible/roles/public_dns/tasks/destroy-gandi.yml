@@ -1,0 +1,28 @@
+---
+- name: Destroy Gandi DNS records
+  community.general.gandi_livedns:
+    state: absent
+    domain: "{{ pd_gandi_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    type: A
+    api_key: "{{ gandi_api_key }}"
+  with_items:
+    - api
+    - '*.apps'
+  tags:
+    - public_dns
+  when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
+
+- name: Destroy IPv6 Gandi DNS records
+  community.general.gandi_livedns:
+    state: absent
+    domain: "{{ pd_gandi_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    type: AAAA
+    api_key: "{{ gandi_api_key }}"
+  with_items:
+    - api
+    - '*.apps'
+  tags:
+    - public_dns
+  when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)

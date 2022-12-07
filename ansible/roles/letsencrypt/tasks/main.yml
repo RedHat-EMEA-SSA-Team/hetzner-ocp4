@@ -143,6 +143,21 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "transip" and sample_com_challenge is changed
 
+- name: Create DNS record at Gandi
+  delegate_to: localhost
+  community.general.gandi_livedns:
+    state: present
+    domain: "{{ le_gandi_zone }}"
+    record: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '') }}"
+    type: TXT
+    values:
+      - "{{ item.1 }}"
+    ttl: 300
+    api_key: "{{ le_gandi_api_key }}"
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "gandi" and sample_com_challenge is changed
+
 - name: DNS record info
   ansible.builtin.debug:    # noqa no-handler
     msg: "{{ item.0.key }} TXT {{ item.1 }}"
@@ -259,6 +274,18 @@
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "transip" and sample_com_challenge is changed
+
+- name: Delete DNS record at Gandi
+  delegate_to: localhost
+  community.general.gandi_livedns:
+    state: absent
+    domain: "{{ le_gandi_zone }}"
+    record: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '') }}"
+    type: TXT
+    api_key: "{{ le_gandi_api_key }}"
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "gandi" and sample_com_challenge is changed
 
 - name: Include DNS provider
   ansible.builtin.include_tasks: "destroy-{{ le_dns_provider }}.yml"

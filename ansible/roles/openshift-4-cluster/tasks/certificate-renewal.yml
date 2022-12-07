@@ -28,5 +28,8 @@
 
     le_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
     le_hetzner_zone: "{{ hetzner_zone }}"
+
+    le_gandi_api_key: "{{ gandi_api_key }}"
+    le_gandi_zone: "{{ gandi_zone }}"
   tags: letsencrypt
   when: not letsencrypt_disabled
