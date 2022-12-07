@@ -151,6 +151,8 @@
     pd_aws_zone: "{{ aws_zone }}"
     pd_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
     pd_hetzner_zone: "{{ hetzner_zone }}"
+    pd_gandi_api_key: "{{ gandi_api_key }}"
+    pd_gandi_zone: "{{ gandi_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
   tags: public_dns
   when: dns_provider != 'none'

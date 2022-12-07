@@ -70,6 +70,8 @@
     le_digitalocean_token: "{{ digitalocean_token }}"
     le_digitalocean_zone: "{{ digitalocean_zone }}"
 
+    le_gandi_api_key: "{{ gandi_api_key }}"
+    le_gandi_zone: "{{ gandi_zone }}"
   tags: letsencrypt
   when: not letsencrypt_disabled
 
