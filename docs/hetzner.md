@@ -61,7 +61,7 @@ The `installimage` tool is used to install CentOS. It takes instructions from a 
 
 If you like to install Red Hat Enterprise Linux, create your own RHEL Image.  Follow the instructions of how you create an RHEL image for Hetzner:
 * [Red Hat Enterprise Linux 8](https://keithtenzer.com/cloud/how-to-create-a-rhel-8-image-for-hetzner-root-servers/)
-
+* [Red Hat Enterprise Linux 9](hetzner_rhel9.md)
 
 Create a new `config.txt` file
 ```
