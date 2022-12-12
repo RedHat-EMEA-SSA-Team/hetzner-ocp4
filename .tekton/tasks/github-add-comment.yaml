@@ -54,17 +54,16 @@ spec:
         The actual comment to add or the filename containing comment to post.
       type: string
 
-    - name: GITHUB_TOKEN_SECRET_NAME
+    - name: PAC_GITHUB_SECRET
       description: |
         The name of the Kubernetes Secret that contains the GitHub token.
       type: string
-      default: github
 
-    - name: GITHUB_TOKEN_SECRET_KEY
+    - name: PAC_GITHUB_SECRET_KEY
       description: |
         The key within the Kubernetes Secret that contains the GitHub token.
       type: string
-      default: token
+      default: .git-credentials
 
     - name: AUTH_TYPE
       description: |
@@ -91,11 +90,11 @@ spec:
     - name: post-comment
       workingDir: $(workspaces.comment-file.path)
       env:
-        - name: GITHUBTOKEN
+        - name: GIT_CREDENTIALS
           valueFrom:
             secretKeyRef:
-              name: $(params.GITHUB_TOKEN_SECRET_NAME)
-              key: $(params.GITHUB_TOKEN_SECRET_KEY)
+              name: $(params.PAC_GITHUB_SECRET)
+              key: $(params.PAC_GITHUB_SECRET_KEY)
 
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
       script: |
@@ -106,7 +105,9 @@ spec:
         import sys
         import urllib.parse
 
-        authHeader = "$(params.AUTH_TYPE) " + os.environ["GITHUBTOKEN"]
+        bearer = urllib.parse.urlparse(os.environ["GIT_CREDENTIALS"])
+
+        authHeader = "$(params.AUTH_TYPE) " + bearer.password
 
         split_url = urllib.parse.urlparse(
             "$(params.REQUEST_URL)").path.split("/")
