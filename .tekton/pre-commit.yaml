@@ -84,7 +84,7 @@ spec:
               script: |
                 set -euxo pipefail
 
-                echo -e " 💀 There was an error during pre-commit / linter:\n\n```" \
+                echo -e ' 💀 There was an error during pre-commit / linter:\n\n```' \
                   > $(workspaces.source.path)/notify-linter-on-failure.txt
 
                 pre-commit run --color=never --all-files \
