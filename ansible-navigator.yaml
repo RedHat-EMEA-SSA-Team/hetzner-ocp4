@@ -2,7 +2,7 @@
 ansible-navigator:
   execution-environment:
     container-options:
-      - --net=host
+    - --net=host
     image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:master
   logging:
     level: critical
