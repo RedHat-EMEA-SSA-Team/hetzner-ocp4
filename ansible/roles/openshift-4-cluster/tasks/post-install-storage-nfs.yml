@@ -19,19 +19,19 @@
 - name: Set nfs_server
   ansible.builtin.set_fact:
     nfs_server: "nfs-server"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '8'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version >= '8'
 
 - name: Ensure nfs is running.
   ansible.builtin.service:
     name: "{{ nfs_server }}"
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Add nfs exports to /etc/exports
   ansible.builtin.blockinfile:
     path: /etc/exports
-    backup: yes
-    create: yes
+    backup: true
+    create: true
     marker: "# {mark} OpenShift cluster - {{ cluster_name }}"
     owner: root
     group: root
