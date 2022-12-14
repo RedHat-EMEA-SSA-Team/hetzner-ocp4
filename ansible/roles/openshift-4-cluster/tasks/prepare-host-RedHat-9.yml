@@ -1,6 +1,6 @@
 ---
 - name: Installing KVM Packages
-  yum:
+  ansible.builtin.yum:
     name:
       - "@virtualization-hypervisor"
       - "@virtualization-client"
@@ -8,10 +8,16 @@
       - "@virtualization-tools"
     state: present
 
+- name: Installing playbook dependencies
+  ansible.builtin.package:
+    name: python3-lxml
+    state: present
+
 - name: Upgrade all packages
-  yum:
+  ansible.builtin.yum:
     name: '*'
     state: latest
+    update_only: true
   register: update
 
 - name: Check if new kernel has been installed and local execution
@@ -24,7 +30,7 @@
     - skip_ansible_lint
 
 - name: Allow NFS traffic from VM's to Host
-  firewalld:
+  ansible.posix.firewalld:
     zone: libvirt
     state: enabled
     permanent: yes
@@ -36,7 +42,7 @@
   notify: 'reload firewalld'
 
 - name: Allow OpenShift traffic from VM's to Host
-  firewalld:
+  ansible.posix.firewalld:
     zone: libvirt
     state: enabled
     permanent: yes
@@ -49,7 +55,7 @@
   notify: 'reload firewalld'
 
 - name: Allow OpenShift traffic from public to Host
-  firewalld:
+  ansible.posix.firewalld:
     zone: public
     state: enabled
     permanent: yes
@@ -61,4 +67,4 @@
   notify: 'reload firewalld'
 
 - name: firewalld reload
-  command: firewall-cmd --reload
+  ansible.builtin.command: firewall-cmd --reload
