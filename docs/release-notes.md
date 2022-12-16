@@ -13,6 +13,9 @@
  * [Added support for remote execution (execute playbooks on your laptop)](remote-execution.md)
  * Added `install_config_capabilities` configuration
  * Added Gandi as a DNS provider
+ * [Added instructions for RHEL9 image creation](hetzner_rhel9.md)
+
+>>>>>>> 86d562a (added rhel9 instructions to release notes)
 
 
 ## 2022-06-19
