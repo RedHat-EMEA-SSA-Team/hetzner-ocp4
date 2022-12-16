@@ -14,8 +14,9 @@
  * Added `install_config_capabilities` configuration
  * Added Gandi as a DNS provider
  * [Added instructions for RHEL9 image creation](hetzner_rhel9.md)
+ * Added Rocky Linux 9 support
 
->>>>>>> 86d562a (added rhel9 instructions to release notes)
+>>>>>>> dc2f464 (Add Rocky Linux 9 support)
 
 
 ## 2022-06-19
