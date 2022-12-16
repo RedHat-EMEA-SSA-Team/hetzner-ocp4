@@ -11,7 +11,7 @@
     name: '*'
     state: disabled
 
-- name: Enable repos for RHEL 8
+- name: Enable repos for RHEL
   rhsm_repository:
     name: "{{ rhsm_repository }}"
     state: enabled
