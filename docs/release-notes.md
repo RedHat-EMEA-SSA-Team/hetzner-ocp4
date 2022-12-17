@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## 2022-xx-xx
+## 2022-12-17
 
  * Bump openshift version to 4.11.12
  * Update ansible-automation-platform to 2.3
