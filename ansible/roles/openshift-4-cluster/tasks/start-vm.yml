@@ -1,6 +1,6 @@
 ---
 - name: Start VM {{ vm_instance_name }}
-  virt:
+  community.libvirt.virt:
     command: start
     name: "{{ vm_instance_name }}"
   ignore_errors: yes

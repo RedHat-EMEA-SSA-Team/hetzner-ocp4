@@ -1,0 +1,200 @@
+---
+- name: Retrieve first public key fingerprint
+  uri:
+    url: "{{ robot_base }}/key"
+    return_content: yes
+    method: GET
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  register: key
+  delegate_to: localhost
+
+### todo: add mechanism to check FP of key with the one give by hetzner_ssh_private_id parameter
+# Sadly, Hetzner provided fingerprint in:
+# "key": {
+#     "created_at": "2020-12-18T14:59:49.000Z",
+#     "data": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAOfl+764UFbDkkxpsQYjET7ZAWoVApSf4I64L1KImoc rbohne@redhat.com",
+#     "fingerprint": "cb:fc:61:a3:de:48:2a:fc:5e:75:14:b6:0a:36:d9:1f",
+#     "name": "AA-ed25519",
+#     "size": 256,
+#     "type": "ED25519"
+# }
+# Ansible module community.crypto.openssh_keypair in SHA356
+#   - name: Check OpenSSH private key
+#     community.crypto.openssh_keypair:
+#       regenerate: never
+#       path: "{{ hetzner_ssh_private_id }}"
+#     register: ssh_private_key
+#   - debug:
+#       var: ssh_private_key
+# =>  "fingerprint": "SHA256:MV6mnlC44jtntBj327ya7mump58SUJQDzzAmlJxnMkM",
+
+- name: Set authorized_key fact
+  set_fact:
+    authorized_key: "{{ key.json[0].key.fingerprint }}"
+
+- name: "Retrieve server number from IP {{ hetzner_ip }}"
+  uri:
+    url: "{{ robot_base }}/server"
+    return_content: yes
+    method: GET
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  register: servers
+  delegate_to: localhost
+
+- name: Filter server by IPv4 or IPv6
+  delegate_to: localhost
+  set_fact:
+    # yamllint disable rule:line-length
+    server_id_list: "{{ servers.json | to_json | from_json | community.general.json_query('[?cancelled == false && status == \"ready\" && ( server.server_ip ==  `'~ hetzner_ip ~'` || contains(`'~ hetzner_ip ~'`, server.server_ipv6_net) ) ].server.server_number')  }}"
+    # yamllint enable rule:line-length
+
+- name: Check server_id
+  delegate_to: localhost
+  ansible.builtin.fail:
+    msg: "Can NOT find Hetzner Server Id, to many or no matching server found."
+  when: server_id_list|length != 1
+
+- name: Filter server by IPv4 or IPv6
+  delegate_to: localhost
+  set_fact:
+    server_id: "{{ server_id_list | first }}"
+
+- name: Check rescue mode
+  uri:
+    url: "{{ robot_base }}/boot/{{ server_id }}/rescue"
+    method: GET
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  register: rescue
+  delegate_to: localhost
+
+- name: Activate rescue mode
+  uri:
+    url: "{{ robot_base }}/boot/{{ server_id }}/rescue"
+    method: POST
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    body: "os=linux&arch=64&authorized_key={{ authorized_key }}"
+    status_code: 200
+    headers:
+      Content_Type: "application/x-www-form-urlencoded"
+  register: activated
+  delegate_to: localhost
+  when: not rescue.json.rescue.active
+
+# - debug: msg="{{ activated }}"
+
+- name: Pause a bit to allow rescue mode to settle
+  pause: seconds=5
+
+- name: Execute hardware reset
+  uri:
+    url: "{{ robot_base }}/reset/{{ server_id }}"
+    method: POST
+    user: "{{ hetzner_webservice_username }}"
+    password: "{{ hetzner_webservice_password }}"
+    force_basic_auth: yes
+    body: "type=hw"
+    status_code: 200
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+  register: reset
+  delegate_to: localhost
+
+- name: Remove server from local known_hosts file
+  command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
+  register: output
+  failed_when: output.rc != 0
+  changed_when: '"updated" in output.stdout'
+  delegate_to: localhost
+
+- name: Pause a bit for the hardware reset to kick in
+  pause: seconds=5
+
+- name: Wait 600 seconds for port 22 to become open
+  wait_for:
+    port: 22
+    host: '{{ hetzner_ip }}'
+    delay: 10
+    timeout: 600
+  connection: local
+
+- name: Copy autosetup configuration file
+  template:
+    src: "{{ hetzner_autosetup_file }}"
+    dest: /root/autosetup.ansible
+    owner: root
+    group: root
+    mode: 0644
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: Run installimage
+  command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup.ansible"
+  environment:
+    TERM: "vt100"
+  register: result
+  changed_when: true
+  failed_when: false
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: Print installimage output with -v
+  debug:
+    var: result.stdout_lines
+    verbosity: 1
+  delegate_to: localhost
+
+- name: Check stderr from installimage
+  debug:
+    msg: "Something want wrong at installimage: {{ result.stderr_lines | join('\n') }}"
+  when:
+    - result.stderr_lines | length > 0
+    - not hetzner_image_ignore_errors
+  delegate_to: localhost
+
+### todo: add pulling of debug.log which is created by the installer for further analysis
+- name: Check stdout from installimage
+  fail:
+    msg: "Installation failed, check log: {{ result.stdout_lines | join('\n') }}"
+  when:
+    - >
+      result.stdout is search('An error occured while installing the new system') or
+      result.stdout is search('Cancelled')
+    - not hetzner_image_ignore_errors
+  delegate_to: localhost
+
+- name: Reboot server
+  shell: sync && sleep 2 && shutdown -r now
+  async: 1
+  poll: 0
+  changed_when: true
+  failed_when: false
+  delegate_to: "{{ hetzner_ip }}"
+
+- name: Remove server from local known_hosts file
+  command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
+  register: output
+  failed_when: output.rc != 0
+  changed_when: '"updated" in output.stdout'
+  delegate_to: localhost
+
+- name: Wait 600 seconds for port 22 to become open
+  wait_for:
+    port: 22
+    host: '{{ hetzner_ip }}'
+    delay: 10
+    timeout: 600
+  connection: local
+
+- name: "Refresh information after re-install of {{ hetzner_ip }}"
+  ansible.builtin.gather_facts:
+  register: host_facts
+  delegate_to: "{{ hetzner_ip }}"

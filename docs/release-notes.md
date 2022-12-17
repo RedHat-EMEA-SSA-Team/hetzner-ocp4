@@ -1,5 +1,24 @@
 # RELEASE NOTES
 
+## 2022-12-17
+
+ * Bump openshift version to 4.11.12
+ * Update ansible-automation-platform to 2.3
+ * Fixed problem with `ansible_python_interpreter` during `00-provision-hetzner.yml`
+ * Added new option `hetzner_size_of_libvirt_images`
+ * Added new option `redhat_subscription_activationkey`, `redhat_subscription_org_id`, `redhat_subscription_pool` to handle Red Hat entitlement during `01-prepare-host.yml`
+ * Introduce `artifacts_dir`
+ * Change ssh public key and kubeconfig handling to support remote execution
+ * Handling reboot after new kernel is installed
+ * [Added support for remote execution (execute playbooks on your laptop)](remote-execution.md)
+ * Added `install_config_capabilities` configuration
+ * Added Gandi as a DNS provider
+ * [Added instructions for RHEL9 image creation](hetzner_rhel9.md)
+ * Added Rocky Linux 9 support
+
+>>>>>>> dc2f464 (Add Rocky Linux 9 support)
+
+
 ## 2022-06-19
 
  * Bump OpenShift Version to 4.10

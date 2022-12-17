@@ -1,0 +1,34 @@
+---
+- name: Create Gandi DNS records
+  community.general.gandi_livedns:
+    state: present
+    domain: "{{ pd_gandi_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    type: A
+    values:
+      - "{{ pd_public_ip }}"
+    ttl: 300
+    api_key: "{{ gandi_api_key }}"
+  with_items:
+    - api
+    - '*.apps'
+  tags:
+    - public_dns
+  when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
+
+- name: Create IPv6 Gandi DNS records
+  community.general.gandi_livedns:
+    state: present
+    domain: "{{ pd_gandi_zone }}"
+    record: "{{ item }}.{{ pd_public_domain }}"
+    type: AAAA
+    values:
+      - "{{ pd_public_ipv6 }}"
+    ttl: 300
+    api_key: "{{ gandi_api_key }}"
+  with_items:
+    - api
+    - '*.apps'
+  tags:
+    - public_dns
+  when: (pd_public_ipv6 is defined) and (pd_public_ipv6|length > 0)

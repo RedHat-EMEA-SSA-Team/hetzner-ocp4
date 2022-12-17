@@ -6,32 +6,32 @@
 #
 
 - name: Ensure NFS utilities are installed.
-  package:
+  ansible.builtin.package:
     name: nfs-utils
     state: present
 
 - name: Ensure rpcbind is running as configured.
-  service:
+  ansible.builtin.service:
     name: rpcbind
     state: started
     enabled: true
 
 - name: Set nfs_server
-  set_fact:
+  ansible.builtin.set_fact:
     nfs_server: "nfs-server"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '8'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version >= '8'
 
 - name: Ensure nfs is running.
-  service:
+  ansible.builtin.service:
     name: "{{ nfs_server }}"
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Add nfs exports to /etc/exports
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/exports
-    backup: yes
-    create: yes
+    backup: true
+    create: true
     marker: "# {mark} OpenShift cluster - {{ cluster_name }}"
     owner: root
     group: root
@@ -49,7 +49,7 @@
   tags: exports
 
 - name: Adjust directory permissions
-  file:
+  ansible.builtin.file:
     path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-{{ item }}"
     state: directory
     mode: "770"
@@ -58,7 +58,7 @@
     - "user-pvs"
 
 - name: reload nfs
-  command: 'exportfs -ra'
+  ansible.builtin.command: 'exportfs -ra'
   tags: exports
 
 
@@ -111,7 +111,7 @@
 - name: Add pvc registry-storage to image registry
   # noqa var-spacing
   # yamllint disable rule:line-length
-  command: |
+  ansible.builtin.command: |
     /opt/openshift-client-{{ openshift_version }}/oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig
   # yamllint enable rule:line-length
   register: registry_status
@@ -122,7 +122,7 @@
     - storage
 
 - name: Adjust directory permissions
-  file:
+  ansible.builtin.file:
     path: "{{ storage_nfs_path_prefix }}/{{ cluster_name }}-pv-{{ item }}"
     state: directory
     mode: "770"

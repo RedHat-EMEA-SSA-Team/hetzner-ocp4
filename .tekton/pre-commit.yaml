@@ -1,0 +1,134 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: linter
+  annotations:
+    # The event we are targeting as seen from the webhook payload
+    # this can be an array too, i.e: [pull_request, push]
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+
+    # The branch or tag we are targeting (ie: main, refs/tags/*)
+    pipelinesascode.tekton.dev/on-target-branch: "[master,devel]"
+
+    # Fetch the git-clone task from hub, we are able to reference later on it
+    # with taskRef and it will automatically be embedded into our pipeline.
+    pipelinesascode.tekton.dev/task: "git-clone"
+
+
+    # Use maven task from hub
+    # pipelinesascode.tekton.dev/task-1: "[pre-commit]"
+
+    # You can add more tasks in here to reuse, browse the one you like from here
+    # https://hub.tekton.dev/
+    # example:
+    #   pipelinesascode.tekton.dev/task-2: "[github-add-labels]"
+    pipelinesascode.tekton.dev/task-2: "[.tekton/tasks/github-add-comment.yaml]"
+
+    # How many runs we want to keep attached to this event
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+spec:
+  params:
+    # The variable with brackets are special to Pipelines as Code
+    # They will automatically be expanded with the events from Github.
+    - name: repo_url
+      value: "{{ repo_url }}"
+    - name: revision
+      value: "{{ revision }}"
+    - name: pull_request_number
+      value: "{{ pull_request_number }}"
+    - name: git_auth_secret
+      value: "{{ git_auth_secret }}"
+  pipelineSpec:
+    params:
+      - name: repo_url
+      - name: revision
+      - name: pull_request_number
+      - name: git_auth_secret
+    workspaces:
+      - name: source
+      - name: basic-auth
+    tasks:
+      - name: fetch-repository
+        taskRef:
+          name: git-clone
+          kind: ClusterTask
+        workspaces:
+          - name: output
+            workspace: source
+          - name: basic-auth
+            workspace: basic-auth
+        params:
+          - name: url
+            value: $(params.repo_url)
+          - name: revision
+            value: $(params.revision)
+      # Customize this task if you like, or just do a taskRef
+      # to one of the hub task.
+      - name: pre-commit
+        runAfter:
+          - fetch-repository
+        workspaces:
+          - name: source
+            workspace: source
+        taskSpec:
+          results:
+            - name: linter-output
+              description: Output of pre-commit run
+          workspaces:
+            - name: source
+          steps:
+            - name: pre-commit
+              image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-pre-commit:latest
+              workingDir: $(workspaces.source.path)
+              script: |
+                set -euxo pipefail
+
+                echo -e ' 💀 There was an error during pre-commit / linter:\n\n```' \
+                  > $(workspaces.source.path)/notify-linter-on-failure.txt
+
+                pre-commit run --color=never --all-files \
+                  | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2};?)?)?[mGK]//g" \
+                  | tee -a $(workspaces.source.path)/notify-linter-on-failure.txt
+
+                RC=$?
+                echo "Return code $RC"
+
+                echo -e '\n```\n' \
+                  > $(workspaces.source.path)/notify-linter-on-failure.txt
+
+                exit $?
+
+    finally:
+      - name: notify-linter-on-failure
+        workspaces:
+          - name: comment-file
+            workspace: source
+        when:
+          - input: $(tasks.pre-commit.status)
+            operator: in
+            values: ["Failed"]
+        params:
+          - name: REQUEST_URL
+            value: "$(params.repo_url)/pull/$(params.pull_request_number)"
+          - name: PAC_GITHUB_SECRET
+            value: "$(params.git_auth_secret)"
+          - name: COMMENT_OR_FILE
+            value: "notify-linter-on-failure.txt"
+        taskRef:
+          name: github-add-comment
+
+  workspaces:
+    - name: source
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    # This workspace will inject secret to help the git-clone task to be able to
+    # checkout the private repositories
+    - name: basic-auth
+      secret:
+        secretName: "{{ git_auth_secret }}"

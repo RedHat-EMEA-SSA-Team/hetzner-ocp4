@@ -1,18 +1,18 @@
 ---
 # Debug...
-# - template:
+# - ansible.builtin.template:
 #     src: templates/network.xml.j2
 #     dest: network.xml
 
 - name: Check IPv6
-  fail:
+  ansible.builtin.fail:
     msg: "IPv6 is enabled via ip_families but your Host system do not have a public IPv6 subnet configured."
   when:
     - "'IPv6' in ip_families"
     - ansible_default_ipv6 | length == 0
 
 - name: Build IPv6 subnet
-  set_fact:
+  ansible.builtin.set_fact:
     vn_subnet_ipv6: "{{ ansible_default_ipv6['address'].split(':')[:4] | join(':') | string }}:{{ '%x' % vn_subnet.split('.')[2] | int }}"
     ipv6_listen_public:
       - "{{ listen_address_ipv6 }}"
@@ -22,7 +22,7 @@
   tags: always
 
 - name: Build IPv4 subnet
-  set_fact:
+  ansible.builtin.set_fact:
     vn_subnet_ipv4: "{{ vn_subnet.split('.')[:3] | join('.') }}"
     ipv4_listen_private:
       - "{{ vn_subnet.split('.')[:3] | join('.') }}.1"
@@ -32,7 +32,7 @@
   tags: always
 
 - name: Build list of nodes
-  set_fact:
+  ansible.builtin.set_fact:
     __data_structure__: |
       bootstrap:
       - name: bootstrap
@@ -78,16 +78,16 @@
 
 
 - name: Print nodes string
-  debug:
+  ansible.builtin.debug:
     msg: "{{ __data_structure__.split('\n')  }}"
     verbosity: 3
 
 - name: Build dict from node yaml
-  set_fact:
+  ansible.builtin.set_fact:
     nodes: "{{ __data_structure__ | from_yaml }}"
 
 - name: Print nodes yaml
-  debug:
+  ansible.builtin.debug:
     var: "nodes"
     verbosity: 1
 
@@ -96,18 +96,18 @@
 #
 
 - name: Define network {{ cluster_name }}
-  virt_net:
+  community.libvirt.virt_net:
     command: define
     name: "{{ cluster_name }}"
     xml: "{{ lookup('template', 'templates/network.xml.j2') }}"
 
 - name: Active network {{ cluster_name }}
-  virt_net:
+  community.libvirt.virt_net:
     state: active
     name: "{{ cluster_name }}"
 
 - name: Activate autostart network {{ cluster_name }}
-  virt_net:
+  community.libvirt.virt_net:
     autostart: yes
     name: "{{ cluster_name }}"
 
@@ -115,16 +115,16 @@
 #  Load Balancer
 #
 - name: Build haproxy config
-  set_fact:
+  ansible.builtin.set_fact:
     lb_haproxy_cfg: "{{ lookup('template','templates/haproxy.conf.j2') }}"
 
 - name: Debug haproxy config
-  debug:
+  ansible.builtin.debug:
     msg: "{{ lb_haproxy_cfg.split('\n') }}"
     verbosity: 1
 
 - name: Create OpenShift 4 load balancer
-  import_role:
+  ansible.builtin.import_role:
     name: openshift-4-loadbalancer
     tasks_from: create.yml
   vars:
@@ -137,7 +137,7 @@
 #
 - name: Create public dns entries
   delegate_to: localhost
-  import_role:
+  ansible.builtin.import_role:
     name: public_dns
     tasks_from: create.yml
   vars:
@@ -151,12 +151,14 @@
     pd_aws_zone: "{{ aws_zone }}"
     pd_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
     pd_hetzner_zone: "{{ hetzner_zone }}"
+    pd_gandi_api_key: "{{ gandi_api_key }}"
+    pd_gandi_zone: "{{ gandi_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
   tags: public_dns
   when: dns_provider != 'none'
 
 - name: Add api.{{ cluster_name }}.{{ public_domain }} to /etc/hosts
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/hosts
     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
     block: |

@@ -1,25 +1,28 @@
 ---
 
-- name: Create own kubeconfig directory
-  file:
+- name: Create temporary kubeconfig directory in runner
+  delegate_to: localhost
+  ansible.builtin.tempfile:
     state: directory
-    path: "{{ openshift_install_dir }}/config/"
-    mode: 0755
+    suffix: "-hetzner-ocp4-{{ cluster_name }}"
+  register: k8s_tmp_dir
 
-- name: Copy kubeconfig
-  copy:
+- name: Fetch kubeconfig into runner
+  ansible.builtin.fetch:
     src: "{{ openshift_install_dir }}/auth/kubeconfig"
-    dest: "{{ openshift_install_dir }}/config/kubeconfig"
-    remote_src: yes
+    dest: "{{ k8s_tmp_dir.path }}/kubeconfig"
+    flat: true
     mode: 0644
 
 - name: Slurp kubeconfig
+  delegate_to: localhost
   ansible.builtin.slurp:
-    src: "{{ openshift_install_dir }}/config/kubeconfig"
+    src: "{{ k8s_tmp_dir.path }}/kubeconfig"
   register: kubeconfig_raw
 
 - name: Copy content into kubeconfig
-  set_fact:
+  delegate_to: localhost
+  ansible.builtin.set_fact:
     kubeconfig: "{{ kubeconfig_raw['content'] | b64decode | from_yaml }}"
 
 # - name: Fetch Kubeconfig
@@ -27,32 +30,37 @@
 #     kubeconfig: "{{ lookup('file',  openshift_install_dir ~ '/config/kubeconfig' ) | from_yaml }}"
 
 - name: Select cluster & user
-  set_fact:
+  delegate_to: localhost
+  ansible.builtin.set_fact:
     cluster: "{{ kubeconfig | json_query('clusters[?name==`'~ cluster_name ~'`].cluster') | first }}"
     user: "{{ kubeconfig | json_query('users[?name==`admin`].user') | first }}"
 
 - name: Set kube variables
-  set_fact:
-    k8s_kubeconfig: "{{ openshift_install_dir }}/config/kubeconfig"
+  delegate_to: localhost
+  ansible.builtin.set_fact:
+    k8s_kubeconfig: "{{ k8s_tmp_dir.path }}/kubeconfig"
     k8s_host: "{{ cluster.server }}"
-    k8s_ca_cert: "{{ openshift_install_dir }}/config/ca.crt"
-    k8s_client_key: "{{ openshift_install_dir }}/config/client.key"
-    k8s_client_cert: "{{ openshift_install_dir }}/config/client.crt"
+    k8s_ca_cert: "{{ k8s_tmp_dir.path }}/ca.crt"
+    k8s_client_key: "{{ k8s_tmp_dir.path }}/client.key"
+    k8s_client_cert: "{{ k8s_tmp_dir.path }}/client.crt"
 
 - name: Create k8s_ca_cert
-  copy:
+  delegate_to: localhost
+  ansible.builtin.copy:
     content: "{{ cluster['certificate-authority-data'] | b64decode }}"
     dest: "{{ k8s_ca_cert }}"
     mode: 0644
 
 - name: Create k8s_client_key
-  copy:
+  delegate_to: localhost
+  ansible.builtin.copy:
     content: "{{ user['client-key-data'] | b64decode }}"
     dest: "{{ k8s_client_key }}"
     mode: 0644
 
 - name: Create k8s_client_cert
-  copy:
+  delegate_to: localhost
+  ansible.builtin.copy:
     content: "{{ user['client-certificate-data'] | b64decode }}"
     dest: "{{ k8s_client_cert }}"
     mode: 0644
