@@ -1,17 +1,18 @@
 # Disclaimer
-This environment has been created for the sole purpose of providing an easy to deploy and consume a Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
+This environment has been created for the sole purpose of providing an easy to deploy and consume Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
 
-This install will create a 'Minimal Viable Setup', which anyone can extend to their needs and purpose.
+This install will create a “Minimal Viable Setup”, which anyone can extend to their needs and purposes.
 
-Recent tests shows that SSD storage on the Server might be required for any persistent deployment to work correctly.
+Recent tests show that SSD storage on the server might be required for any persistent deployment to work correctly.
 
-Use it at your own please and risk!
+Use it at your own pleasure and risk!
 
 # Release notes
 
 [Release notes](docs/release-notes.md)
 
 # Contribution
+
 If you want to provide additional features, please feel free to contribute via pull requests or any other means.
 
 We are happy to track and discuss ideas, topics and requests via [Issues](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues).
@@ -19,13 +20,13 @@ We are happy to track and discuss ideas, topics and requests via [Issues](https:
 
 # Install Instructions
 
-Our instructions are based on the CentOS Root Server as provided by https://www.hetzner.com/ , please feel free to adapt it to the needs of your preferred hosting provider. We are happy to get pull requests for an updated documentation, which makes consuming this setup easy also for other hosting providers.
+Our instructions are based on the CentOS Root Server as provided by [Hetzner](https://www.hetzner.com/), please feel free to adapt it to the needs of your preferred hosting provider. We are happy to get pull requests for an updated documentation, which makes consuming this setup easy also for other hosting providers.
 
-**These instructions are for running CentOS and 'root' machines which is setup following [Hetzner CentOS](docs/hetzner.md) documentation. You might have to modify commands if running on another Linux distro.  Feel free to provided instructions for providers.**
+**These instructions are for running CentOS and 'root' machines which are set up following the [Hetzner CentOS](docs/hetzner.md) documentation. You might have to modify commands if running on another Linux distro.  Feel free to provide instructions for alternative providers.**
 
-**NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)
+**NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)**
 
-** Supported root server operating systems: **
+**Supported root server operating systems:**
 - CentOS Stream 8
 - RHEL 8 - How to install RHEL8: https://keithtenzer.com/cloud/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
 - RHEL 9 - leapp update from RHEL 8
@@ -34,15 +35,15 @@ Our instructions are based on the CentOS Root Server as provided by https://www.
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
 
-When following below instructional steps, you will end with a setup similar to
+When following the steps below, you will end with a setup similar to this:
 
 ![](images/architecture.png)
 
-## Strongly recommend: configure Hetzner Firewall
+## Strongly recommended: configure Hetzner Firewall
 
 **Important:** Hetzner Firewall only support IPv4 - IPv6 must be solved via the host firewall(d)!
 
-Here an example Hetzner firewall configuration:
+Here is an example Hetzner Firewall configuration:
 
 ![](images/firewall.png)
 
@@ -91,7 +92,6 @@ source ~/.profile
 
 ## Initialize tools
 
-
 ```
 ssh-keygen
 cat ~/.ssh/*.pub >> ~/.ssh/authorized_keys
@@ -107,26 +107,26 @@ We are now ready to install `libvirt` as our hypervisor, provision VMs and prepa
 
 ## Define variables for your cluster
 
-Here is an example about [_cluster.yml_](cluster-example.yml) file that contains information about the cluster that is going to be installed.
+Here is an example of a [cluster.yml](cluster-example.yml) file that contains information about the cluster that is going to be installed. The parameters that can be configured are as follows:
 
 | variable | description  |Default|
 |---|---|---|
 |`cluster_name`               |Name of the cluster to be installed | **Required** |
 |`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_, _hetzner_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
 |`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
-|`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS recods, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
+|`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS records, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
 |`public_domain`              |Root domain that will be used for your cluster.  | **Required** |
 |`ip_families`                |Decide whether you want IPv4, IPv6 or dual-stack. | `['IPv4']` |
 |`listen_address`             |Listen address for the load balancer on your host system.  |`hostvars['localhost']['ansible_default_ipv4']['address']` |
 |`listen_address_ipv6`        |Same as listen_address but for IPv6 |`hostvars['localhost']['ansible_default_ipv6']['address']`|
-|`public_ip`                  |Optional to overwrite public ip, if it is different from `listen_address`. Used for dns records at your dns_provider. | `listen_address` |
+|`public_ip`                  |Optional to overwrite public IP, if it is different from `listen_address`. Used for dns records at your `dns_provider`. | `listen_address` |
 |`public_ipv6`                |Same as `public_ip` but for IPv6 | `listen_address_ipv6` |
 |`masters_schedulable`        |Optional to overwrite masters schedulable| `false` |
 |`sdn_plugin_name`            |Optional to change the SDN plugin between `OVNKubernetes` or `OpenShiftSDN` | `OVNKubernetes` |
 
 ### Cluster design (single node, compact or normal)
 
-It is possible to install three different types of cluster designes: single node, compact or normal.
+It is possible to install three different types of cluster designs: single node, compact or normal.
 
 #### Single Node
 
@@ -145,6 +145,7 @@ masters_schedulable: true # is default
 #### Compact
 
 Recommended `cluster.yml` settings:
+
 ```yaml
 master_count: 3
 compute_count: 0
@@ -154,6 +155,7 @@ masters_schedulable: true # is default
 #### Normal
 
 Recommended `cluster.yml` settings:
+
 ```yaml
 master_count: 3
 compute_count: 2 # at least 2 recommended
@@ -164,7 +166,7 @@ masters_schedulable: false
 
 [Read this if you want to deploy pre releases](docs/ocp-pre-release.md)
 
-### Setup public DNS records
+### Set up public DNS records
 
 Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_, _DigitalOcean_, _GCP DNS_ or _none_.
 If you want to use _Route53_, _Cloudflare_, _DigitalOcean_, _GCP_ or _Gandi_ as your DNS provider, you have to add a few variables. Check the instructions below.
@@ -173,7 +175,7 @@ DNS records are constructed based on _cluster_name_ and _public_domain_ values. 
 - api._cluster_name_._public_domain_
 - \*.apps._cluster_name_._public_domain_
 
-If you use another DNS provider, feel free to contribute. :D
+If you use another DNS provider, feel free to contribute! 😀
 
 With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.
 
@@ -195,14 +197,14 @@ Please configure in `cluster.yml` all necessary credentials:
 
 |Variable | Default | Description |
 |---|---|---|
-|`storage_nfs`|false|Setup a local NFS server, create a Storage Class (with [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) ) pointing to it, and use that StorageClass for the internal Registry Storage|
+|`storage_nfs`|false|Set up a local NFS server, create a Storage Class (with [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) ) pointing to it, and use that StorageClass for the internal Registry Storage|
 |`vm_autostart`|false|Create cluster VMs with `autostart` enabled|
 |`vm_storage_backend`|`qcow2`|You can choose between default `qcow2` and `lvm` as storage backend.|
 |`vm_storage_backend_location`|empty|Important for vm_storage_backend lvm, please add the volume group for example `vg0`|
 |`auth_redhatsso`|empty|Install Red Hat SSO, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_htpasswd`|empty|Install htpasswd, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`auth_github`|empty|Install GitHub IDP, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
-|`cluster_role_bindings`|empty|Setup cluster role binding, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
+|`cluster_role_bindings`|empty|Set up cluster role binding, checkout  [_cluster-example.yml_](cluster-example.yml) for an example |
 |`openshift_install_command`|[check defaults](ansible/roles/openshift-4-cluster/defaults/main.yml)|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)|
 |`install_config_additionalTrustBundle`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
 |`install_config_imageContentSources`|empty|Important for air-gapped installation. checkout [docs/air-gapped.md](docs/air-gapped.md)
