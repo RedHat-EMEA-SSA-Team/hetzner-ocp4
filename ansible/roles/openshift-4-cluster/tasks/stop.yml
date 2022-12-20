@@ -5,29 +5,29 @@
 #     vm_instance_name: "{{ cluster_name }}-bootstrap"
 
 - name: Init empty vms
-  set_fact:
+  ansible.builtin.set_fact:
     vms: "[]"
 
 - name: Add masters to vms
-  set_fact:
+  ansible.builtin.set_fact:
     vms: "{{ vms }} + [ '{{ cluster_name }}-master-{{ item }}' ]"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
 - name: Add compute to vms
-  set_fact:
+  ansible.builtin.set_fact:
     vms: "{{ vms }} + [ '{{ cluster_name }}-compute-{{ item }}' ]"
   with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
   when: compute_count > 0
 
 - name: "Shutdown VM"
-  virt:
+  community.libvirt.virt:
     command: shutdown
     name: "{{ item }}"
   ignore_errors: yes
   with_items: "{{ vms }}"
 
 - name: "Check VM state"
-  virt:
+  community.libvirt.virt:
     name: "{{ item }}"
     command: status
   register: result
@@ -37,7 +37,7 @@
   with_items: "{{ vms }}"
 
 - name: Stop OpenShift 4 load balancer
-  import_role:
+  ansible.builtin.import_role:
     name: openshift-4-loadbalancer
     tasks_from: stop.yml
   vars:

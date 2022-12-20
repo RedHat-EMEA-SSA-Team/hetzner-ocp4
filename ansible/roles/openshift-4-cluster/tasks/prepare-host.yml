@@ -1,25 +1,29 @@
 ---
+- name: Initial reboot warning (off)
+  ansible.builtin.set_fact:
+    hetzner_ocp4_prepare_host_reboot_needed: false
+
 - name: Include OS specific part
-  include_tasks: "prepare-host-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+  ansible.builtin.include_tasks: "prepare-host-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
 - name: Enable and Start libvirtd
-  systemd:
+  ansible.builtin.service:
     name: libvirtd
     state: started
     enabled: yes
 
 - name: 'Restart libvirtd because of Issue #146'
-  systemd:
+  ansible.builtin.service:
     name: libvirtd
     state: restarted
 
 - name: Verify KVM module is loaded
-  shell: "set -o pipefail && lsmod | grep -i kvm"
+  ansible.builtin.shell: "set -o pipefail && lsmod | grep -i kvm"
   register: result
   failed_when: "result.rc != 0"
 
 - name: Create SSH key for root
-  user:
+  ansible.builtin.user:
     name: root
     generate_ssh_key: yes
     ssh_key_bits: 2048
@@ -27,14 +31,40 @@
 
 # Enable ip forwarding globally - fixed issue #35
 - name: Check /etc/systemd/network/10-mainif.network
-  stat:
+  ansible.builtin.stat:
     path: /etc/systemd/network/10-mainif.network
   register: stat_result
 
 - name: Add IPForward=ipv4 to /etc/systemd/network/10-mainif.network
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/systemd/network/10-mainif.network
     line: 'IPForward=ipv4'
     insertafter: '^\[Network\]'
     regexp: '^IPForward='
   when: stat_result.stat.exists
+
+- name: Check if new kernel has been installed and local execution
+  ansible.builtin.fail:
+    msg: "A new kernel has been installed, please reboot and run the playbook again."
+  when:
+    - hetzner_ocp4_prepare_host_reboot_needed
+    - ansible_host == "localhost"
+
+- name: Reboot in case of remote execution
+  block:
+    - name: Reboot server
+      ansible.builtin.shell: sync && sleep 2 && shutdown -r now
+      async: 1
+      poll: 0
+      changed_when: true
+      failed_when: false
+
+    - name: Wait for the reboot to complete
+      ansible.builtin.wait_for_connection:
+        connect_timeout: 10
+        sleep: 5
+        delay: 5
+        timeout: 300
+  when:
+    - hetzner_ocp4_prepare_host_reboot_needed
+    - ansible_host != "localhost"

@@ -53,3 +53,7 @@ imageContentSources:
 proxy:
   {{ install_config_proxy  | to_nice_yaml(indent=2) | indent(width=2) }}
 {% endif %}
+{%- if install_config_capabilities is defined %}
+capabilities:
+  {{ install_config_capabilities  | to_nice_yaml(indent=2) | indent(width=2) }}
+{% endif %}

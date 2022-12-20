@@ -1,0 +1,6 @@
+---
+- name: Restart SSH daemon
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+  delegate_to: "{{ hetzner_ip }}"

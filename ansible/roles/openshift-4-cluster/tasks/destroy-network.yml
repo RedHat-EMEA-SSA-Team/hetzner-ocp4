@@ -1,7 +1,7 @@
 ---
 - name: Destroy public dns entries
   delegate_to: localhost
-  import_role:
+  ansible.builtin.import_role:
     name: public_dns
     tasks_from: destroy.yml
   vars:
@@ -15,19 +15,21 @@
     pd_aws_zone: "{{ aws_zone }}"
     pd_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
     pd_hetzner_zone: "{{ hetzner_zone }}"
+    pd_gandi_api_key: "{{ gandi_api_key }}"
+    pd_gandi_zone: "{{ gandi_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
   tags: public_dns
   when: dns_provider != 'none'
 
 - name: Remove api.{{ cluster_name }}.{{ public_domain }} to /etc/hosts
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/hosts
     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ cluster_name }}.{{ public_domain }}"
     block: ""
   tags: public_dns
 
 - name: Destroy OpenShift 4 load balancer
-  import_role:
+  ansible.builtin.import_role:
     name: openshift-4-loadbalancer
     tasks_from: destroy.yml
   vars:
@@ -36,17 +38,17 @@
     lb
 
 - name: Destroy Network {{ vn_name }}
-  virt_net:
+  community.libvirt.virt_net:
     command: destroy
     name: "{{ vn_name }}"
   ignore_errors: yes
 
 - name: Undefine Network {{ vn_name }}
-  virt_net:
+  community.libvirt.virt_net:
     command: undefine
     name: "{{ vn_name }}"
 
 - name: Check firewalld source
-  shell: "firewall-cmd --zone=internal --list-sources | grep -q '{{ vn_subnet }}/24'"
+  ansible.builtin.shell: "firewall-cmd --zone=internal --list-sources | grep -q '{{ vn_subnet }}/24'"
   ignore_errors: true
   register: grep_rc

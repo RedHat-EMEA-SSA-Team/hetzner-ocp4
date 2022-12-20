@@ -1,27 +1,28 @@
 ---
 
 - name: Build openshift download urls
-  set_fact:
+  ansible.builtin.set_fact:
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
 
 - name: Init check_urls
-  set_fact:
+  ansible.builtin.set_fact:
     check_urls:
       - "{{ coreos_download_url }}"
       - "{{ tmp_openshift_install_download_url }}"
       - "{{ tmp_openshift_client_download_url }}"
+      - "{{ openshift_location }}/oc-mirror.tar.gz"
       - "{{ opm_download_url }}"
       - "{{ helm_cli_location }}"
       - "{{ butane_cli_location }}"
 
 - name: Add coreos_csum_url to check_urls
-  set_fact:
+  ansible.builtin.set_fact:
     check_urls: "{{ check_urls + [coreos_csum_url] }}"
   when: coreos_csum_str is not defined
 
 - name: Check download urls
-  uri:
+  ansible.builtin.uri:
     method: HEAD
     url: "{{ item }}"
     status_code:
@@ -32,13 +33,13 @@
   with_items: "{{ check_urls }}"
 
 - name: check if coreos image already downloaded and get checksum
-  stat:
+  ansible.builtin.stat:
     checksum_algorithm: sha256
     path: "{{ coreos_path }}/{{ coreos_file }}"
   register: coreos_old_image
 
 - name: verify existing coreos image is valid
-  lineinfile:
+  ansible.builtin.lineinfile:
     name: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
     line: "{{ coreos_old_image.stat.checksum }}  {{ coreos_file }}"
     state: present
@@ -53,32 +54,32 @@
     # Work-a-round for https://github.com/ansible/ansible/issues/71420
     #   fix not shipped yet
     - name: Findout exactly sha256
-      set_fact:
+      ansible.builtin.set_fact:
         coreos_csum_str: "{{ lookup('url', coreos_csum_url,  split_lines=False ).split('\n') |map('regex_search','.*' + coreos_download_url | basename + '$') | select('string') | first | regex_search('^([a-z0-9])+') }}"  # noqa line-length
       when: coreos_csum_str is not defined
 
     - name: download coreos
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ coreos_download_url }}"
         dest: "{{ coreos_path }}/{{ coreos_download_url | basename }}"
         checksum: "sha256:{{ coreos_csum_str }}"
       register: coreos_download
 
     - name: Get filetype
-      stat:
+      ansible.builtin.stat:
         path: "{{ coreos_path }}/{{ coreos_download_url | basename }}"
       register: coreos_stat
 
     - name: unzip the coreos
-      command: "gunzip {{ coreos_path }}/{{ coreos_download_url | basename }}"
+      ansible.builtin.command: "gunzip {{ coreos_path }}/{{ coreos_download_url | basename }}"
       args:
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
       register: unzip
-      when: coreos_stat.stat.mimetype == 'application/x-gzip'
+      when: coreos_stat.stat.mimetype == 'application/x-gzip' or coreos_stat.stat.mimetype == 'application/gzip'
 
     - name: unxz the coreos
-      command: "unxz {{ coreos_path }}/{{ coreos_download_url | basename }}"
+      ansible.builtin.command: "unxz {{ coreos_path }}/{{ coreos_download_url | basename }}"
       args:
         chdir: "{{ coreos_path }}"
         creates: "{{ coreos_path }}/{{ coreos_file }}"
@@ -86,13 +87,13 @@
       when: coreos_stat.stat.mimetype == 'application/x-xz'
 
     - name: calculate checksum of the new coreos image
-      stat:
+      ansible.builtin.stat:
         checksum_algorithm: sha256
         path: "{{ coreos_path }}/{{ coreos_file }}"
       register: coreos_csum
 
     - name: store the checksum of the file
-      copy:
+      ansible.builtin.copy:
         dest: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
         content: "{{ coreos_csum.stat.checksum }}  {{ coreos_file }}\n"
         mode: 0644
@@ -103,7 +104,7 @@
     csum_check.failed
 
 - name: Create OpenShift artifacts directory
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: u+rwx,g+rx,o+rx
@@ -113,7 +114,7 @@
     - "{{ opm_dest }}"
 
 - name: Download Openshift installer
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ tmp_openshift_install_download_url }}"
     dest: "/opt/openshift-install-{{ openshift_version }}/"
     remote_src: yes
@@ -125,7 +126,7 @@
     creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
 
 - name: Download Openshift client
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ tmp_openshift_client_download_url }}"
     dest: "/opt/openshift-client-{{ openshift_version }}/"
     remote_src: yes
@@ -136,8 +137,20 @@
       - 'README.md'
     creates: "/opt/openshift-client-{{ openshift_version }}/oc"
 
+- name: Download OpenShift Mirror
+  ansible.builtin.unarchive:
+    src: "{{ openshift_location }}/oc-mirror.tar.gz"
+    dest: "/opt/openshift-client-{{ openshift_version }}/"
+    remote_src: yes
+    mode: u+rwx,g+rx,o+rx
+    owner: root
+    group: root
+    exclude:
+      - 'README.md'
+    creates: "/opt/openshift-client-{{ openshift_version }}/oc-mirror"
+
 - name: Download OPM (gz)
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ opm_download_url }}"
     dest: "{{ opm_dest }}"
     remote_src: yes
@@ -150,33 +163,34 @@
   when: opm_download_url | regex_search("^(.*)\.tar\.gz$")
 
 - name: Download OPM
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ opm_download_url }}"
     dest: "{{ opm_dest }}/opm"
     mode: u+rwx,g+rx,o+rx
   when: not opm_download_url | regex_search("^(.*)\.tar\.gz$")
 
 - name: Download Helm client
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ helm_cli_location }}"
     mode: u+rwx,g+rx,o+rx
     dest: "/opt/openshift-client-{{ openshift_version }}/helm"
 
 - name: Download butane client
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ butane_cli_location }}"
     mode: u+rwx,g+rx,o+rx
     dest: "/opt/openshift-client-{{ openshift_version }}/butane"
 
 
 - name: Create a symbolic link
-  file:
+  ansible.builtin.file:
     src: "{{ item.value }}"
     dest: "{{ item.key }}"
     state: link
     force: yes
   with_dict:
     "/usr/local/bin/oc": "/opt/openshift-client-{{ openshift_version }}/oc"
+    "/usr/local/bin/oc-mirror": "/opt/openshift-client-{{ openshift_version }}/oc-mirror"
     "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
     "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"
     "/usr/local/bin/helm": "/opt/openshift-client-{{ openshift_version }}/helm"

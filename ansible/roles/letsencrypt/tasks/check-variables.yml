@@ -1,6 +1,6 @@
 ---
 - name: Check required variables
-  assert:
+  ansible.builtin.assert:
     that:
       - lookup('vars',item) is defined
     msg: "{{ item }} is not defined!"
@@ -10,7 +10,7 @@
     - le_letsencrypt_account_email
 
 - name: Check required Route53 variables
-  assert:
+  ansible.builtin.assert:
     that:
       - lookup('vars',item) is defined
     msg: "{{ item }} is not defined!"
@@ -21,7 +21,7 @@
   when: le_dns_provider == "route53"
 
 - name: Check required CloudFlare variables
-  assert:
+  ansible.builtin.assert:
     that:
       - lookup('vars',item) is defined
     msg: "{{ item }} is not defined!"
@@ -32,7 +32,7 @@
   when: le_dns_provider == "cloudflare"
 
 - name: Check required GCP variables
-  assert:
+  ansible.builtin.assert:
     that:
       - lookup('vars',item) is defined
     msg: "{{ item }} is not defined!"
@@ -43,7 +43,7 @@
   when: le_dns_provider == "gcp"
 
 - name: Check required Azure variables
-  assert:
+  ansible.builtin.assert:
     that:
       - lookup('vars',item) is defined
     msg: "{{ item }} is not defined!"
@@ -56,7 +56,7 @@
   when: le_dns_provider == "azure"
 
 - name: Check required Hetzner variables
-  assert:
+  ansible.builtin.assert:
     that:
       - lookup('vars',item) is defined
     msg: "{{ item }} is not defined!"
@@ -65,8 +65,18 @@
     - le_hetzner_zone
   when: le_dns_provider == "hetzner"
 
+- name: Check required Gandi variables
+  ansible.builtin.assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_gandi_api_key
+    - le_gandi_zone
+  when: le_dns_provider == "gandi"
+
 - name: Debug var only with -vv CloudFlare
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
     verbosity: 2
   with_items:
@@ -80,7 +90,7 @@
   when: le_dns_provider == "cloudflare"
 
 - name: Debug var only with -vv for Route53
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
     verbosity: 2
   with_items:
@@ -94,7 +104,7 @@
   when: le_dns_provider == "route53"
 
 - name: Debug var only with -vv for GCP
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
     verbosity: 2
   with_items:
@@ -109,7 +119,7 @@
   when: le_dns_provider == "gcp"
 
 - name: Debug var only with -vv for Azure
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
     verbosity: 2
   with_items:
@@ -126,10 +136,19 @@
   when: le_dns_provider == "azure"
 
 - name: Debug var only with -vv for Hetzner
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
     verbosity: 2
   with_items:
     - le_hetzner_account_api_token
     - le_hetzner_zone
   when: le_dns_provider == "hetzner"
+
+- name: Debug var only with -vv for Gandi
+  ansible.builtin.debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_gandi_api_key
+    - le_gandi_zone
+  when: le_dns_provider == "gandi"

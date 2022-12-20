@@ -1,29 +1,29 @@
 ---
 - name: Ensure installation directory
-  file:
+  ansible.builtin.file:
     path: "{{ openshift_install_dir }}"
     state: directory
     mode: 0755
 
 - name: Create install config
-  template:
+  ansible.builtin.template:
     src: install-config.yaml.j2
     dest: "{{ openshift_install_dir }}/install-config.yaml"
     mode: 0644
 
 - name: Save install-config from deletion
-  copy:
+  ansible.builtin.copy:
     dest: "{{ openshift_install_dir }}/install-config.yaml.original"
     src: "{{ openshift_install_dir }}/install-config.yaml"
     remote_src: yes
     mode: 0644
 
 - name: Create manifest files
-  command: "{{ openshift_install_command }} create manifests --dir={{ openshift_install_dir }}"
+  ansible.builtin.command: "{{ openshift_install_command }} create manifests --dir={{ openshift_install_dir }}"
   when: not masters_schedulable
 
 - name: Make Master nodes unschedulable
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ openshift_install_dir }}/manifests/cluster-scheduler-02-config.yml"
     regexp: '^(.*)mastersSchedulable(.*)$'
     line: '  masterSchedulable: False'
@@ -31,14 +31,14 @@
   when: not masters_schedulable
 
 - name: Create ignition files
-  command: "{{ openshift_install_command }} --dir={{ openshift_install_dir }} create ignition-configs"
+  ansible.builtin.command: "{{ openshift_install_command }} --dir={{ openshift_install_dir }} create ignition-configs"
 
 # #
 # [connection]
 # ipv6.dhcp-iaid=mac
 # ipv6.dhcp-duid=ll
 - name: Create RHCOS Config
-  copy:
+  ansible.builtin.copy:
     dest: "{{ openshift_install_dir }}/{{ item }}.rcc"
     mode: 0644
     content: |
@@ -63,7 +63,7 @@
     - worker
 
 - name: Mangle ignition config
-  command: |
+  ansible.builtin.command: |
     /opt/openshift-client-{{ openshift_version }}/butane \
       --files-dir {{ openshift_install_dir }} \
       --output {{ openshift_install_dir }}/{{ item }}-extra.ign \

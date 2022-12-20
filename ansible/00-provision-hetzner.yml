@@ -1,16 +1,5 @@
 ---
 
-- name: Build inventory
-  hosts: localhost
-  connection: local
-  gather_facts: no
-  vars_files:
-    - ../cluster.yml
-  tasks:
-    - name: Add hetzner server to inventory
-      add_host:
-        name: "{{ hetzner_ip }}"
-
 - name: install hetzner server
   hosts: all
   gather_facts: no
@@ -18,6 +7,12 @@
   vars_files:
     - ../cluster.yml
   tasks:
+    - name: Check remote execution or 'local'
+      set_fact:
+        ansible_host: "{{ hetzner_ip }}"
+      when:
+        ansible_host == 'localhost'
+
     - name: provision hetzner root server
       import_role:
         name: provision-hetzner

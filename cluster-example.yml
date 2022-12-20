@@ -35,6 +35,9 @@ azure_resource_group: dns_zone_resource_group
 # Hetzner
 hetzner_account_api_token: 3543ade82AA$73.....
 hetzner_zone: example.com
+# Gandi
+gandi_api_key: api_key
+gandi_zone: example.com
 
 # Created with: htpasswd -nb admin openshift
 # Example password is openshift

@@ -27,6 +27,8 @@ Role Variables
 | le_gcp_managed_zone_domain | GCP DNS managed zone domain || non **required if provider is  gcp** |
 | le_hetzner_account_api_token | Hetzner API token for API authentication | `jdu...zalU`| non **required if provider is hetzner** |
 | le_hetzner_zone | Hetzner zone in which the entries are created and deleted for the dns challenge | `domain.tld` | non **required if provider is hetzner** |
+| le_gandi_api_key | Gandi API key for API authentication || non **required if provider is gandi** |
+| le_gandi_zone | Gandi zone in which the entries are created and delete for the DNS challenge | `domain.tld` | non **required if provider is gandi** |
 | le_public_domain | Use to create SAN certificate: `DNS:*.apps.{{ le_public_domain }},DNS:api.{{ le_public_domain }}` | cluster.domain.tld | non **required** |
 | le_certificates_dir | Here the certificates are stored  | `/root/certificates` | `{{ playbook_dir }}../certificate/` |
 | le_acme_directory | ACME Directory by default it use staging env because of https://letsencrypt.org/docs/rate-limits/ | `https://acme-v02.api.letsencrypt.org/directory` | `https://acme-staging-v02.api.letsencrypt.org/directory` |
