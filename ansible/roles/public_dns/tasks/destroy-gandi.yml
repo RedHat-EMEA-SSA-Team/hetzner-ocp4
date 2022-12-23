@@ -3,7 +3,7 @@
   community.general.gandi_livedns:
     state: absent
     domain: "{{ pd_gandi_zone }}"
-    record: "{{ item }}.{{ pd_public_domain }}"
+    record: "{{ item }}.{{ cluster_name }}"
     type: A
     api_key: "{{ gandi_api_key }}"
   with_items:
@@ -17,7 +17,7 @@
   community.general.gandi_livedns:
     state: absent
     domain: "{{ pd_gandi_zone }}"
-    record: "{{ item }}.{{ pd_public_domain }}"
+    record: "{{ item }}.{{ cluster_name }}"
     type: AAAA
     api_key: "{{ gandi_api_key }}"
   with_items:
