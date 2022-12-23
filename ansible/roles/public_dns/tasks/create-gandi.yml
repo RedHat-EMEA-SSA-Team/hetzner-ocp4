@@ -3,7 +3,7 @@
   community.general.gandi_livedns:
     state: present
     domain: "{{ pd_gandi_zone }}"
-    record: "{{ item }}.{{ pd_public_domain }}"
+    record: "{{ item }}.{{ cluster_name }}"
     type: A
     values:
       - "{{ pd_public_ip }}"
@@ -20,7 +20,7 @@
   community.general.gandi_livedns:
     state: present
     domain: "{{ pd_gandi_zone }}"
-    record: "{{ item }}.{{ pd_public_domain }}"
+    record: "{{ item }}.{{ cluster_name }}"
     type: AAAA
     values:
       - "{{ pd_public_ipv6 }}"
