@@ -12,11 +12,12 @@ Requirements
 Role Variables
 --------------
 
-| variable | describtion  | example | default | 
+| variable | describtion  | example | default |
 |---|---|---|---|
 | le_dns_provider | DNS provider | `[route53|cloudflare|gcp|azure|hetzner]` |  non **required** |
 | le_cloudflare_account_email | Cloudflare Account E-Mail for API authentication | `account@domain.tld`| non **required if provider is cloudflare** |
-| le_cloudflare_account_api_token | Cloudflare API token for API authentication | `loo...ngiJ`| non **required if provider is cloudflare** |
+| le_cloudflare_account_api_token | Cloudflare Global API token for API authentication | `loo...ngiJ`| non **required if provider is cloudflare** |
+| le_cloudflare_api_token | Cloudflare API token for API authentication | `loo...ngiJ`| non **required if provider is cloudflare** |
 | le_cloudflare_zone | Cloudflare zone in which the entries are created and deleted for the dns challenge | `domain.tld` | non **required if provider is cloudflare** |
 | le_aws_access_key | AWS Access key | |  non **required if provider is  route53** |
 | le_aws_secret_key | AWS secret key || non **required if provider is  route53** |
@@ -71,7 +72,7 @@ Example in context of hetzner-ocp4
     lc_cloudflare_account_email: "{{ cloudflare_account_email }}"
     lc_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
     lc_cloudflare_zone: "{{ cloudflare_zone }}"
-    lc_public_domain: "{{ cluster_name }}.{{ public_domain }}" 
+    lc_public_domain: "{{ cluster_name }}.{{ public_domain }}"
     # Only set if you really want a production letsencrypt certificate
     #   https://letsencrypt.org/docs/rate-limits/
     # lc_acme_directory: "https://acme-v02.api.letsencrypt.org/directory"

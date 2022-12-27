@@ -55,21 +55,6 @@
     challenge_data_dns: "{{ sample_com_challenge.challenge_data_dns }}"
   when: sample_com_challenge is changed
 
-- name: Create DNS record at CloudFlare
-  delegate_to: localhost
-  community.general.net_tools.cloudflare_dns:
-    zone: "{{ le_cloudflare_zone }}"
-    record: "{{ item.0.key }}"
-    # 1 for automatic
-    ttl: 1
-    type: TXT
-    value: "{{ item.1 }}"
-    account_email: "{{ le_cloudflare_account_email }}"
-    account_api_token: "{{ le_cloudflare_account_api_token }}"
-  register: record
-  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
-  when: le_dns_provider == "cloudflare" and sample_com_challenge is changed
-
 - name: Create DNS record at Route53
   delegate_to: localhost
   community.aws.route53:
@@ -167,7 +152,7 @@
 - name: Include DNS provider
   ansible.builtin.include_tasks: "create-{{ le_dns_provider }}.yml"
   when:
-    - le_dns_provider in ['hetzner', 'digitalocean']
+    - le_dns_provider in ['hetzner', 'digitalocean', 'cloudflare']
     - sample_com_challenge is changed
 
 - name: Pause, wait for DNS changes
@@ -189,21 +174,6 @@
     remaining_days: 60
     data: "{{ sample_com_challenge }}"
   when: sample_com_challenge is changed
-
-- name: Delete DNS record at CloudFlare
-  delegate_to: localhost
-  community.general.net_tools.cloudflare_dns:
-    zone: "{{ le_cloudflare_zone }}"
-    record: "{{ item.0.key }}"
-    # 1 for automatic
-    ttl: 1
-    type: TXT
-    value: "{{ item.1 }}"
-    account_email: "{{ le_cloudflare_account_email }}"
-    account_api_token: "{{ le_cloudflare_account_api_token }}"
-    state: absent
-  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
-  when: le_dns_provider == "cloudflare" and sample_com_challenge is changed
 
 - name: Delete DNS record at Route53
   delegate_to: localhost
@@ -290,7 +260,7 @@
 - name: Include DNS provider
   ansible.builtin.include_tasks: "destroy-{{ le_dns_provider }}.yml"
   when:
-    - le_dns_provider in ['hetzner', 'digitalocean']
+    - le_dns_provider in ['hetzner', 'digitalocean','cloudflare']
     - sample_com_challenge is changed
 
 - name: concat root ca and intermediate
