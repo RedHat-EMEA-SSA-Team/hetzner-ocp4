@@ -1,4 +1,20 @@
-## Setup Hetzner root server
+## Set up the Hetzner root server
+
+There are three options to set up the server: the automated installation via Hetzner Robot, the manual one in rescue mode, and the automated provisioning via an Ansible playbook.
+
+### Automated Linux installation via Hetzner Robot
+
+Select the “Linux” tab under https://robot.hetzner.com/server, and select one of the Linux distributions offered. We recommend CentOS Stream 8. Select the checkbox about recognition of data loss on the machine, and press “Linux Installation aktivieren”.
+
+![](../images/hetzner-linux.png)
+
+Next, go to the “Reset” tab and trigger the “Hardware Reset” action.
+
+![](../images/hetzner-reset.png)
+
+The Linux installation will then complete automatically. Once it is finished, you shall receive an email notification.
+
+### Manual Linux installation via rescue mode
 
 When you get your server you get it without OS and it will be booted to rescue mode where you decide how it will be configured.
 
@@ -118,9 +134,9 @@ You are now ready to reboot your system into the newly installed OS.
 [root@server ~]# reboot now
 ```
 
-### Optional: Install hetzer server via ansible
+### Install Hetzer server via Ansible
 
-If you do not want to do the above steps by hand: use Ansible! :-)
+If you do not want to follow any the above steps, use Ansible instead! :-)
 
 1) Create a `cluster.yml` in the repo's root folder and add your Hetzner server specifc information, as in the following example:
     ```
