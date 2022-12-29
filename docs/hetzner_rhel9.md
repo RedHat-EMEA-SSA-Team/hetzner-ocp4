@@ -1,85 +1,96 @@
-## Howto install RHEL 9 and use it as Hetzner Base image
+## How to install RHEL 9 and use it as Hetzner base image
 
 ### Download the image and install a RHEL-9-minimal virtual machine
 
-Download RHEL 9.1 DVD image from [Red Hat Customer Portal](https://access.redhat.com/downloads/content/479/ver=/rhel---9/9.1/x86_64/product-software)
+Download the RHEL 9.1 DVD image from [Red Hat Customer Portal](https://access.redhat.com/downloads/content/479/ver=/rhel---9/9.1/x86_64/product-software)
 
-Create a virtual machine and boot from the downloaded ISO. Once the `Anaconda Installer` is loaded, adjust settings as required. Recommend adjustments are `minimal` Software selection and specific filesystem layout. For all other options, the defaults are sufficient.
+Create a virtual machine and boot from the downloaded ISO. Once the `Anaconda Installer` is loaded, adjust settings as required. The recommended adjustments are `minimal` software selection and specific filesystem layout. For all other options, the defaults are sufficient.
 
+Adjust the filesystem layout to be more compatible with automation of this repository.
 
-Adjust the filesystem layout to be more comfortable with automation of this repository.
-
-Open the disk partitioning dialog and select `Manual Partitioning` and create the filesystem layout choosing the automation proposal and LVM. 
-![](../images/rhel9_disk-layout-1.png)
+Open the disk partitioning dialog and select `Manual Partitioning` and create the filesystem layout choosing the automation proposal and LVM.
+![RHEL 9 disk layout 1](../images/rhel9_disk-layout-1.png)
 
 Once created, change the volume group for `root` and `swap` logical volume to `vg0`
-![](../images/rhel9_disk-layout-2.png)
+![RHEL 9 disk layout 2](../images/rhel9_disk-layout-2.png)
 
 When finished, it will look like this.
-![](../images/rhel9_disk-layout-3.png)
+![RHEL 9 disk layout 3](../images/rhel9_disk-layout-3.png)
 
-
-Wait until installation is finished and press reboot.
+Wait until the installation is finished and press reboot.
 
 ### Configure the system to match Hetzner requirements
-Once installed and rebooted, login with previously given credentials and adjust to met Hetzner requirements accordingly.
 
-#### Install package dependencies and upgrade the OS to latest version.
-```
+Once installed and rebooted, login with previously given credentials and adjust accordingly to meet Hetzner requirements.
+
+#### Install package dependencies and upgrade the OS to latest version
+
+```shell
 # dnf install -y lvm2 mdadm tar bzip2
 # dnf upgrade 
 ```
 
 #### Disable LVM system.devices
-In RHEL 9, `system.devices` became [default](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/pdf/configuring_and_managing_logical_volumes/red_hat_enterprise_linux-9-configuring_and_managing_logical_volumes-en-us.pdf), which is not recommended for the image-based installation for Hetzner. For that, let's disable this.
-```
+
+In RHEL 9, `system.devices` became [default](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/pdf/configuring_and_managing_logical_volumes/red_hat_enterprise_linux-9-configuring_and_managing_logical_volumes-en-us.pdf), which is not recommended for the image-based installation for Hetzner. Disable as such:
+
+```shell
 # rm -f /etc/lvm/devices/system.devices
 # sed -i -E 's/\s+# use_devicesfile = 0/        use_devicesfile = 0/' /etc/lvm/lvm.conf
 ```
 
-#### enable autoassembly of special devices
+#### Enable autoassembly of special devices
+
 To allow RAID and LVM devices scanned during boot, `rd.auto` needs to be enabled.
-```
+
+```shell
 # grubby --update-kernel=/boot/vmlinuz-5.14.0-162.6.1.el9_1.x86_64 --args=rd.auto
 ```
 
 #### Create a symlink for dracut
-Hetzner creates a ram disk and uses the dracut tool. It expects dracut to be installed under /sbin. This is not the case since RHEL 8 so we will add a symlink.
-```
+
+Hetzner creates a ram disk and uses the dracut tool. It expects dracut to be installed under `/sbin`. This is not the case since RHEL 8 so we will add a symlink.
+
+```shell
 # ln -s /usr/bin/dracut /sbin/dracut
 ```
 
 #### Cleanup and finish image creation
+
 Remove not required wireless firmware-drivers
-```
+
+```shell
 # dnf remove iwl*
 ```
 
 Unregister and remove cached files
-``` 
+
+```shell 
 # subscription-manager unregister
 # subscription-manager clean
 # dnf clean all
 # rm -rf /etc/ssh/ssh_host_*
 ```
 
-Finally clean the history
-```
+Finally, clean the history
+
+```shell
 # history -c
 ```
 
-Now it's time to create the image-archive, which can be uploaded to the rescue-shell
-```
+Create the image-archive, which can be uploaded to the rescue-shell
+
+```shell
 # tar cJvf /CentOS-91-el-x86_64-minimal.tar.xz --exclude=/dev --exclude=/proc --exclude=/sys --exclude=/CentOS-91-el-x86_64-minimal.tar.xz /
 ```
 
+## Install the image on your server
 
-## Install the image to your server
-Boot the Hetzner System into Rescue Shell, create `config.txt` and upload the image to your `/root`-folder for use with `installimage` tool.
+Boot the Hetzner system into the Rescue Shell, create `config.txt` and upload the image to your `/root` folder for use with the `installimage` tool.
 
-Based on the image creation, which name for volume group was chosen, one need to adjust the `PART lvm vg0` in the `config.txt` file. Below is the example, based on the image created above.
+Based on the volume group name chosen during the image creation, one needs to adjust the `PART lvm vg0` in the `config.txt` file. Below is the example, based on the image created above.
 
-```
+```txt
 DRIVE1 /dev/sda
 DRIVE2 /dev/sdb
 DRIVE3 /dev/sdc
@@ -105,14 +116,15 @@ LV vg1 storage /data xfs all
 IMAGE /root/CentOS-91-el-x86_64-minimal.tar.xz
 ```
 
+To install the image, run the `installimage` command.
 
-To install the image, run `installimage` command.
-```
+```shell
 # installimage -a -c config.txt
 ```
 
-The output should be expected to look like the following.
-```shell
+The output should look like the following:
+
+```txt
 
                 Hetzner Online GmbH - installimage
 
