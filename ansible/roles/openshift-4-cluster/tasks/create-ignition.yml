@@ -52,7 +52,7 @@
         files:
           - path: /etc/NetworkManager/conf.d/01-ipv6.conf
             contents:
-              source: data:,%5Bconnection%5D%0Aipv6.dhcp-iaid%3Dmac%0Aipv6.dhcp-duid%3Dll%0Aipv6.may-fail%3Dno
+              source: data:,%5Bconnection%5D%0Aipv6.dhcp-iaid%3Dmac%0Aipv6.dhcp-duid%3Dll
             mode: 420
             user:
               name: root
