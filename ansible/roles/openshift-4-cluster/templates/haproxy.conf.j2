@@ -1,25 +1,14 @@
 global
     log         127.0.0.1 local2
-    chroot      /var/lib/haproxy
     pidfile     /var/run/haproxy.pid
     maxconn     4000
-    user        haproxy
-    group       haproxy
     # turn on stats unix socket
     stats socket /var/lib/haproxy/stats
-
-#---------------------------------------------------------------------
-# common defaults that all the 'listen' and 'backend' sections will
-# use if not designated in their block
-#---------------------------------------------------------------------
-
 defaults
     mode                    http
     log                     global
-    #option                  httplog
     option                  dontlognull
-    #option http-server-close
-    #option forwardfor       except 127.0.0.0/8
+    option                  http-server-close
     option                  redispatch
     retries                 3
     timeout http-request    10s
@@ -38,10 +27,10 @@ listen ingress-http
 {% endfor %}
     mode tcp
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv4 }}:80 check
+    server {{ node.name }} {{ node.ipv4 }}:80 check inter 1s
 {% endfor %}
 {% for node in nodes.workers %}
-    server {{ node.name }} {{ node.ipv4 }}:80 check
+    server {{ node.name }} {{ node.ipv4 }}:80 check inter 1s
 {% endfor %}
 
 listen ingress-https
@@ -50,10 +39,10 @@ listen ingress-https
 {% endfor %}
     mode tcp
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv4 }}:443 check
+    server {{ node.name }} {{ node.ipv4 }}:443 check inter 1s
 {% endfor %}
 {% for node in nodes.workers %}
-    server {{ node.name }} {{ node.ipv4 }}:443 check
+    server {{ node.name }} {{ node.ipv4 }}:443 check inter 1s
 {% endfor %}
 
 listen api
@@ -62,13 +51,13 @@ listen api
 {% endfor %}
     mode tcp
 {% for node in nodes.bootstrap %}
-    server {{ node.name }} {{ node.ipv4 }}:6443 check
+    server {{ node.name }} {{ node.ipv4 }}:6443 check inter 1s backup
 {% endfor %}
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv4 }}:6443 check
+    server {{ node.name }} {{ node.ipv4 }}:6443 check inter 1s
 {% endfor %}
 {% for node in nodes.workers %}
-    server {{ node.name }} {{ node.ipv4 }}:6443 check
+    server {{ node.name }} {{ node.ipv4 }}:6443 check inter 1s
 {% endfor %}
 
 listen machine-config-server
@@ -77,10 +66,10 @@ listen machine-config-server
 {% endfor %}
     mode tcp
 {% for node in nodes.bootstrap %}
-    server {{ node.name }} {{ node.ipv4 }}:22623 check
+    server {{ node.name }} {{ node.ipv4 }}:22623 check inter 1s backup
 {% endfor %}
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv4 }}:22623 check
+    server {{ node.name }} {{ node.ipv4 }}:22623 check inter 1s
 {% endfor %}
 {% endif %}
 
@@ -92,10 +81,10 @@ listen ingress-http-ipv6
 {% endfor %}
     mode tcp
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv6 }}:80 check
+    server {{ node.name }} {{ node.ipv6 }}:80 check inter 1s
 {% endfor %}
 {% for node in nodes.workers %}
-    server {{ node.name }} {{ node.ipv6 }}:80 check
+    server {{ node.name }} {{ node.ipv6 }}:80 check inter 1s
 {% endfor %}
 
 listen ingress-https-ipv6
@@ -104,10 +93,10 @@ listen ingress-https-ipv6
 {% endfor %}
     mode tcp
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv6 }}:443 check
+    server {{ node.name }} {{ node.ipv6 }}:443 check inter 1s
 {% endfor %}
 {% for node in nodes.workers %}
-    server {{ node.name }} {{ node.ipv6 }}:443 check
+    server {{ node.name }} {{ node.ipv6 }}:443 check inter 1s
 {% endfor %}
 
 listen api-ipv6
@@ -116,13 +105,13 @@ listen api-ipv6
 {% endfor %}
     mode tcp
 {% for node in nodes.bootstrap %}
-    server {{ node.name }} {{ node.ipv6 }}:6443 check
+    server {{ node.name }} {{ node.ipv6 }}:6443 check inter 1s backup
 {% endfor %}
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv6 }}:6443 check
+    server {{ node.name }} {{ node.ipv6 }}:6443 check inter 1s
 {% endfor %}
 {% for node in nodes.workers %}
-    server {{ node.name }} {{ node.ipv6 }}:6443 check
+    server {{ node.name }} {{ node.ipv6 }}:6443 check inter 1s
 {% endfor %}
 
 listen machine-config-server-ipv6
@@ -131,9 +120,9 @@ listen machine-config-server-ipv6
 {% endfor %}
     mode tcp
 {% for node in nodes.bootstrap %}
-    server {{ node.name }} {{ node.ipv6 }}:22623 check
+    server {{ node.name }} {{ node.ipv6 }}:22623 check inter 1s backup
 {% endfor %}
 {% for node in nodes.masters %}
-    server {{ node.name }} {{ node.ipv6 }}:22623 check
+    server {{ node.name }} {{ node.ipv6 }}:22623 check inter 1s
 {% endfor %}
 {% endif %}
