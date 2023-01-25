@@ -9,6 +9,7 @@
       # ansible virt need lxml
       - python3-lxml
       - firewalld
+      - jq
     state: present
 
 - name: Upgrade all packages
