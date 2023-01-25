@@ -2,81 +2,147 @@
 
 Some notes how you can setup a air-gapped / disconnected OpenShift 4 cluster with hetzner-ocp4
 
-## Create network
+## Create ait-gapped configuration file: 
+To distiguish online & offline configuration file, let's create the file cluster-air-gapped.yml
 
-Create only the network, important to install and start the mirror registry add
-```
+Be sure that the following lines are defined in your configuration file: 
+
+```yaml
 network_forward_mode: "route"
+vn_subnet: "192.168.50.0"
 ```
-into `cluster.yml` and setup the network:
+
+## Prepare the installation host
+To be sure that all packages are installed accordingly prepare your node: 
+
+```bash
+# ansible-navigator run ./ansible/01-prepare-host.yml -e @cluster-air-gapped.yml 
+```
+
+## Create network
 
 ```bash
 # ansible-navigator run ./ansible/02-create-cluster.yml \
-  [-e @cluster-air-gapped.yml \]
+  -e @cluster-air-gapped.yml \
   --tags network
 ```
 
 ## Setup mirror registry on kvm-host
 
-### via Office quay mirror registry
+### Using Red Hat Mirror Registry
 
 https://docs.openshift.com/container-platform/latest/installing/disconnected_install/installing-mirroring-creating-registry.html
 
-```
-ansible-navigator run ./docs/air-gapped/prep-mirror-registry.yaml [-e @cluster-air-gapped.yml]
+Prepare your node and create certificates for the registry and other stuff.
+```bash
+# ansible-navigator run ./docs/air-gapped/prep-mirror-registry.yaml -e @cluster-air-gapped.yml
+``` 
 
-./mirror-registry install \
+Download and extract the mirror-registry binary: (This is currently not done via Ansible) 
+```bash
+mkdir ~/mirror
+cd ~/mirror
+wget https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz
+tar -xzvf mirror-registry.tar.gz 
+```
+
+Create the Mirror Registry
+
+```bash
+./mirror-registry install -v \
   --quayHostname host.compute.local:5000 \
   --quayRoot /var/lib/libvirt/images/mirror-registry/quay/ \
   --ssh-key /root/.ssh/id_rsa \
   --sslKey /var/lib/libvirt/images/mirror-registry/certs/registry.key \
   --sslCert /var/lib/libvirt/images/mirror-registry/certs/registry.crt \
   --initPassword r3dh4t\!1
+```
 
+Login into the created registry and store the authentication information 
+
+```bash
 podman login --username init --password r3dh4t\!1 \
   --authfile mirror-registry-pullsecret.json \
   host.compute.local:5000
 ```
 
-### via Docker registry - deprecated
-
-```
-./docs/air-gapped/setup-registry.yaml
-```
-
-Check registry
-```
-$ curl -u admin:r3dh4t\!1 https://host.compute.local:5000/v2/_catalog
-{"repositories":[]}
-```
-
-Create mirror registry pullsecret
-```
-podman login --username admin --password r3dh4t\!1 \
-  --authfile mirror-registry-pullsecret.json \
-  host.compute.local:5000
-```
-
-
 ## Download Red Hat pull secret
 
-Download Red Hat pull secret and store it in `redhat-pullsecret.json`
+Download Red Hat pull secret from cloud.redhat.com and store it in `redhat-pullsecret.json`
 
-## Mirror images
+## Concat redhat pull secret and the authfile created above
 
-Merge  mirror-registry-pullsecret.json & redhat-pullsecret.json
-```
-jq -s '{"auths": ( .[0].auths + .[1].auths ) }' mirror-registry-pullsecret.json redhat-pullsecret.json > pullsecret.json
-```
+Store the result in ~/.docker/config.json
 
-Install oc client
-```
-# ansible-navigator run ./ansible/02-create-cluster.yml \
-  [-e @cluster-air-gapped.yml \]
-  --tags network
+```bash
+mkdir ~/.docker
+jq -s '{"auths": ( .[0].auths + .[1].auths ) }' mirror-registry-pullsecret.json <path-to-your-redhat-pullsecret> > ~/.docker/config.json
 ```
 
-Mirror images:
+## Download OC Client
+
+Download oc client, oc mirror pluging (and other stuff) 
+
+```bash
+ansible-navigator run ./ansible/02-create-cluster.yml -e @cluster-air-gapped.yml --tags download-openshift-artifacts
+```
+
+## Mirror Images using oc-mirror plugin
+
+### Initialize the mirror configuration:
+```bash 
+oc mirror init --registry host.compute.local:5000/mirror/oc-mirror-metadata > imageset-config.yaml 
+```
+
+This will create a configuration file like the following: 
+
+```yaml
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+storageConfig:
+  registry:
+    imageURL: host.compute.local:5000/mirror/oc-mirror-metadata
+    skipTLS: false
+mirror:
+  platform:
+    channels:
+    - name: stable-4.11
+      type: ocp
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.12
+    packages:
+    - name: serverless-operator
+      channels:
+      - name: stable
+  additionalImages:
+  - name: registry.redhat.io/ubi8/ubi:latest
+  helm: {}
+```
+
+You can add additional Operators, Images or Charts. 
+
+### Download Images to local disk 
+
+I am downloading it to the local disk first ... just for fun 
+```bash
+mkdir ~/mirror-data/
+oc mirror --config=./imageset-config.yaml file:///root/mirror-data/
+```
+
+This will download everything into your folder: 
+```bash
+du -sh ~/mirror-data
+21G	~/mirror-data
+```
+
+*Note*: If you do not want to download everything locally, your can push them directly into the mirror registry by using `docker://registry.example:5000` instead of `file://...` 
+
+### Push everything into the mirror registry 
+```bash
+oc mirror --from=./mirror_seq1_000000.tar docker://host.compute.local:5000/ocp4/openshift4
+``` 
+
+## Mirror images - The old way before OCP 4.11
 ```
 export OCP_RELEASE=$(oc version -o json  --client | jq -r '.releaseClientVersion')
 export LOCAL_REGISTRY='host.compute.local:5000'
