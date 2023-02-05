@@ -12,5 +12,4 @@ collections:
  - community.aws
  - community.digitalocean
  - community.kubernetes
- # Added for community.dns.hetzner_dns_record
- - community.dns
+ - community.dns # Added for community.dns.hetzner_dns_record
