@@ -1,7 +1,7 @@
 ---
 
 - name: Delete DNS record at CloudFlare
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     state: absent
     zone: "{{ pd_cloudflare_zone }}"
     record: "{{ item }}.{{ pd_public_domain }}"
@@ -16,7 +16,7 @@
     - '*.apps'
 
 - name: Delete IPv6 DNS record at CloudFlare
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     state: absent
     zone: "{{ pd_cloudflare_zone }}"
     record: "{{ item }}.{{ pd_public_domain }}"
