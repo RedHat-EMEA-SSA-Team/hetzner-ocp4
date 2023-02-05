@@ -11,10 +11,13 @@ dependencies:
   python: ee-python-requirements.txt
   system: ee-bindep.txt
 
-# additional_build_steps:
+additional_build_steps:
 #   prepend: |
 #     RUN whoami
 #     RUN cat /etc/os-release
-#   append:
+  append:
+    # Upgrade pyopenssl to solve
+    # The error was: AttributeError: module 'lib' has no attribute 'X509_V_FLAG_CB_ISSUER_CHECK'
+    - RUN pip install pyopenssl --upgrade
 #     - RUN echo This is a post-install command!
 #     - RUN ls -la /etc
