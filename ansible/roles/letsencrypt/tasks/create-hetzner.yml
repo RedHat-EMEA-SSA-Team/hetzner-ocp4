@@ -1,33 +1,12 @@
 ---
-
-- name: Get DNS zone id at Hetzner
-  delegate_to: localhost
-  ansible.builtin.uri:
-    url: "https://dns.hetzner.com/api/v1/zones"
-    body_format: json
-    return_content: true
-    body:
-      name: "{{ le_hetzner_zone }}"
-    headers:
-      Auth-API-Token: "{{ hetzner_account_api_token }}"
-      Content-Type: 'application/json'
-  register: le_hetzner_zone_id
-
 - name: Create letsencrypt DNS record at Hetzner
-  delegate_to: localhost
-  ansible.builtin.uri:
-    url: "https://dns.hetzner.com/api/v1/records"
-    method: POST
-    body_format: json
-    return_content: true
-    body:
-      value: "{{ item.1 }}"
-      ttl: 60
-      type: TXT
-      name: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '') }}"
-      zone_id: "{{ le_hetzner_zone_id.json.zones | json_query('[*].id') | join(', ') }}"
-    headers:
-      Auth-API-Token: "{{ le_hetzner_account_api_token }}"
-      Content-Type: 'application/json'
+  community.dns.hetzner_dns_record:
+    state: present
+    zone: "{{ hetzner_zone }}"
+    record: "{{ item.0.key }}"
+    type: TXT
+    ttl: 60
+    value: "{{ item.1 }}"
+    hetzner_token: "{{ hetzner_account_api_token }}"
   register: hetzner_record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
