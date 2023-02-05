@@ -57,7 +57,7 @@
 
 - name: Create DNS record at CloudFlare
   delegate_to: localhost
-  community.general.net_tools.cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
     # 1 for automatic
@@ -192,7 +192,7 @@
 
 - name: Delete DNS record at CloudFlare
   delegate_to: localhost
-  community.general.net_tools.cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
     # 1 for automatic

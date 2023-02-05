@@ -1,6 +1,6 @@
 ---
 - name: Create Cloudflare DNS records
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: "{{ pd_cloudflare_zone }}"
     record: "{{ item }}.{{ pd_public_domain }}"
     # 1 is auto
@@ -18,7 +18,7 @@
 
 
 - name: Create IPv6 Cloudflare DNS records
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: "{{ pd_cloudflare_zone }}"
     record: "{{ item }}.{{ pd_public_domain }}"
     # 1 is auto
