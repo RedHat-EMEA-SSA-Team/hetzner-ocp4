@@ -5,7 +5,7 @@
   connection: local
   # gather_facts: no
   vars_files:
-  - ../cluster.yml
+    - ../cluster.yml
   vars:
     # post_install_add_ons:
     #   nvidia-gpu: "post-install.yaml"

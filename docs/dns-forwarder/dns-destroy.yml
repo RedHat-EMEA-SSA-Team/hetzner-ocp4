@@ -5,35 +5,33 @@
   # gather_facts true because we need the public ip address
   gather_facts: false
   vars_files:
-  - ../../cluster.yml
+    - ../../cluster.yml
   tasks:
-
   # ToDo later, loop
+    - set_fact:
+        vm_instance_name: "{{ cluster_name }}-dns-1"
 
-  - set_fact:
-      vm_instance_name: "{{ cluster_name }}-dns-1"
+    - name: Destroy VM {{ vm_instance_name }}
+      virt:
+        command: destroy
+        name: "{{ vm_instance_name }}"
+      ignore_errors: true
 
-  - name: Destroy VM {{ vm_instance_name }}
-    virt:
-      command: destroy
-      name: "{{ vm_instance_name }}"
-    ignore_errors: true
+    - name: Undefine VM {{ vm_instance_name }}
+      virt:
+        command: undefine
+        name: "{{ vm_instance_name }}"
+      ignore_errors: true
 
-  - name: Undefine VM {{ vm_instance_name }}
-    virt:
-      command: undefine
-      name: "{{ vm_instance_name }}"
-    ignore_errors: true
+    - name: Delete directory
+      file:
+        state: absent
+        path: "/var/lib/libvirt/images/{{ vm_instance_name }}"
 
-  - name: Delete directory
-    file:
-      state: absent
-      path: "/var/lib/libvirt/images/{{ vm_instance_name }}"
-
-  - name: Delete files of {{ vm_instance_name }}
-    file:
-      path: "{{ item }}"
-      state: absent
-    with_items:
-      - "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
-      - "/var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso"
+    - name: Delete files of {{ vm_instance_name }}
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2"
+        - "/var/lib/libvirt/images/{{ vm_instance_name }}-cloud-init.iso"
