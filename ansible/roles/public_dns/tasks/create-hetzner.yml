@@ -1,58 +1,13 @@
 ---
-- name: Get DNS zone id at Hetzner
-  uri:
-    url: "https://dns.hetzner.com/api/v1/zones"
-    body_format: json
-    return_content: true
-    body:
-      name: "{{ hetzner_zone }}"
-    headers:
-      Auth-API-Token: "{{ hetzner_account_api_token }}"
-      Content-Type: 'application/json'
-  register: register_hetzner_zone_id
-  tags:
-    - public_dns
-
-- name: Set hetzner_zone_id
-  set_fact:
-    # hetzner_zone_id:  "{{ register_hetzner_zone_id.json.zones | json_query('[?name==`'~ hetzner_zone ~'`] | [0].id')  }}"
-    #   You don't need the name == .. because of the body above.
-    #   https://dns.hetzner.com/api-docs#operation/GetZones
-    hetzner_zone_id: "{{ register_hetzner_zone_id.json.zones[0].id }}"
-
-- name: Get all DNS records
-  uri:
-    url: "https://dns.hetzner.com/api/v1/records?zone_id={{ hetzner_zone_id }}"
-    body_format: json
-    return_content: true
-    headers:
-      Auth-API-Token: "{{ hetzner_account_api_token }}"
-      Content-Type: 'application/json'
-  register: register_hetzner_records
-  tags:
-    - public_dns
-
-- name: Define hetzner_records_to_delete
-  # yamllint disable rule:line-length
-  set_fact:
-    available_records: "{{ register_hetzner_records.json.records | json_query('[?(value==`'~  pd_public_ip ~'` && ( name==`api.'~ cluster_name ~'` || name ==`*.apps.'~ cluster_name ~'` ) )] | [*].name') }}"
-  # yamllint enable rule:line-length
-
 - name: Create DNS record at Hetzner
-  uri:
-    url: "https://dns.hetzner.com/api/v1/records"
-    method: POST
-    body_format: json
-    return_content: true
-    body:
-      value: "{{ pd_public_ip }}"
-      ttl: 120
-      type: A
-      name: "{{ item }}.{{ cluster_name }}"
-      zone_id: "{{ hetzner_zone_id }}"
-    headers:
-      Auth-API-Token: "{{ hetzner_account_api_token }}"
-      Content-Type: 'application/json'
+  community.dns.hetzner_dns_record:
+    state: present
+    zone: "{{ hetzner_zone }}"
+    record: "{{ item }}.{{ cluster_name }}.{{ public_domain }}."
+    type: A
+    ttl: 120
+    value: "{{ pd_public_ip }}"
+    hetzner_token: "{{ hetzner_account_api_token }}"
   with_items:
     - api
     - '*.apps'
@@ -61,20 +16,14 @@
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
 
 - name: Create IPv6 DNS record at Hetzner
-  uri:
-    url: "https://dns.hetzner.com/api/v1/records"
-    method: POST
-    body_format: json
-    return_content: true
-    body:
-      value: "{{ pd_public_ipv6 }}"
-      ttl: 120
-      type: AAAA
-      name: "{{ item }}.{{ cluster_name }}"
-      zone_id: "{{ hetzner_zone_id }}"
-    headers:
-      Auth-API-Token: "{{ hetzner_account_api_token }}"
-      Content-Type: 'application/json'
+  community.dns.hetzner_dns_record:
+    state: present
+    zone: "{{ hetzner_zone }}"
+    record: "{{ item }}.{{ cluster_name }}.{{ public_domain }}."
+    type: AAAA
+    ttl: 120
+    value: "{{ pd_public_ipv6 }}"
+    hetzner_token: "{{ hetzner_account_api_token }}"
   with_items:
     - api
     - '*.apps'
