@@ -1,12 +1,12 @@
 ---
 - name: Delete DNS record at Hetzner
-  delegate_to: localhost
-  ansible.builtin.uri:  # noqa no-handler
-    url: "https://dns.hetzner.com/api/v1/records/{{ item.json.record.id }}"
-    method: DELETE
-    headers:
-      Auth-API-Token: "{{ le_hetzner_account_api_token }}"
-      Content-Type: 'application/json'
-  with_items: "{{ hetzner_record.results }}"
-  when:
-    - sample_com_challenge is changed
+  community.dns.hetzner_dns_record:
+    state: absent
+    zone: "{{ hetzner_zone }}"
+    record: "{{ item.0.key }}"
+    type: TXT
+    ttl: 60
+    value: "{{ item.1 }}"
+    hetzner_token: "{{ hetzner_account_api_token }}"
+  register: hetzner_record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
