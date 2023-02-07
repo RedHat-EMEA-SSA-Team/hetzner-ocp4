@@ -7,6 +7,11 @@
     - ../cluster.yml
 
   tasks:
+    - name: Check IPv6 & OpenShift 4.12
+      ansible.builtin.fail:
+        msg: "Currently, it is not possible to install OpenShift 4.12 with IPv6 enabled with hetzner-ocp4 because of Issue #247"
+      when: (ip_families is defined and "IPv6" in ip_families)
+
     - name: Deploy cluster
       import_role:
         name: openshift-4-cluster
