@@ -14,13 +14,13 @@ Open the disk installation destination dialog and select `Custom` under the `Sto
 Hit the Done button. Confirm that `New mount points will use the following partitioning scheme` says LVM and then select the `Click here to create them automatically` text.
 ![RHEL 9 disk layout 1](../images/rhel9_disk-layout-2.png)
 
-Once created, change the volume group for `root` and `swap` logical volume to `vg0`
+Once created, change the volume group for `root` and `swap` logical volume to `vg0`. Select `Volume Group` Drop down, if vg0 does not exist `Create new volume group`.
 ![RHEL 9 disk layout 2](../images/rhel9_disk-layout-3.png)
 
 When finished, it will look like this.
 ![RHEL 9 disk layout 3](../images/rhel9_disk-layout-4.png)
 
-Wait until the installation is finished and press reboot.
+Press Done. Accept changes. Begin Installation. Wait until the installation is finished and press reboot.
 
 ### Configure the system to match Hetzner requirements
 
