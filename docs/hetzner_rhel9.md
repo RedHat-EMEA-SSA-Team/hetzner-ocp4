@@ -8,14 +8,17 @@ Create a virtual machine and boot from the downloaded ISO. Once the `Anaconda In
 
 Adjust the filesystem layout to be more compatible with automation of this repository.
 
-Open the disk partitioning dialog and select `Manual Partitioning` and create the filesystem layout choosing the automation proposal and LVM.
+Open the disk installation destination dialog and select `Custom` under the `Storage Configuration` section.
 ![RHEL 9 disk layout 1](../images/rhel9_disk-layout-1.png)
 
+Hit the Done button. Confirm that `New mount points will use the following partitioning scheme` says LVM and then select the `Click here to create them automatically` text.
+![RHEL 9 disk layout 1](../images/rhel9_disk-layout-2.png)
+
 Once created, change the volume group for `root` and `swap` logical volume to `vg0`
-![RHEL 9 disk layout 2](../images/rhel9_disk-layout-2.png)
+![RHEL 9 disk layout 2](../images/rhel9_disk-layout-3.png)
 
 When finished, it will look like this.
-![RHEL 9 disk layout 3](../images/rhel9_disk-layout-3.png)
+![RHEL 9 disk layout 3](../images/rhel9_disk-layout-4.png)
 
 Wait until the installation is finished and press reboot.
 
