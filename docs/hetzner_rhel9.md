@@ -26,9 +26,10 @@ Press Done. Accept changes. Begin Installation. Wait until the installation is f
 
 Once installed and rebooted, login with previously given credentials and adjust accordingly to meet Hetzner requirements.
 
-#### Install package dependencies and upgrade the OS to latest version
+#### Register system, install package dependencies and upgrade the OS to latest version
 
 ```shell
+# subscription-manager register --username $NAME
 # dnf install -y lvm2 mdadm tar bzip2
 # dnf upgrade 
 ```
