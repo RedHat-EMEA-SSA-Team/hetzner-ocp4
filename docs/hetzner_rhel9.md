@@ -91,7 +91,7 @@ Create the image-archive, which can be uploaded to the rescue-shell
 
 Boot the Hetzner system into the Rescue Shell, create `config.txt` and upload the image to your `/root` folder for use with the `installimage` tool.
 
-Based on the volume group name chosen during the image creation, one needs to adjust the `PART lvm vg0` in the `config.txt` file. Below is the example, based on the image created above.
+Based on the volume group name chosen during the image creation, one needs to adjust the `PART lvm vg0` in the `config.txt` file. Below is the example, based on the image created above. The name of the image should follow the used notation. Images beginning with `RHEL` won't work with `installimage`.
 
 ```txt
 DRIVE1 /dev/sda
