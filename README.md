@@ -56,10 +56,10 @@ Here is an example Hetzner Firewall configuration:
 |[outgoing connections](https://docs.hetzner.com/robot/dedicated-server/firewall/#out-going-tcp-connections)||||32768-65535|tcp|ack|accept|
 
 
-## In case of Red Hat Enterprise Linux 8
+## In case of Red Hat Enterprise Linux
 
 Subscribe your RHEL host:
-```
+```bash
 subscription-manager register
 
 # get pool id via:
@@ -68,15 +68,29 @@ subscription-manager attach [--auto] --pool=...
 
 subscription-manager repos --disable=*
 
+```
+
+
+### Red Hat Enterprise Linux 8
+```bash
 subscription-manager repos \
     --enable=rhel-8-for-x86_64-baseos-rpms \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
     --enable=ansible-automation-platform-2.3-for-rhel-8-x86_64-rpms
+```
 
+### Red Hat Enterprise Linux 9
+```bash
+subscription-manager repos \
+    --enable=rhel-9-for-x86_64-baseos-rpms \
+    --enable=rhel-9-for-x86_64-appstream-rpms \
+    --enable=rhel-9-for-x86_64-highavailability-rpms \
+    --enable=ansible-automation-platform-2.3-for-rhel-9-x86_64-rpms
+```
 
+```bash
 dnf install -y ansible-navigator git podman
-
 ```
 
 ## In case of Rocky Linux 8 or Centos 8
