@@ -15,8 +15,8 @@
 {% else %}
   <cpu mode='host-passthrough'></cpu>
 {% endif %}
-  <os>
-    <type arch="x86_64">hvm</type>
+  <os firmware="efi">
+    <type arch="x86_64" machine="q35" >hvm</type>
     <boot dev="hd"/>
   </os>
   <features>
@@ -35,6 +35,7 @@
   </pm>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
+    <controller type="pci" index="0" model="pcie-root"/>
 {% if vm_storage_backend is defined and vm_storage_backend == "lvm" %}
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
@@ -43,12 +44,11 @@
     </disk>
 {% else %}
     <disk type='file' device='disk'>
-      <driver name='qemu' type='qcow2'/>
+      <driver name='qemu' type='qcow2' discard='unmap' />
       <source file='/var/lib/libvirt/images/{{ vm_instance_name }}.qcow2'/>
       <target dev='vda' bus='virtio'/>
     </disk>
 {% endif %}
-
 
     <controller type="usb" index="0" model="ich9-ehci1"/>
     <controller type="usb" index="0" model="ich9-uhci1">
@@ -65,7 +65,9 @@
       <source network='{{ vm_network }}'/>
       <model type='virtio'/>
     </interface>
-    <graphics type="vnc" port="-1"/>
+    <video>
+      <model type='none' />
+    </video>
     <console type="pty"/>
     <rng model="virtio">
       <backend model="random">/dev/urandom</backend>
