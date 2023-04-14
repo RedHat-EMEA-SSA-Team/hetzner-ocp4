@@ -99,7 +99,7 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-bootstrap"
     vm_network: "{{ cluster_name }}"
-    vm_ignition_file: "{{ openshift_install_dir }}/bootstrap-extra.ign"
+    vm_ignition_file: "{{ openshift_install_dir }}/bootstrap{{ ignition_filename_appendix }}.ign"
     vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % 2 }}"
     vm_vcpu: 4
     vm_memory_size: 16384
@@ -111,7 +111,7 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-master-{{ item }}"
     vm_network: "{{ cluster_name }}"
-    vm_ignition_file: "{{ openshift_install_dir }}/master-extra.ign"
+    vm_ignition_file: "{{ openshift_install_dir }}/master{{ ignition_filename_appendix }}.ign"
     vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + item|int) }}"
     vm_vcpu: "{{ master_vcpu }}"
     vm_special_cpu: "{{ master_special_cpu | default('') }}"
@@ -125,7 +125,7 @@
   vars:
     vm_instance_name: "{{ cluster_name }}-compute-{{ item }}"
     vm_network: "{{ cluster_name }}"
-    vm_ignition_file: "{{ openshift_install_dir }}/worker-extra.ign"
+    vm_ignition_file: "{{ openshift_install_dir }}/worker{{ ignition_filename_appendix }}.ign"
     vm_mac_address: "52:54:00:{{ '%02x' % vn_subnet.split('.')[1]|int }}:{{ '%02x' % vn_subnet.split('.')[2]|int }}:{{ '%02x' % (10 + master_count|int + item|int) }}"     # noqa line-length
     vm_vcpu: "{{ compute_vcpu }}"
     vm_special_cpu: "{{ compute_special_cpu | default('') }}"

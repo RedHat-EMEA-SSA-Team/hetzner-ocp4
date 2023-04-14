@@ -33,47 +33,54 @@
 - name: Create ignition files
   ansible.builtin.command: "{{ openshift_install_command }} --dir={{ openshift_install_dir }} create ignition-configs"
 
-# #
-# [connection]
-# ipv6.dhcp-iaid=mac
-# ipv6.dhcp-duid=ll
-- name: Create RHCOS Config
-  ansible.builtin.copy:
-    dest: "{{ openshift_install_dir }}/{{ item }}.rcc"
-    mode: 0644
-    content: |
-      variant: openshift
-      version: {{ openshift_version.split('.')[:2]|join('.') }}.0
-      metadata:
-        name: 99-{{ item }}-ipv6
-        labels:
-          machineconfiguration.openshift.io/role: {{ item }}
-      ignition:
-        config:
-          merge:
-            - local: {{ item }}.ign
-      storage:
-        files:
-          - path: /etc/NetworkManager/conf.d/01-ipv6.conf
-            contents:
-              source: data:,%5Bconnection%5D%0Aipv6.dhcp-iaid%3Dmac%0Aipv6.dhcp-duid%3Dll
-            mode: 420
-            user:
-              name: root
-            overwrite: true
-  with_items:
-    - bootstrap
-    - master
-    - worker
+- name: Added some IPv6 dhcp settings
+  when: (ip_families is defined and "IPv6" in ip_families)
+  block:
+    # #
+    # [connection]
+    # ipv6.dhcp-iaid=mac
+    # ipv6.dhcp-duid=ll
+    - name: Create RHCOS Config
+      ansible.builtin.copy:
+        dest: "{{ openshift_install_dir }}/{{ item }}.rcc"
+        mode: 0644
+        content: |
+          variant: openshift
+          version: {{ openshift_version.split('.')[:2]|join('.') }}.0
+          metadata:
+            name: 99-{{ item }}-ipv6
+            labels:
+              machineconfiguration.openshift.io/role: {{ item }}
+          ignition:
+            config:
+              merge:
+                - local: {{ item }}.ign
+          storage:
+            files:
+              - path: /etc/NetworkManager/conf.d/01-ipv6.conf
+                contents:
+                  source: data:,%5Bconnection%5D%0Aipv6.dhcp-iaid%3Dmac%0Aipv6.dhcp-duid%3Dll
+                mode: 420
+                user:
+                  name: root
+                overwrite: true
+      with_items:
+        - bootstrap
+        - master
+        - worker
 
-- name: Mangle ignition config
-  ansible.builtin.command: |
-    /opt/openshift-client-{{ openshift_version }}/butane \
-      --raw \
-      --files-dir {{ openshift_install_dir }} \
-      --output {{ openshift_install_dir }}/{{ item }}-extra.ign \
-      {{ openshift_install_dir }}/{{ item }}.rcc
-  with_items:
-    - bootstrap
-    - master
-    - worker
+    - name: Mangle ignition config
+      ansible.builtin.command: |
+        /opt/openshift-client-{{ openshift_version }}/butane \
+          --raw \
+          --files-dir {{ openshift_install_dir }} \
+          --output {{ openshift_install_dir }}/{{ item }}-extra.ign \
+          {{ openshift_install_dir }}/{{ item }}.rcc
+      with_items:
+        - bootstrap
+        - master
+        - worker
+
+    - name: Set ignition_filename_appendix
+      ansible.builtin.set_fact:
+        ignition_filename_appendix: "-extra"
