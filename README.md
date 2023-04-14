@@ -280,6 +280,7 @@ ansible-navigator run -m stdout ./ansible/setup.yml
 VERSION=$(date +%Y%m%d%H%M)
 
 ansible-builder build \
+    --verbosity 3 \
     --container-runtime podman \
     --tag quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:$VERSION
 
