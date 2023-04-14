@@ -98,3 +98,6 @@ sdn_plugin_name: OVNKubernetes
 masters_schedulable: true
 
 add_ons_enabled: false
+
+# Internal use only, to use an adjusted ignition config.
+ignition_filename_appendix: ""
