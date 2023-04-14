@@ -276,11 +276,14 @@ ansible-navigator run -m stdout ./ansible/setup.yml
 ## Build ansible execution enviorment
 
 ```bash
+
+VERSION=$(date +%Y%m%d%H%M)
+
 ansible-builder build \
     --container-runtime podman \
-    --tag quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
+    --tag quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:$VERSION
 
-podman push quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:devel
+podman push quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:$VERSION
 ```
 
 # Stargazers over time

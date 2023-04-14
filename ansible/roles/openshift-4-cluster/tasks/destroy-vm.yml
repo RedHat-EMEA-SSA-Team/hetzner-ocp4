@@ -9,6 +9,7 @@
   community.libvirt.virt:
     command: undefine
     name: "{{ vm_instance_name }}"
+    force: true
   ignore_errors: yes
 
 - name: Delete logical volume
