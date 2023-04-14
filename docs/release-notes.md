@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## 2024-04-14
+## 2023-04-14
 
  * Bump OpenShift version to 4.12.10
  * Fixed #249 Hetzner DNS Provider: Let's Encrypt DNS Record Fails w/ multiple Hetzner DNS Zones: "HTTP Error 422: Unprocessable Entity"
