@@ -1,5 +1,15 @@
 # RELEASE NOTES
 
+## 2024-04-14
+
+ * Bump OpenShift version to 4.12.10
+ * Fixed #249 Hetzner DNS Provider: Let's Encrypt DNS Record Fails w/ multiple Hetzner DNS Zones: "HTTP Error 422: Unprocessable Entity"
+ * Fixed #241 Hetzner DNS Api not idempotent - playbook cannot be rerun
+ * [Added RHEL 9 installation nodes](hetzner_rhel9.md)
+ * Fixed #264 rhcos variant has been removed; use openshift variant instead: https://coreos.github.io/butane/upgrading-openshift/
+ * Fixed #246 Use relative DNS records for Gandi
+ * Fixed #265 Looks like ./ansible/99-destroy-cluster.yml doesn't work well anymore.
+
 ## 2022-12-17
 
  * Bump openshift version to 4.11.12
