@@ -1,16 +1,18 @@
 ---
 collections:
- - community.libvirt
- - community.crypto
- - community.general
- - community.aws
- - google.cloud
- - community.azure
- - kubernetes.core
- - ansible.posix
- - community.azure
- - community.aws
- - community.digitalocean
- - community.kubernetes
- # Added for community.dns.hetzner_dns_record
- - community.dns
+  - name: https://github.com/ansible-collections/community.libvirt
+    type: git
+    version: main
+  - community.crypto
+  - community.general
+  - community.aws
+  - google.cloud
+  - community.azure
+  - kubernetes.core
+  - ansible.posix
+  - community.azure
+  - community.aws
+  - community.digitalocean
+  - community.kubernetes
+  # Added for community.dns.hetzner_dns_record
+  - community.dns
