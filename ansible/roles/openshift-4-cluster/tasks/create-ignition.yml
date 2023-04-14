@@ -42,8 +42,12 @@
     dest: "{{ openshift_install_dir }}/{{ item }}.rcc"
     mode: 0644
     content: |
-      variant: rhcos
-      version: 0.1.0
+      variant: openshift
+      version: {{ openshift_version.split('.')[:2]|join('.') }}.0
+      metadata:
+        name: 99-{{ item }}-ipv6
+        labels:
+          machineconfiguration.openshift.io/role: {{ item }}
       ignition:
         config:
           merge:
@@ -65,6 +69,7 @@
 - name: Mangle ignition config
   ansible.builtin.command: |
     /opt/openshift-client-{{ openshift_version }}/butane \
+      --raw \
       --files-dir {{ openshift_install_dir }} \
       --output {{ openshift_install_dir }}/{{ item }}-extra.ign \
       {{ openshift_install_dir }}/{{ item }}.rcc
