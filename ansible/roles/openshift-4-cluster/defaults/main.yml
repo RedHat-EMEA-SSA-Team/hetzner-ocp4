@@ -83,6 +83,8 @@ helm_cli_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/helm/latest/
 
 butane_cli_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/butane/latest/butane-amd64"
 
+# set to false if using OKD as it does not provide oc-mirror binary
+download_oc_mirror: true
 
 # NFS Storage
 #  storage_nfs do not support multi cluster support, it overwrites the
