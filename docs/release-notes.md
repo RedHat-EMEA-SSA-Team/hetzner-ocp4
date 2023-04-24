@@ -1,5 +1,9 @@
 # RELEASE NOTES
 
+## Unreleased
+
+* Make oc-mirror binary an opt-in
+
 ## 2023-04-14
 
  * Bump OpenShift version to 4.12.10
