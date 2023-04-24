@@ -1,9 +1,15 @@
 ---
 - name: Install haproxy
-  yum:
+  package:
     name:
       - podman
     state: present
+
+- name: Ensure /etc/sysconfig directory exists
+  file:
+    path: /etc/sysconfig
+    state: directory
+    mode: '0755'
 
 - name: Install OpenShift 4 Loadbalancer SystemD service
   copy:

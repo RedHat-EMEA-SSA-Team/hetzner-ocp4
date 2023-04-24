@@ -1,5 +1,9 @@
 # RELEASE NOTES
 
+## Unreleased
+
+* Add Debian 11 support for root server
+
 ## 2023-04-14
 
  * Bump OpenShift version to 4.12.10

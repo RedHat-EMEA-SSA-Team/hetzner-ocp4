@@ -31,6 +31,7 @@ Our instructions are based on the CentOS Root Server as provided by [Hetzner](ht
 - RHEL 8 - How to install RHEL8: https://keithtenzer.com/cloud/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
 - RHEL 9 - leapp update from RHEL 8
 - RHEL 9 ([How to install RHEL9](docs/hetzner_rhel9.md))
+- Debian 11
 
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
