@@ -100,7 +100,7 @@ dnf install -y ansible-navigator git podman
 Ansible navigator installation based on the upstream [documentation](https://ansible-navigator.readthedocs.io/en/latest/installation/#install-ansible-navigator).
 
 ```bash
-dnf install -y python3-pip podman git
+dnf install -y python38-pip podman git
 python3 -m pip install ansible-navigator --user
 echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.profile
 source ~/.profile
