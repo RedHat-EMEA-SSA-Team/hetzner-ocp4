@@ -227,6 +227,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |`sdn_plugin_name`|`OVNKubernetes`|This allows you to change SDN plugin. Valid values are OpenShiftSDN and OVNKubernetes. (Default is OVNKubernetes.)
 |`masters_schedulable`|true|Set to false if don't want to allow workload onto the master nodes. (Default is to allow this)|
 |`install_config_capabilities`|null|Configure [Cluster capabilities](https://docs.openshift.com/container-platform/latest/post_installation_configuration/cluster-capabilities.html)
+|`fips`|false|Enable FIPS mode on the OpenShift cluster (Default is false)|
 
 ## Prepare kvm-host and install OpenShift
 
