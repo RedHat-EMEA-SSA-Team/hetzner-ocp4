@@ -1,0 +1,5 @@
+---
+proxy_name: "openshift-4-proxy"
+proxy_container_image: quay.io/openshifttest/squid-proxy:latest
+proxy_cache_dir: "/var/srv/containers/squid"
+proxy_cache_peer_port: 3128

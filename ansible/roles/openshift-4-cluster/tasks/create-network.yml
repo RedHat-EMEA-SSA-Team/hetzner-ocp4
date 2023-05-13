@@ -133,6 +133,16 @@
   tags: lb
 
 #
+#  System-wide proxy
+#  Optionally tunnel IPv6 to IPv4 addresses
+#
+- name: Ensure Squid Proxy is configured
+  ansible.builtin.import_role:
+    name: openshift-4-proxy
+    tasks_from: create.yml
+  when: proxy_cache_enabled is defined and proxy_cache_enabled
+
+#
 # Public DNS
 #
 - name: Create public dns entries

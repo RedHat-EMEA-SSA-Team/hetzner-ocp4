@@ -1,0 +1,17 @@
+---
+- name: Ensure {{ proxy_name }}.service is stopped and disabled
+  ansible.builtin.systemd:
+    name: "{{ proxy_name }}.service"
+    enabled: no
+    state: stopped
+
+- name: Collect services facts
+  ansible.builtin.service_facts:
+  register: services_state
+
+- name: Check {{ proxy_name }}.service
+  fail:
+    msg: "Load balancer service {{ proxy_name }}.service is not running!!! Please check, run: systemctl status {{ proxy_name }}.service"
+  when:
+    - services_state.ansible_facts.services[ proxy_name  + '.service'].state != 'inactive'
+    - services_state.ansible_facts.services[ proxy_name  + '.service'].status != 'disabled'

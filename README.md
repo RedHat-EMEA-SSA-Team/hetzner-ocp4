@@ -226,6 +226,9 @@ Please configure in `cluster.yml` all necessary credentials:
 |`sdn_plugin_name`|`OVNKubernetes`|This allows you to change SDN plugin. Valid values are OpenShiftSDN and OVNKubernetes. (Default is OVNKubernetes.)
 |`masters_schedulable`|true|Set to false if don't want to allow workload onto the master nodes. (Default is to allow this)|
 |`install_config_capabilities`|null|Configure [Cluster capabilities](https://docs.openshift.com/container-platform/latest/post_installation_configuration/cluster-capabilities.html)
+|`proxy_cache_enabled`|false|Enable local Squid in a container to allow caching and IPv6 to IPv4 conversion (requires external dual-stack system which also has a Squid running)|
+|`proxy_cache_peer`|none|Host (IP/name) of Squid upstream cache. If unset, no upstream cache will be used|
+|`proxy_cache_peer_port`|3128|Listening port of remote Squid proxy|
 
 ## Prepare kvm-host and install OpenShift
 

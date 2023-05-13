@@ -1,0 +1,24 @@
+---
+- name: Collect services facts
+  ansible.builtin.service_facts:
+  register: services_state
+
+- name: Ensure {{ proxy_name }}.service is stopped and disabled
+  ansible.builtin.systemd:
+    name: "{{ proxy_name }}.service"
+    enabled: false
+    state: stopped
+  when: services_state.ansible_facts.services[ proxy_name  + '.service'] is defined
+
+- name: Remove OpenShift 4 Proxy SystemD service
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/etc/sysconfig/{{ proxy_name }}.env"
+    - "/etc/sysconfig/{{ proxy_name }}.conf"
+    - "/etc/systemd/system/{{ proxy_name }}.service"
+
+- name: Podman will stay in the Host, Play with it! ;-)
+  debug:
+    msg: "Podman will stay in the Host, Play with it! ;-)"
