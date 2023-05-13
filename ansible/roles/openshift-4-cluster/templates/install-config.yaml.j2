@@ -37,6 +37,7 @@ networking:
   type: {{ sdn_plugin_name }}
 platform:
   none: {}
+fips: {{ fips }}
 pullSecret:
   '{{ image_pull_secret }}'
 sshKey: |
