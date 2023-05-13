@@ -1,4 +1,6 @@
 # RELEASE NOTES
+## 2023-05-13
+ * Added new option `fips` to allow FIPS enabled cluster setups
 
 ## 2023-04-14
 
