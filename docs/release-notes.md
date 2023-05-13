@@ -10,6 +10,9 @@
 
 * Make oc-mirror binary an opt-in
 
+## 2023-05-13
+ * Introduce `ansible-vault` for credentials
+
 ## 2023-04-14
 
  * Bump OpenShift version to 4.12.10
