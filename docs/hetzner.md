@@ -146,6 +146,8 @@ If you do not want to follow any the above steps, use Ansible instead! :-)
    hetzner_ip: "IP_ADDRESS"
     ```
 
+   a) It's probably a better idea to protect credentials in a `ansible-vault`. When using `ansible-navigator`, [special considerations](https://ansible-navigator.readthedocs.io/en/latest/faq/#how-can-i-use-a-vault-password-with-ansible-navigator) need to be taken to allow access to this vault from a container.
+
    More detailed information about the configurable parameters can be found in the [defaults variable file](../ansible/roles/provision-hetzner/defaults/main.yml)
 
 2) Run playbook: `ansible/00-provision-hetzner.yml`

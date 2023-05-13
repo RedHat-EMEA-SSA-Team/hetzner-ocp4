@@ -229,10 +229,21 @@ Please configure in `cluster.yml` all necessary credentials:
 
 ## Prepare kvm-host and install OpenShift
 
-```
+```bash
 cd hetzner-ocp4
-ansible-navigator run -m stdout ./ansible/setup.yml
+ansible-navigator run ansible/setup.yml
 ```
+
+When using an Ansible-vault containing sensitive configuration data:
+```bash
+% ansible-vault create ansible/group_vars/all/my-vault.yml
+% touch ~/.vault-password && chmod 0600 ~/.vault-password
+% vi ~/.vault-password   # enter password as plain-text
+% export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault-password
+% ansible-navigator run ansible/setup.yml
+```
+Please note that `group_vars` and `host_vars` will have to reside in the directory of the playbook to be run.
+In our setup, this will be `ansible/group_vars` and `ansible/host_vars`.
 
 # Additional documentation
 
