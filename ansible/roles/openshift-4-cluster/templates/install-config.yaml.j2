@@ -35,6 +35,17 @@ networking:
   - fd00:172:16::/112
 {% endif %}
   type: {{ sdn_plugin_name }}
+{% if sdn_plugin_name == "OpenShiftSDN" %}
+  openshiftSDNConfig:
+    mtu: {{ network_mtu | int }}
+{% endif %}
+{% if sdn_plugin_name == "OVNKubernetes" and ( ipsec is defined and ipsec) %}
+  ovnKubernetesConfig:
+    mtu: {{ network_mtu - 50 | int }}
+{% if ipsec is defined and ipsec %}
+    ipsecConfig: {}
+{% endif %}
+{% endif %}
 platform:
   none: {}
 pullSecret:

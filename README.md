@@ -226,6 +226,9 @@ Please configure in `cluster.yml` all necessary credentials:
 |`sdn_plugin_name`|`OVNKubernetes`|This allows you to change SDN plugin. Valid values are OpenShiftSDN and OVNKubernetes. (Default is OVNKubernetes.)
 |`masters_schedulable`|true|Set to false if don't want to allow workload onto the master nodes. (Default is to allow this)|
 |`install_config_capabilities`|null|Configure [Cluster capabilities](https://docs.openshift.com/container-platform/latest/post_installation_configuration/cluster-capabilities.html)
+|`ipsec`|false|Enable IPSec communication between nodes when using `OVNKubernetes`|
+|`ipsec_only_on_day2`|false|Enable IPSec as a day2 operation (manual MTU adjustment required)|
+|`mtu`|1500|Configure MTU of default network (applies to SDN and OVN)|
 
 ## Prepare kvm-host and install OpenShift
 
