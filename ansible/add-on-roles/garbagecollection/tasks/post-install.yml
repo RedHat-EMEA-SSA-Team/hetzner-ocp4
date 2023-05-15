@@ -1,0 +1,18 @@
+---
+- name: Ensure GarbageCollection machineconfig
+  delegate_to: localhost
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ k8s_kubeconfig }}"
+    host: "{{ k8s_host }}"
+    ca_cert: "{{ k8s_ca_cert }}"
+    client_cert: "{{ k8s_client_cert }}"
+    client_key: "{{ k8s_client_key }}"
+    definition: "{{ lookup('template', 'templates/cluster-garbagecollection-machineconfig.yml.j2') }}"
+  vars:
+    role: "{{ loop_role }}"
+  with_items:
+    - master
+    - worker
+  loop_control:
+    loop_var: loop_role
