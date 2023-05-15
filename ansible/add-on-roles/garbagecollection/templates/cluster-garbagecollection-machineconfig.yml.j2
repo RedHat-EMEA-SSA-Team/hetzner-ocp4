@@ -1,0 +1,14 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: KubeletConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 60-{{ role }}-kubeconfig-tight-garbage
+spec:
+  kubeletConfig:
+    imageGCHighThresholdPercent: {{ garbagecollection_high_treshold_percent }}
+    imageGCLowThresholdPercent: {{ garbagecollection_low_treshold_percent }}
+    imageMinimumGCAge: "{{ garbagecollection_minimum_age }} "
+  machineConfigPoolSelector:
+    matchLabels:
+      pools.operator.machineconfiguration.openshift.io/{{ role }}: ""
