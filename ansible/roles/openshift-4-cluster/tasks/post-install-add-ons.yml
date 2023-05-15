@@ -10,6 +10,11 @@
   ansible.builtin.include_role:
     name: "{{ item.name }}"
     tasks_from: "{{ item.tasks_from | default('main.yml') }}"
+    apply:
+      tags:
+        - post-install
+        - add-ons
+        - post-install-add-ons
   tags:
     - post-install
     - add-ons
