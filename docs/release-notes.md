@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## 2023-05-13
+ * Added new option `ipsec` to enable IPSec when OVNKubernetes is used.
+ * Added new option `mtu` to allow customization of default network MTU.
+ * Added new option `ipsec_only_on_day2` to be prepared whenever the activation
+   of IPSec during installation is removed.
+
 ## 2023-04-14
 
  * Bump OpenShift version to 4.12.10

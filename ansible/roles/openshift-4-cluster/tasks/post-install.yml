@@ -68,6 +68,20 @@
   tags:
     - post-install
 
+- name: Ensure IPsec is enabled
+  # yamllint disable rule:line-length
+  # noqa var-spacing
+  ansible.builtin.command: "/opt/openshift-client-{{ openshift_version }}/oc patch networks.operator.openshift.io cluster --type merge --patch '{\"spec\": {\"defaultNetwork\": {\"ovnKubernetesConfig\": {\"ipsecConfig\": {} }}}}' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig"
+  # yamllint enable rule:line-length
+  register: ipsec_status
+  retries: 60
+  delay: 30
+  until: ipsec_status.rc == 0
+  when:
+    - ipsec is defined and ipsec
+    - ipsec_only_on_day2 is defined
+  tags: post-install
+
 ###########################################################################################
 # Install letsencrypt certificates
 ###########################################################################################
