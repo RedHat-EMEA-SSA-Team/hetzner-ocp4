@@ -1,0 +1,99 @@
+pid_filename    /run/squid.pid
+logfile_rotate  0
+access_log      stdio:/dev/tty
+cache_log       stdio:/dev/tty
+
+# the hostname squid displays in error messages
+visible_hostname localhost
+
+# Squid listening port
+http_port 3128
+
+
+# cache size
+cache_mem 256 MB
+cache_dir ufs /var/spool/squid 4000 16 256
+
+acl acl_direct_access dstdomain .quay.io
+acl acl_direct_access dstdomain registry.redhat.io
+acl acl_direct_access dstdomain registry.connect.redhat.com
+acl acl_direct_access dstdomain .ipv6.docker.com
+acl acl_direct_access dstdomain .cloudflare.docker.com
+acl acl_direct_access dstdomain registry.ipv6.docker.com
+acl acl_direct_access dstdomain .gcr.io
+acl acl_direct_access dstdomain .googleapis.com
+acl acl_direct_access dstdomain .{{ public_domain }}
+acl acl_direct_access dstdomain .stackrox.io
+
+
+# cache peering:
+# Proxy requests are send to peering cache first.
+# Used for i.e. IPv6 only networks where IPv4 hosts won't be reachable at all even from the host
+# You will need to setup your local squid to *only* allow connections from this host (and probably your local-networks' hosts)
+# A public IPv6 address exposed to the internet (and therefore also the Hetzner host) will be required, as well
+# as a public ipv4 address - but there is no need to expose Squid on IPv4 as well. We just need to send requests
+# to the remote proxy via IPv6 and reach out to IPv4 hosts via that host.
+{% if proxy_cache_peer is defined %}
+cache_peer 		{{ proxy_cache_peer }}          parent    {{ proxy_cache_peer_port }}       0  default no-query no-digest no-netdb-exchange
+# always request access via parent
+prefer_direct          off
+nonhierarchical_direct off
+
+always_direct allow acl_direct_access
+always_direct deny  all
+
+never_direct deny  acl_direct_access
+never_direct allow all
+{% endif %}
+
+# Example rule allowing access from your local networks.
+# Adapt to list your (internal) IP networks from where browsing
+# should be allowed
+acl localnet src 0.0.0.1-0.255.255.255  # RFC 1122 "this" network (LAN)
+acl localnet src 10.0.0.0/8             # RFC 1918 local private network (LAN)
+acl localnet src 100.64.0.0/10          # RFC 6598 shared address space (CGN)
+acl localnet src 169.254.0.0/16         # RFC 3927 link-local (directly plugged) machines
+acl localnet src 172.16.0.0/12          # RFC 1918 local private network (LAN)
+acl localnet src 192.168.0.0/16         # RFC 1918 local private network (LAN)
+acl localnet src fc00::/7               # RFC 4193 local private network range
+acl localnet src fe80::/10              # RFC 4291 link-local (directly plugged) machines
+
+{% if 'IPv4' in ip_families  %}
+{%if public_ip is defined %}#acl localhost src {{ public_ip }} # The host may need to send proxy requests too{% endif %}
+#acl localhost src 127.0.0.1 # The host may need to send proxy requests too
+acl localnet src {{ vn_subnet }}/24   # OpenShift network
+{% endif %}
+{% if 'IPv6' in ip_families  %}
+{%if public_ipv6 is defined %}#acl localhost src {{ public_ipv6 }} # With IPv6 chances are that some services are not IPv6 enabled, make use of peering Squid{% endif %}
+#acl localhost src ::1 # With IPv6 chances are that some services are not IPv6 enabled, make use of peering Squid
+acl localnet src {{ vn_subnet_ipv6 }}::/80   # OpenShift network
+{% endif %}
+
+acl SSL_ports port 443
+acl SSL_ports port 6443         # API
+acl Safe_ports port 80          # http
+acl Safe_ports port 21          # ftp
+acl Safe_ports port 443         # https
+acl Safe_ports port 70          # gopher
+acl Safe_ports port 210         # wais
+acl Safe_ports port 1025-65535  # unregistered ports
+acl Safe_ports port 280         # http-mgmt
+acl Safe_ports port 488         # gss-http
+acl Safe_ports port 591         # filemaker
+acl Safe_ports port 777         # multiling http
+
+acl CONNECT method CONNECT
+
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow localhost manager
+http_access deny manager
+
+#
+# INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
+#
+
+http_access allow localnet
+http_access allow localhost
+http_access deny all
+

@@ -1,0 +1,66 @@
+---
+- name: Create "install_config_proxy" for local proxy
+  ansible.builtin.set_fact:
+    install_config_proxy:
+      # yamllint disable rule:line-length
+      httpProxy: "http://{{ ansible_host }}:3128"
+      httpsProxy: "http://{{ ansible_host }}:3128"
+      noProxy: "{{ ansible_host }}"
+      # yamllint enable rule:line-length
+  when: proxy_cache_enabled is defined and proxy_cache_enabled
+
+- name: Ensure Podman is present
+  ansible.builtin.package:
+    name:
+      - podman
+      - netavark
+    state: present
+
+- name: Ensure OpenShift 4 Proxy environment-file exists
+  ansible.builtin.copy:
+    content: |
+      ### environment for squid-proxy
+      SQUID_DIR={{ proxy_cache_dir }}
+    dest: "/etc/sysconfig/{{ proxy_name }}.env"
+    mode: 0644
+
+- name: Ensure Squid disk-cache directory exists
+  ansible.builtin.file:
+    path: "{{ proxy_cache_dir }}"
+    state: directory
+    mode: 0770
+    owner: 23
+    group: 23
+    setype: container_var_lib_t
+
+- name: Ensure OpenShift 4 Proxy configuration-file exists
+  ansible.builtin.template:
+    src: squid-config.j2
+    dest: "/etc/sysconfig/{{ proxy_name }}.conf"
+    mode: 0644
+
+- name: Ensure OpenShift 4 Proxy SystemD service exists
+  ansible.builtin.template:
+    src: systemd.service.j2
+    dest: "/etc/systemd/system/{{ proxy_name }}.service"
+    mode: 0644
+
+- name: Enable and start {{ proxy_name }}.service
+  ansible.builtin.systemd:
+    name: "{{ proxy_name }}.service"
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: Allow services to start up
+  ansible.builtin.pause:
+    seconds: 30
+
+- name: Collect services facts
+  ansible.builtin.service_facts:
+  register: services_state
+
+- name: Check {{ proxy_name }}.service status
+  fail:
+    msg: "Proxy service {{ proxy_name }}.service is not running!!! Please check, run: systemctl status {{ proxy_name }}.service"
+  when: services_state.ansible_facts.services[ proxy_name  + '.service'].state != 'running'

@@ -1,5 +1,9 @@
 # RELEASE NOTES
 
+## 2023-05-12
+ * Added new option `proxy_cache_enabled` to configure Squid in a container.
+ * Added new option `proxy_cache_peer` and `proxy_cache_peer_port` to allow upstream Squid cache
+
 ## 2023-04-14
 
  * Bump OpenShift version to 4.12.10
