@@ -88,6 +88,18 @@
     src: "{{ ssh_public_key_location }}.pub"
   register: slurped_ssh_public_key
 
+###########################################################################################
+# Handle pre-install-add-ons
+###########################################################################################
+
+- name: Include pre-install-add-ons
+  ansible.builtin.include_tasks: pre-install-add-ons.yml
+  when: add_ons_enabled
+  tags:
+    - pre-install
+    - add-ons
+    - pre-install-add-ons
+
 - name: Create ignition files
   ansible.builtin.include_tasks: create-ignition.yml
   vars:
