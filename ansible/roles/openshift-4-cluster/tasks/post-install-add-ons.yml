@@ -3,7 +3,6 @@
   ansible.builtin.include_vars: "{{ playbook_dir }}/../add-ons.yml"
   tags:
     - post-install
-    - add-ons
     - post-install-add-ons
 
 - name: "Handle post_install_add_ons (include_role)"
@@ -13,10 +12,8 @@
     apply:
       tags:
         - post-install
-        - add-ons
         - post-install-add-ons
   tags:
     - post-install
-    - add-ons
     - post-install-add-ons
   with_items: "{{ post_install_add_ons | default ([]) }}"
