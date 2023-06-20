@@ -1,17 +1,16 @@
 # RELEASE NOTES
-## 2023-05-13
+
+## 2023-06-xx
+ * Bump OpenShift version to 4.13.3
+ * Add support of
+    * CentOS Stream 9 base
+    * Rocky Linux 9.1 base
+ * Remove support of CentOS 8 and Rocky 8
  * Added new option `fips` to allow FIPS enabled cluster setups
-
-## Unreleased
-
-* Add Debian 11 support for root server
-
-## Unreleased
-
-* Make oc-mirror binary an opt-in
-
-## 2023-05-13
+ * Add Debian 11 support for root server
+ * Make oc-mirror binary an opt-in
  * Introduce `ansible-vault` for credentials
+
 
 ## 2023-04-14
 
