@@ -1,0 +1,74 @@
+---
+- name: Installing KVM Packages
+  ansible.builtin.package:
+    name:
+      - "@virtualization-hypervisor"
+      - "@virtualization-client"
+      - "@virtualization-platform"
+      - "@virtualization-tools"
+      # ansible virt need lxml
+      - python3-lxml
+      - firewalld
+      - jq
+    state: present
+
+- name: Upgrade all packages
+  ansible.builtin.package:
+    name: '*'
+    state: latest
+  register: update
+
+- name: Check if new kernel has been installed and local execution
+  ansible.builtin.set_fact:
+    hetzner_ocp4_prepare_host_reboot_needed: true
+  when:
+    - update.changed
+    - update.results | select('match','Installed:.*kernel.*') | length > 0
+  tags:
+    - skip_ansible_lint
+
+- name: Enable & Start firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: Allow NFS traffic from VM's to Host
+  ansible.posix.firewalld:
+    zone: libvirt
+    state: enabled
+    permanent: yes
+    service: "{{ item }}"
+  with_items:
+    - nfs
+    - mountd
+    - rpc-bind
+  notify: 'reload firewalld'
+
+- name: Allow OpenShift traffic from VM's to Host
+  ansible.posix.firewalld:
+    zone: libvirt
+    state: enabled
+    permanent: yes
+    port: "{{ item }}"
+  with_items:
+    - 80/tcp
+    - 443/tcp
+    - 6443/tcp
+    - 22623/tcp
+  notify: 'reload firewalld'
+
+- name: Allow OpenShift traffic from public to Host
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: yes
+    port: "{{ item }}"
+  with_items:
+    - 80/tcp
+    - 443/tcp
+    - 6443/tcp
+  notify: 'reload firewalld'
+
+- name: firewalld reload
+  ansible.builtin.command: firewall-cmd --reload
