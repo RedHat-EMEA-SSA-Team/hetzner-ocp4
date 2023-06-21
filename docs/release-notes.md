@@ -4,7 +4,6 @@
  * Bump OpenShift version to 4.13.3
  * Add support of
     * CentOS Stream 9 base
-    * Rocky Linux 9.1 base
  * Remove support of CentOS 8 and Rocky 8
  * Added new option `fips` to allow FIPS enabled cluster setups
  * Add Debian 11 support for root server
@@ -37,9 +36,6 @@
  * Added Gandi as a DNS provider
  * [Added instructions for RHEL9 image creation](hetzner_rhel9.md)
  * Added Rocky Linux 9 support
-
->>>>>>> dc2f464 (Add Rocky Linux 9 support)
-
 
 ## 2022-06-19
 
