@@ -21,3 +21,6 @@ additional_build_steps:
     - RUN pip install pyopenssl --upgrade
 #     - RUN echo This is a post-install command!
 #     - RUN ls -la /etc
+    # Needed for tekton
+    - RUN pip install pre-commit
+
