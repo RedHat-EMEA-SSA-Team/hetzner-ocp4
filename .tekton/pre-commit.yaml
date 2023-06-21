@@ -79,7 +79,7 @@ spec:
             - name: source
           steps:
             - name: pre-commit
-              image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-pre-commit:latest
+              image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:202306212139
               workingDir: $(workspaces.source.path)
               script: |
                 set -euxo pipefail
