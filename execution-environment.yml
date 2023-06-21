@@ -23,4 +23,3 @@ additional_build_steps:
 #     - RUN ls -la /etc
     # Needed for tekton
     - RUN pip install pre-commit
-
