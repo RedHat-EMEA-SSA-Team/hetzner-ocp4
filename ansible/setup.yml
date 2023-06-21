@@ -1,3 +1,5 @@
 ---
-- import_playbook: 01-prepare-host.yml
-- import_playbook: 02-create-cluster.yml
+- ansible.builtin.import_playbook: 00-check-cluster-config.yml
+- ansible.builtin.import_playbook: 00-provision-hetzner.yml
+- ansible.builtin.import_playbook: 01-prepare-host.yml
+- ansible.builtin.import_playbook: 02-create-cluster.yml

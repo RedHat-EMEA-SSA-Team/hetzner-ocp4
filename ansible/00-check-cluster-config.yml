@@ -1,0 +1,30 @@
+---
+- name: Ensure required options are present
+  hosts: all
+  gather_facts: no
+  vars_files:
+    - ../cluster.yml
+  tasks:
+
+    - name: Check if `cluster_name` is configured
+      ansible.builtin.fail:
+        msg: "`cluster_name` is a mandatory setting, please define it in `cluster.yml`"
+      when: cluster_name is not defined
+
+    - name: Check if `dns_provider` is configured
+      ansible.builtin.fail:
+        msg: |-
+          `dns_provider` is a mandatory setting, please define it in `cluster.yml` with
+          one of the following values: route53, cloudflare, gcp, azure,transip, hetzner or none
+          Please check the README.md for most updated list.
+      when: dns_provider is not defined
+
+    - name: Check if `image_pull_secret` is configured
+      ansible.builtin.fail:
+        msg: "`image_pull_secret` is a mandatory setting, please define it in `cluster.yml`"
+      when: image_pull_secret is not defined and image_pull_secret | json_query('auths.quay\.io') | length == 0
+
+    - name: Check if `public_domain` is configured
+      ansible.builtin.fail:
+        msg: "`public_domain` is a mandatory setting, please define it in `cluster.yml`"
+      when: public_domain is not defined
