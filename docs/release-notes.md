@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## 2023-06-xx
+## 2023-06-22
  * Bump OpenShift version to 4.13.3
  * Add support of
     * CentOS Stream 9 base
