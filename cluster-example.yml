@@ -7,6 +7,7 @@ ip_families:
   - IPv4
   - IPv6
 
+fips: false
 # set custom public ip for DNS entries. Defaults to: hostvars['localhost']['ansible_default_ipv4']['address']
 # public_ip: 92.100.42.2
 dns_provider: [route53|cloudflare|gcp|azure|hetzner]
