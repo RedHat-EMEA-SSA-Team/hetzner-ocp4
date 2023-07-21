@@ -52,6 +52,7 @@ Create the Mirror Registry
 ./mirror-registry install -v \
   --quayHostname host.compute.local:5000 \
   --quayRoot /var/lib/libvirt/images/mirror-registry/quay/ \
+  --quayStorage /var/lib/libvirt/images/mirror-registry/quay-storage/ \
   --ssh-key /root/.ssh/id_rsa \
   --sslKey /var/lib/libvirt/images/mirror-registry/certs/registry.key \
   --sslCert /var/lib/libvirt/images/mirror-registry/certs/registry.crt \
