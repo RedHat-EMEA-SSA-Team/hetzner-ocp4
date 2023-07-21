@@ -22,6 +22,11 @@
       - "@virtualization-tools"
     state: present
 
+- name: Installing playbook dependencies
+  ansible.builtin.package:
+    name: python3-lxml
+    state: present
+
 - name: Upgrade all packages
   ansible.builtin.package:
     name: '*'
