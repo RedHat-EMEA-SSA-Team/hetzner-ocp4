@@ -16,7 +16,7 @@
         name: web-terminal
         namespace: openshift-operators
       spec:
-        channel: alpha
+        channel: fast
         name: web-terminal
         source: redhat-operators
         sourceNamespace: openshift-marketplace
