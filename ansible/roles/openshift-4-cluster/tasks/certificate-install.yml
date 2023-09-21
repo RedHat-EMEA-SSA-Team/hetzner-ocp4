@@ -33,6 +33,7 @@
         ca_cert: "{{ k8s_ca_cert }}"
         client_cert: "{{ k8s_client_cert }}"
         client_key: "{{ k8s_client_key }}"
+        validate_certs: false
         definition:
           apiVersion: v1
           kind: Secret
@@ -62,6 +63,7 @@
           spec:
             defaultCertificate:
               name: letsencrypt-router-certs
+        validate_certs: false
     # Hot fix, remove of openshift api cert installation because of
     #          https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4/issues/117
     # - name: Create secret with certificates for openshift api
