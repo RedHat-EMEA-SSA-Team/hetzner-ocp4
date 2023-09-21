@@ -1,6 +1,6 @@
 ---
 
-- name: Build openshift download urls
+- name: Build OpenShift download urls
   ansible.builtin.set_fact:
     tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
     tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
@@ -11,10 +11,14 @@
       - "{{ coreos_download_url }}"
       - "{{ tmp_openshift_install_download_url }}"
       - "{{ tmp_openshift_client_download_url }}"
-      - "{{ openshift_location }}/oc-mirror.tar.gz"
+      - "{{ (download_oc_mirror is true) | ternary('{{ openshift_location }}/oc-mirror.tar.gz', '') }}"
       - "{{ opm_download_url }}"
       - "{{ helm_cli_location }}"
       - "{{ butane_cli_location }}"
+
+- name: Filter check_urls
+  ansible.builtin.set_fact:
+    check_urls: "{{ check_urls|select|list }}"
 
 - name: Add coreos_csum_url to check_urls
   ansible.builtin.set_fact:
@@ -113,7 +117,7 @@
     - "/opt/openshift-client-{{ openshift_version }}"
     - "{{ opm_dest }}"
 
-- name: Download Openshift installer
+- name: Download OpenShift installer
   ansible.builtin.unarchive:
     src: "{{ tmp_openshift_install_download_url }}"
     dest: "/opt/openshift-install-{{ openshift_version }}/"
@@ -125,7 +129,7 @@
       - 'README.md'
     creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
 
-- name: Download Openshift client
+- name: Download OpenShift client
   ansible.builtin.unarchive:
     src: "{{ tmp_openshift_client_download_url }}"
     dest: "/opt/openshift-client-{{ openshift_version }}/"
@@ -148,6 +152,7 @@
     exclude:
       - 'README.md'
     creates: "/opt/openshift-client-{{ openshift_version }}/oc-mirror"
+  when: download_oc_mirror is true
 
 - name: Download OPM (gz)
   ansible.builtin.unarchive:
@@ -188,6 +193,7 @@
     dest: "{{ item.key }}"
     state: link
     force: yes
+    follow: false
   with_dict:
     "/usr/local/bin/oc": "/opt/openshift-client-{{ openshift_version }}/oc"
     "/usr/local/bin/oc-mirror": "/opt/openshift-client-{{ openshift_version }}/oc-mirror"

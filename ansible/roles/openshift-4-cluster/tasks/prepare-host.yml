@@ -19,6 +19,9 @@
 
 - name: Verify KVM module is loaded
   ansible.builtin.shell: "set -o pipefail && lsmod | grep -i kvm"
+  args:
+    executable: /bin/bash
+
   register: result
   failed_when: "result.rc != 0"
 

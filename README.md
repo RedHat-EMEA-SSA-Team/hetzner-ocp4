@@ -27,10 +27,12 @@ Our instructions are based on the CentOS Root Server as provided by [Hetzner](ht
 **NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)**
 
 **Supported root server operating systems:**
-- CentOS Stream 8
 - RHEL 8 - How to install RHEL8: https://keithtenzer.com/cloud/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
 - RHEL 9 - leapp update from RHEL 8
 - RHEL 9 ([How to install RHEL9](docs/hetzner_rhel9.md))
+- CentOS Stream 9 base
+- Rocky Linux 9.1 base
+- Debian 11
 
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
@@ -226,13 +228,25 @@ Please configure in `cluster.yml` all necessary credentials:
 |`sdn_plugin_name`|`OVNKubernetes`|This allows you to change SDN plugin. Valid values are OpenShiftSDN and OVNKubernetes. (Default is OVNKubernetes.)
 |`masters_schedulable`|true|Set to false if don't want to allow workload onto the master nodes. (Default is to allow this)|
 |`install_config_capabilities`|null|Configure [Cluster capabilities](https://docs.openshift.com/container-platform/latest/post_installation_configuration/cluster-capabilities.html)
+|`fips`|false|Enable FIPS mode on the OpenShift cluster (Default is false)|
 
 ## Prepare kvm-host and install OpenShift
 
-```
+```bash
 cd hetzner-ocp4
-ansible-navigator run -m stdout ./ansible/setup.yml
+ansible-navigator run ansible/setup.yml
 ```
+
+When using an Ansible-vault containing sensitive configuration data:
+```bash
+% ansible-vault create ansible/group_vars/all/my-vault.yml
+% touch ~/.vault-password && chmod 0600 ~/.vault-password
+% vi ~/.vault-password   # enter password as plain-text
+% export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault-password
+% ansible-navigator run ansible/setup.yml
+```
+Please note that `group_vars` and `host_vars` will have to reside in the directory of the playbook to be run.
+In our setup, this will be `ansible/group_vars` and `ansible/host_vars`.
 
 # Additional documentation
 
