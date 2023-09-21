@@ -1,5 +1,8 @@
 # RELEASE NOTES
 
+## 2023-09-21
+ * Fixed #296 unable to renew certificate if already expired
+
 ## 2023-06-22
  * Bump OpenShift version to 4.13.3
  * Add support of
