@@ -8,7 +8,7 @@ To distiguish online & offline configuration file, let's create the file cluster
 Be sure that the following lines are defined in your configuration file:
 
 ```yaml
-network_forward_mode: "route"
+network_forward_mode: "open"
 vn_subnet: "192.168.50.0"
 ```
 
