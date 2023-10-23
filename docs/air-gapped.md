@@ -42,7 +42,7 @@ Download and extract the mirror-registry binary: (This is currently not done via
 ```bash
 mkdir ~/mirror
 cd ~/mirror
-wget https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz
+curl -L -O https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz
 tar -xzvf mirror-registry.tar.gz
 ```
 
@@ -76,7 +76,9 @@ Store the result in ~/.docker/config.json
 
 ```bash
 mkdir ~/.docker
-jq -s '{"auths": ( .[0].auths + .[1].auths ) }' mirror-registry-pullsecret.json <path-to-your-redhat-pullsecret> > ~/.docker/config.json
+jq -s '{"auths": ( .[0].auths + .[1].auths ) }' \ 
+    mirror-registry-pullsecret.json \
+    <path-to-your-redhat-pullsecret> > ~/.docker/config.json
 ```
 
 ## Download OC Client
@@ -108,8 +110,8 @@ mirror:
     channels:
     - name: stable-4.12
       type: ocp
-  operators: {}
-  additionalImages: {}
+  operators: []
+  additionalImages: []
   helm: {}
 ```
 
@@ -139,9 +141,9 @@ oc mirror --from=./mirror_seq1_000000.tar docker://host.compute.local:5000
 ## Extract `openshift-install` command
 
 ```
-oc adm release extract -a ${LOCAL_SECRET_JSON} \
+oc adm release extract -a  ~/.docker/config.json \
   --command=openshift-install \
-  "host.compute.local:5000/openshift/release-images:4.12.4-x86_64"
+  "host.compute.local:5000/openshift/release-images:$(oc version -o json | jq -r .releaseClientVersion )-x86_64"
 ```
 
 ## Update cluster.yml
