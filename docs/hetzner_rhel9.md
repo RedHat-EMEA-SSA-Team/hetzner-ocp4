@@ -106,7 +106,6 @@ BOOTLOADER grub
 HOSTNAME lab.froemer.net
 PART /boot ext4 1024M 
 PART lvm vg0 500G
-PART lvm vg1 all
 
 LV vg0 root            /               xfs  40G
 LV vg0 swap            swap            swap 15G
