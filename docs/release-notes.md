@@ -1,7 +1,11 @@
 # RELEASE NOTES
 
-## 2023-09-21
+## 2023-12-27
+ * Bump OpenShift version to 4.14.6
+ * Improve & Fix ( #294 ) air-gapped documentation
+ * Improve RHEL 9 bare metal installation ( #302 )
  * Fixed #296 unable to renew certificate if already expired
+ * Fixed issue #295 - web-terminal add-on
 
 ## 2023-06-22
  * Bump OpenShift version to 4.13.3
