@@ -93,15 +93,15 @@ SWRAID 1
 SWRAIDLEVEL 0
 BOOTLOADER grub
 HOSTNAME my-cool-hostname
-PART /boot ext3     512M
-PART lvm   vg0       all
+PART /boot ext4   1024M
+PART lvm   vg0    all
 
-LV vg0   root   /       ext4      50G
-LV vg0   swap   swap    swap       5G
-LV vg0   tmp    /tmp    ext4      10G
-LV vg0   home   /home   ext4      40G
-LV vg0   var    /var ext4 50G
-LV vg0   libvirt /var/lib/libvirt/images xfs all
+LV vg0   root   /                         xfs   50G
+LV vg0   swap   swap                      swap  5G
+LV vg0   tmp    /tmp                      xfs   10G
+LV vg0   home   /home                     xfs   40G
+LV vg0   var    /var                      xfs   50G
+LV vg0   libvirt /var/lib/libvirt/images  xfs   all
 
 
 IMAGE /root/.oldroot/nfs/install/../images/CentOS-80-stream-amd64-base.tar.gz
