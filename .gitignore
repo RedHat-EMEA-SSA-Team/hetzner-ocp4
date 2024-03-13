@@ -3,3 +3,4 @@ cluster.yml
 certificate/
 ansible-navigator.log
 context/
+.vaultpasswd
