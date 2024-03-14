@@ -14,3 +14,4 @@ hetzner_size_of_libvirt_images: all
 
 robot_base: https://robot-ws.your-server.de/
 needs_reprovision: false
+already_in_rescue: false
