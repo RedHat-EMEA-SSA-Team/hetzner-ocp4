@@ -1,4 +1,10 @@
 ---
+hetzner_webservice_username: # see docs
+hetzner_webservice_password: # see docs
+
+hetzner_hostname: "changeme"
+hetzner_ip: "changeme"
+
 cluster_name: ocp4
 public_domain: example.com
 

@@ -89,7 +89,9 @@
       Content_Type: "application/x-www-form-urlencoded"
   register: activated
   delegate_to: localhost
-  when: not rescue.json.rescue.active
+  when:
+    - not rescue.json.rescue.active
+    - not already_in_rescue
 
 # - debug: msg="{{ activated }}"
 
@@ -109,6 +111,9 @@
       Content-Type: "application/x-www-form-urlencoded"
   register: reset
   delegate_to: localhost
+  when:
+    - not already_in_rescue
+
 
 - name: Remove server from local known_hosts file
   command: "/usr/bin/ssh-keygen -R {{ hetzner_ip }}"
