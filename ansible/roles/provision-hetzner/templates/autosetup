@@ -1,16 +1,16 @@
 DRIVE1 /dev/{{ hetzner_disk1 }}
 DRIVE2 /dev/{{ hetzner_disk2 }}
 SWRAID 1
-SWRAIDLEVEL 0
+SWRAIDLEVEL {{ hetzner_raid_level }}
 BOOTLOADER grub
 HOSTNAME {{ hetzner_hostname }}
 PART /boot ext3 1024M
-PART lvm vg0 all
+PART lvm {{ hetzner_vg_name }} all
 
-LV vg0 root / xfs 50G
-LV vg0 swap swap swap 8G
-LV vg0 home   /home   xfs      10G
-LV vg0 var    /var xfs 50G
-LV vg0 libvirt /var/lib/libvirt/images xfs {{ hetzner_size_of_libvirt_images }}
+LV {{ hetzner_vg_name }} root / xfs 50G
+LV {{ hetzner_vg_name }} swap swap swap 8G
+LV {{ hetzner_vg_name }} home   /home   xfs      10G
+LV {{ hetzner_vg_name }} var    /var xfs 50G
+LV {{ hetzner_vg_name }} libvirt /var/lib/libvirt/images xfs {{ hetzner_size_of_libvirt_images }}
 
 IMAGE {{ hetzner_image }}
