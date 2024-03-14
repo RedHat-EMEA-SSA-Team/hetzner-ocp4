@@ -5,12 +5,22 @@ SWRAIDLEVEL {{ hetzner_raid_level }}
 BOOTLOADER grub
 HOSTNAME {{ hetzner_hostname }}
 PART /boot ext3 1024M
-PART lvm {{ hetzner_vg_name }} all
+
+PART lvm {{ hetzner_vg_name }} all {% if hetzner_crypt_password is defined %} crypt{% endif %}
 
 LV {{ hetzner_vg_name }} root / xfs 50G
 LV {{ hetzner_vg_name }} swap swap swap 8G
 LV {{ hetzner_vg_name }} home   /home   xfs      10G
 LV {{ hetzner_vg_name }} var    /var xfs 50G
 LV {{ hetzner_vg_name }} libvirt /var/lib/libvirt/images xfs {{ hetzner_size_of_libvirt_images }}
+
+{#
+  we are setting an dummy password here, because this one is unsafe
+  This file remains on the server and could have been read by the
+  installimage, we're setting this one here and change it afterwards
+#}
+{% if hetzner_crypt_password is defined %}
+CRYPTPASSWORD {{ hetzner_crypt_bootstrap_password }}
+{% endif %}
 
 IMAGE {{ hetzner_image }}
