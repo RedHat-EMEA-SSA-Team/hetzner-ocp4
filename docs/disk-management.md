@@ -56,3 +56,11 @@ IMAGE=`oc -n openshift-machine-config-operator get configmap/coreos-bootimages -
 gunzip `echo $IMAGE | cut -d/ -f12`
 ```
 
+Or via openshift-install command:
+```bash
+$ openshift-install coreos print-stream-json | jq '.architectures.x86_64.artifacts.qemu.formats."qcow2.gz".disk.location'
+"https://rhcos.mirror.openshift.com/art/storage/prod/streams/4.14-9.2/builds/414.92.202310210434-0/x86_64/rhcos-414.92.202310210434-0-qemu.x86_64.qcow2.gz"
+```
+
+Or via mirror.openshift.pub: https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.15/4.15.0/rhcos-4.15.0-x86_64-qemu.x86_64.qcow2.gz
+
