@@ -87,7 +87,7 @@
     - post-install
     - idp
   ansible.builtin.set_fact:
-    identity_providers: "[]"
+    identity_providers: "{{ [] }}"
 
 - name: Handle auth_htpasswd
   block:
@@ -120,7 +120,7 @@
           type: HTPasswd
     - name: Push htpasswd_idp to identity_providers
       ansible.builtin.set_fact:
-        identity_providers: "{{ identity_providers }} + [ {{ htpasswd_idp }} ]"
+        identity_providers: "{{ identity_providers + [ htpasswd_idp ] }}"
   when: auth_htpasswd is defined
   tags:
     - post-install
@@ -159,7 +159,7 @@
           type: Google
     - name: Push redhatsso_idp to identity_providers
       ansible.builtin.set_fact:
-        identity_providers: "{{ identity_providers }} + [ {{ redhatsso_idp }} ]"
+        identity_providers: "{{ identity_providers + [ redhatsso_idp ] }}"
   when: auth_redhatsso is defined
   tags:
     - post-install
@@ -207,7 +207,7 @@
           type: GitHub
     - name: Push github_idp to identity_providers
       ansible.builtin.set_fact:
-        identity_providers: "{{ identity_providers }} + [ {{ github_idp }} ]"
+        identity_providers: "{{ identity_providers + [ github_idp ] }}"
   when: auth_github is defined
   tags:
     - post-install
