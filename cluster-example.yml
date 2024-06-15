@@ -16,7 +16,7 @@ ip_families:
 fips: false
 # set custom public ip for DNS entries. Defaults to: hostvars['localhost']['ansible_default_ipv4']['address']
 # public_ip: 92.100.42.2
-dns_provider: [route53|cloudflare|gcp|azure|hetzner]
+dns_provider: [route53|cloudflare|gcp|azure|hetzner|gandi]
 letsencrypt_account_email: name@example.com
 # Depending on the dns provider:
 # CloudFlare
