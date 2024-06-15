@@ -14,7 +14,7 @@ Role Variables
 
 | variable | describtion  | example | default | 
 |---|---|---|---|
-| le_dns_provider | DNS provider | `[route53|cloudflare|gcp|azure|hetzner]` |  non **required** |
+| le_dns_provider | DNS provider | `[route53\|cloudflare\|gcp\|azure\|hetzner\|gandi]` |  non **required** |
 | le_cloudflare_account_email | Cloudflare Account E-Mail for API authentication | `account@domain.tld`| non **required if provider is cloudflare** |
 | le_cloudflare_account_api_token | Cloudflare API token for API authentication | `loo...ngiJ`| non **required if provider is cloudflare** |
 | le_cloudflare_zone | Cloudflare zone in which the entries are created and deleted for the dns challenge | `domain.tld` | non **required if provider is cloudflare** |
