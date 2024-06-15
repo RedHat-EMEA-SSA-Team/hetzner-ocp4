@@ -1,5 +1,8 @@
 # RELEASE NOTES
 
+## 2024-06-15
+ * Added gandi as option to docs and example_cluster.yml
+
 ## 2023-12-27
  * Bump OpenShift version to 4.14.6
  * Improve & Fix ( #294 ) air-gapped documentation
