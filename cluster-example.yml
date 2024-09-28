@@ -5,6 +5,12 @@ hetzner_webservice_password: # see docs
 hetzner_hostname: "changeme"
 hetzner_ip: "changeme"
 
+## the following block needs to be set for installation with cryptroot
+#hetzner_crypt_password:
+#hetzner_crypt_network_gatewayv4:
+#hetzner_crypt_network_interface: enp7s0
+#hetzner_crypt_network_ssh_port: 22
+
 cluster_name: ocp4
 public_domain: example.com
 

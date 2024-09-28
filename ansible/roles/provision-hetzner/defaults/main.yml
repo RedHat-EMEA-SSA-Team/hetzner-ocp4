@@ -4,13 +4,18 @@ hetzner_webservice_password:
 hetzner_hostname:               # needed for Hetzner server computer name
 hetzner_ip:                     # needed for Hetzner Web UI and Ansible
 hetzner_autosetup_file: templates/autosetup
+hetzner_postinst_file: templates/post-install
 hetzner_disk1: sda
 hetzner_disk2: sdb
 hetzner_raid_level: 0
 hetzner_vg_name: vg0
+
+hetzner_crypt_bootstrap_password: InitialCryptPW
+
 hetzner_image: "/root/.oldroot/nfs/install/../images/CentOS-90-stream-amd64-base.tar.gz"
 hetzner_image_ignore_errors: false
 hetzner_size_of_libvirt_images: all
+
 
 robot_base: https://robot-ws.your-server.de/
 needs_reprovision: false
