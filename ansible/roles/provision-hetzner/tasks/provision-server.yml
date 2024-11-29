@@ -142,18 +142,37 @@
     mode: 0644
   delegate_to: "{{ hetzner_ip }}"
 
+- name: Copy postinstall file for cryptroot
+  template:
+    src: "{{ hetzner_postinst_file }}"
+    dest: /root/post-install.ansible
+    owner: root
+    group: root
+    mode: 0755
+  delegate_to: "{{ hetzner_ip }}"
+  when: hetzner_crypt_password is defined
+
+
 - name: Run installimage
-  command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup.ansible"
+  command: "/root/.oldroot/nfs/install/installimage -a -c /root/autosetup.ansible {{postinst_string}}"
   environment:
     TERM: "vt100"
   register: result
   changed_when: true
   failed_when: false
   delegate_to: "{{ hetzner_ip }}"
+  vars:
+    postinst_string: "{% if hetzner_crypt_password is defined %}-x /root/post-install.ansible{% endif %}"
 
 - name: Print installimage output with -v
   debug:
     var: result.stdout_lines
+    verbosity: 1
+  delegate_to: localhost
+
+- name: Print installimage stderroutput with -v
+  debug:
+    var: result.stderr_lines
     verbosity: 1
   delegate_to: localhost
 
@@ -191,6 +210,97 @@
   changed_when: '"updated" in output.stdout'
   delegate_to: localhost
 
+- name: Crypt-Unlocking twice
+  when: hetzner_crypt_password is defined
+  block:
+  ##
+  ## We have to unlock twice, because of auto-relabeling there are two boots
+  ##
+
+  # wait for first reboot
+  - name: Wait 600 seconds for port crypt-shell to become open
+    wait_for:
+      port: "{{ hetzner_crypt_network_ssh_port }}"
+      host: '{{ hetzner_ip }}'
+      delay: 10
+      timeout: 600
+    connection: local
+
+  # Show console before auth
+  - name: Read the console
+    ansible.builtin.raw: |
+      console_peek
+    timeout: 5
+    register: cryptroot_peek_reg
+    delegate_to: "{{ hetzner_ip }}"
+    ignore_errors: true
+  - debug: var=cryptroot_peek_reg
+
+  # this needs to be done manually, because the "console_auth" tool
+  # wants interactive input and we need to fake that
+  - name: Unlock cryptroot
+    ansible.builtin.shell: "echo {{ hetzner_crypt_bootstrap_password }} | ssh  -o StrictHostKeyChecking=no -l root -t {{ hetzner_ip }} 'console_auth'"
+    timeout: 5
+    register: cryptroot_unlock_reg
+    ignore_errors: true
+    delegate_to: "localhost"
+
+  # Show console after auth
+  - name: Pause a bit for the hardware reset to kick in
+    pause: seconds=2
+  - name: Read the console
+    ansible.builtin.raw: |
+      console_peek
+    timeout: 5
+    register: cryptroot_peek_reg
+    delegate_to: "{{ hetzner_ip }}"
+    ignore_errors: true
+  - debug: var=cryptroot_peek_reg
+
+  - name: Pause a bit for the hardware reset to kick in
+    pause: seconds=15
+
+  # wait for second reboot
+  - name: Wait 600 seconds for port crypt-shell to become open
+    wait_for:
+      port: "{{ hetzner_crypt_network_ssh_port }}"
+      host: '{{ hetzner_ip }}'
+      delay: 10
+      timeout: 600
+    connection: local
+
+  # Show console before auth
+  - name: Read the console
+    ansible.builtin.raw: |
+      console_peek
+    timeout: 5
+    register: cryptroot_peek_reg
+    delegate_to: "{{ hetzner_ip }}"
+    ignore_errors: true
+  - debug: var=cryptroot_peek_reg
+
+  # this needs to be done manually, because the "console_auth" tool
+  # wants interactive input and we need to fake that
+  - name: Unlock cryptroot
+    ansible.builtin.shell: "echo {{ hetzner_crypt_bootstrap_password }} | ssh  -o StrictHostKeyChecking=no -l root -t {{ hetzner_ip }} 'console_auth'"
+    timeout: 5
+    register: cryptroot_unlock_reg
+    ignore_errors: true
+    delegate_to: "localhost"
+
+  # Show console after auth
+  - name: Pause a bit for the hardware reset to kick in
+    pause: seconds=2
+  - name: Read the console
+    ansible.builtin.raw: |
+      console_peek
+    timeout: 5
+    register: cryptroot_peek_reg
+    delegate_to: "{{ hetzner_ip }}"
+    ignore_errors: true
+  - debug: var=cryptroot_peek_reg
+
+
 - name: Wait 600 seconds for port 22 to become open
   wait_for:
     port: 22
@@ -203,3 +313,46 @@
   ansible.builtin.gather_facts:
   register: host_facts
   delegate_to: "{{ hetzner_ip }}"
+
+- name: Change luks passphrase
+  when: hetzner_crypt_password is defined
+  delegate_to: "{{ hetzner_ip }}"
+  block:
+    - name: Set fact for the LVM PVs of vg0
+      set_fact:
+        luks_pv: "{{ ansible_facts.lvm.pvs | dict2items | selectattr('value.vg', 'equalto', hetzner_vg_name) | map(attribute='key') | list }}"
+      no_log: true
+
+    - name: Find parent of cryptdevice
+      ansible.builtin.shell:
+        cmd: "lsblk -l -o path,pkname | grep {{ luks_pv[0] }} | cut -d ' ' -f 2"
+        executable: /bin/bash
+      when: luks_pv | length > 0
+      register: luks_cryptdev_reg
+      ignore_errors: true
+
+    - set_fact:
+        luks_cryptdev: "{{luks_cryptdev_reg.stdout_lines[0]}}"
+
+    - name: Ensure the LUKS device variable is set
+      fail:
+        msg: "LUKS device could not be determined."
+      when: luks_pv | length == 0
+
+    - name: Add new passphrase to LUKS device
+      ansible.builtin.shell:
+        cmd: "echo -n '{{ hetzner_crypt_password }}' | cryptsetup luksAddKey /dev/{{ luks_cryptdev }} --key-file <(echo -n '{{ hetzner_crypt_bootstrap_password }}')"
+        executable: /bin/bash
+      no_log: true
+      when: luks_pv | length > 0
+      register: lukskey_add_reg
+      ignore_errors: true
+
+    - name: Remove old passphrase from LUKS device
+      ansible.builtin.shell:
+        cmd: "echo -n '{{ hetzner_crypt_bootstrap_password }}' | cryptsetup luksRemoveKey /dev/{{ luks_cryptdev }} --key-file <(echo -n '{{ hetzner_crypt_bootstrap_password }}')"
+        executable: /bin/bash
+      no_log: true
+      when: luks_pv | length > 0
+      register: lukskey_del_reg
+      ignore_errors: true
