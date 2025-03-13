@@ -13,7 +13,7 @@ images:
 
 dependencies:
   ansible_core:
-    package_pip: ansible-core==2.14.4
+    package_pip: ansible-core==2.15.13
   ansible_runner:
     package_pip: ansible-runner
   galaxy: ee-requirements.yml
