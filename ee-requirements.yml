@@ -1,8 +1,6 @@
 ---
 collections:
-  - name: https://github.com/ansible-collections/community.libvirt
-    type: git
-    version: main
+  - community.libvirt
   - community.crypto
   - community.general
   - community.aws
