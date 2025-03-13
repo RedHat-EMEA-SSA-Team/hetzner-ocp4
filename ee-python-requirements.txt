@@ -1,4 +1,5 @@
 libvirt-python
+jmespath
 # Azure should be covert by collection: community.azure
 # packaging
 # msrest

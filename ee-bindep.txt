@@ -1,6 +1,11 @@
-pkgconf-pkg-config
+# for python-libvirt
 libvirt-client
 libvirt-libs
+pkgconf-pkg-config
 libvirt-devel
 gcc
-python38-devel
+python3.9-devel
+python3.11-devel
+python-devel
+# for postinstall commands
+python3-pip
