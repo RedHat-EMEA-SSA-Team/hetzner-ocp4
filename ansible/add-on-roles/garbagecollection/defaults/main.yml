@@ -1,3 +1,3 @@
 garbagecollection_high_treshold_percent: 66
 garbagecollection_low_treshold_percent: 50
-garbagecollection_minimum_age: "5m30s"
+garbagecollection_minimum_age: "6m"
