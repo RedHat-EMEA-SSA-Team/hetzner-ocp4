@@ -137,6 +137,6 @@
 
 - name: Include post installation tasks
   ansible.builtin.include_tasks: post-install.yml
-  tags:
+  tags: 
     - post-install
     - post-install-add-ons
