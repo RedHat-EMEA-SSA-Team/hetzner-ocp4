@@ -290,6 +290,9 @@ In our setup, this will be `ansible/group_vars` and `ansible/host_vars`.
 ## Build ansible execution enviorment
 
 ```bash
+python -m venv ansible-builder
+source ./ansible-builder/bin/activate
+pip install ansible-builder>=3.1.0
 
 VERSION=$(date +%Y%m%d%H%M)
 
