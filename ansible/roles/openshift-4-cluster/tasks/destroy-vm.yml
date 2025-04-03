@@ -13,7 +13,7 @@
   ignore_errors: yes
 
 - name: Delete logical volume
-  community.general.system.lvol:
+  community.general.lvol:
     vg: "{{ vm_storage_backend_location }}"
     lv: "{{ vm_instance_name }}"
     state: absent
