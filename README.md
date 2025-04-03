@@ -305,3 +305,24 @@ podman push quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:$VERSION
 
 [![Stargazers over time](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4.svg)](https://starchart.cc/RedHat-EMEA-SSA-Team/hetzner-ocp4)
 
+# Troubleshooting
+
+## ansible can not connect to host
+
+If you get a message like
+
+```
+fatal: [host]: UNREACHABLE! => {
+    "changed": false,
+    "msg": "Data could not be sent to remote host \"localhost\". Make sure this host can be reached over ssh: root@localhost: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).\r\n",
+    "unreachable": true
+}
+```
+
+you can put an additional entry into the ```cluster.yml``` like
+
+```
+ansible_ssh_private_key_file: /root/.ssh/id_ed25519
+```
+
+Don't know if this is the most elegant solution, but at least it worked for me :-)
