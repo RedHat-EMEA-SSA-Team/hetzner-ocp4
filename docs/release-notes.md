@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## 2025-04-03
+ * Add support for CentOS 10
+ * Use latest version of hetzner-ocp4-ansible-ee
+ * Use module community.general.lvol instead of community.general.system.lvol (which no longer seems to be available)
+ * Add troubleshooting section and table of content to README.md
+
 ## 2024-09-28
  * Added gandi as option to docs and example-cluster.yml
  * Bump OpenShift Version to 4.16.13
