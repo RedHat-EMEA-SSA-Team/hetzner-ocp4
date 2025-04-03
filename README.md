@@ -1,3 +1,35 @@
+# TOC
+
+- [TOC](#toc)
+- [Disclaimer](#disclaimer)
+- [Release notes](#release-notes)
+- [Contribution](#contribution)
+- [Install Instructions](#install-instructions)
+  - [Infra providers](#infra-providers)
+  - [Strongly recommended: configure Hetzner Firewall](#strongly-recommended-configure-hetzner-firewall)
+  - [In case of Red Hat Enterprise Linux](#in-case-of-red-hat-enterprise-linux)
+    - [Red Hat Enterprise Linux 8](#red-hat-enterprise-linux-8)
+    - [Red Hat Enterprise Linux 9](#red-hat-enterprise-linux-9)
+  - [In case of Rocky Linux 8 or Centos 8](#in-case-of-rocky-linux-8-or-centos-8)
+  - [Initialize tools](#initialize-tools)
+  - [Define variables for your cluster](#define-variables-for-your-cluster)
+    - [Cluster design (single node, compact or normal)](#cluster-design-single-node-compact-or-normal)
+      - [Single Node](#single-node)
+      - [Compact](#compact)
+      - [Normal](#normal)
+    - [Pre-releases](#pre-releases)
+    - [Set up public DNS records](#set-up-public-dns-records)
+    - [Optional configuration](#optional-configuration)
+  - [Prepare kvm-host and install OpenShift](#prepare-kvm-host-and-install-openshift)
+- [Additional documentation](#additional-documentation)
+- [Playbook overview](#playbook-overview)
+- [Useful commands](#useful-commands)
+- [Build / Development](#build--development)
+  - [Build ansible execution enviorment](#build-ansible-execution-enviorment)
+- [Stargazers over time](#stargazers-over-time)
+- [Troubleshooting](#troubleshooting)
+  - [ansible can not connect to host](#ansible-can-not-connect-to-host)
+
 # Disclaimer
 This environment has been created for the sole purpose of providing an easy to deploy and consume Red Hat OpenShift Container Platform 4 environment *as a sandpit*.
 
