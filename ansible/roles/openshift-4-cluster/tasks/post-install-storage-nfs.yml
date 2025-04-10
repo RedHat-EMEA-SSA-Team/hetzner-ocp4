@@ -9,7 +9,7 @@
   ansible.builtin.package:
     name: nfs-utils
     state: present
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version >= '8'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
 
 - name: Ensure NFS server is installed.
   ansible.builtin.package:
@@ -27,7 +27,7 @@
 - name: Set nfs_server
   ansible.builtin.set_fact:
     nfs_server: "nfs-server"
-  when: (ansible_os_family == "RedHat" and ansible_distribution_major_version >= '8') or (ansible_os_family == "Debian")
+  when: (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8) or (ansible_os_family == "Debian")
 
 - name: Ensure nfs is running.
   ansible.builtin.service:
