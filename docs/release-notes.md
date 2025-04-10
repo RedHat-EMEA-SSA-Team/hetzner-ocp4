@@ -1,5 +1,8 @@
 # RELEASE NOTES
 
+## 2025-04-10
+ * Fixed the issue that nfs storage creation did not work with CentOS 10
+
 ## 2025-04-04
  * Add support for CentOS 10
  * Use latest version of hetzner-ocp4-ansible-ee
