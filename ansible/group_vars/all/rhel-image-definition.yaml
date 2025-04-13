@@ -1,0 +1,16 @@
+---
+images:
+  - name: rhel9-hetzner-ocp4
+    distribution: rhel-9
+    description: RHEL 9.latest image customized for OCP4 on Hetzner
+    customizations:
+      kernel:
+        append: rd.auto
+      partitioning_mode: lvm
+      packages:
+        - lvm2
+      filesystem:
+        - mountpoint: /boot
+          min_size: 1024
+        - mountpoint: /
+          min_size: 10240

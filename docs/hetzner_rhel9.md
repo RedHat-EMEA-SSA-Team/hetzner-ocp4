@@ -1,6 +1,112 @@
 ## How to install RHEL 9 and use it as Hetzner base image
 
-### Download the image and install a RHEL-9-minimal virtual machine
+There's (at least) two ways to get a RHEL9 image ready to use at Hetzner:
+1. [Automatically from a qcow2 image](#using-red-hat-insights-image-builder)
+2. [Manually deploying a virtual machine](#download-the-iso-image-and-install-a-RHEL-9-minimal-virtual-machine)
+
+### Using Red Hat Insights Image Builder
+
+Use the provided [image definition](../ansible/group_vars/all/rhel-image-definition.yaml) with [ansible-image-builder](https://github.com/enothen/ansible-image-builder) in order to request and download a virtualization image, from which the content is extracted into the tarball that you can use at Hetzner.
+
+#### Prerequisites
+
+You need an offline token in order for the playbook to interact with Red Hat Insights Image builder. You can get one [here](https://access.redhat.com/management/api). Then, put the token in a variable called `vault_offline_token` in your vault:
+```shell
+$ echo 'vault_offline_token: "<your offline token here>"' > group_vars/all/vault
+$ ansible-vault encrypt group_vars/all/vault
+```
+Then add your vault's password to ansible.cfg or provide it on the command line.
+
+Then, add the `image_builder` role (optionally customize the role installation path):
+```shell
+$ ansible-galaxy role install https://github.com/enothen/ansible-image-builder/releases/download/v0.1.0/image_builder.tar.gz
+```
+
+Finally, the playbook assumes you have `guestfs-tools` installed. Otherwise, a simple `dnf install guestfs-tools`  will do.
+
+When all the above is done, run the playbook to get the virtualization image and generate the tarball:
+```shell
+$ ansible-playbook 00-create-rhel-image.yml
+
+PLAY [Generate RHEL 9 image using insights image builder and extract OS as a tarball] **********************************
+
+TASK [Check that required variables are defined] ***********************************************************************
+ok: [localhost] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [image_builder : Set fact with release_str if release_id is set] **************************************************
+skipping: [localhost]
+
+TASK [image_builder : Check if image exists] ***************************************************************************
+ok: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2)
+
+TASK [image_builder : Show file status] ********************************************************************************
+ok: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2) => {
+    "msg": "File exists: False"
+}
+
+TASK [image_builder : Get refresh_token from offline_token] ************************************************************
+ok: [localhost]
+
+TASK [image_builder : Request creation of images] **********************************************************************
+ok: [localhost] => (item=rhel9-hetzner-ocp4)
+
+TASK [image_builder : Set retry counter] *******************************************************************************
+ok: [localhost]
+
+TASK [image_builder : Get compose requests ids if undefined] ***********************************************************
+skipping: [localhost]
+
+TASK [image_builder : Verify compose request is finished] **************************************************************
+FAILED - RETRYING: [localhost]: Verify compose request is finished (15 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (14 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (13 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (12 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (11 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (10 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (9 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (8 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (7 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (6 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (5 retries left).
+ok: [localhost] => (item=rhel9-hetzner-ocp4: compose_status: success, upload_status: success)
+
+TASK [image_builder : Set fact with release_str if release_id is set] **************************************************
+skipping: [localhost]
+
+TASK [image_builder : Start image download] ****************************************************************************
+changed: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2)
+
+TASK [image_builder : Confirm image download completed] ****************************************************************
+FAILED - RETRYING: [localhost]: Confirm image download completed (10 retries left).
+FAILED - RETRYING: [localhost]: Confirm image download completed (9 retries left).
+FAILED - RETRYING: [localhost]: Confirm image download completed (8 retries left).
+changed: [localhost] => (item=rhel9-hetzner-ocp4)
+
+TASK [Add simlink to dracut] *******************************************************************************************
+changed: [localhost]
+
+TASK [Extract tarball from qcow2] **************************************************************************************
+changed: [localhost]
+
+TASK [Compress tarball] ************************************************************************************************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************************************************
+localhost                       : ok=11   changed=5    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
+```
+
+At this point, both the qcow2 image and the tarball will be available in the directory:
+```shell
+$ ls -1 rhel9-hetzner-ocp4.*
+rhel9-hetzner-ocp4.qcow2
+rhel9-hetzner-ocp4.tar.xz
+```
+The tar file is ready, proceed to section [Install the image on your server](#install-the-image-on-your-server) down below.
+
+### Download the iso image and install a RHEL-9-minimal virtual machine
 
 Download the RHEL 9.1 DVD image from [Red Hat Customer Portal](https://access.redhat.com/downloads/content/479/ver=/rhel---9/9.1/x86_64/product-software)
 

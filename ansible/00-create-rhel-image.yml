@@ -1,0 +1,64 @@
+---
+- name: Generate RHEL 9 image using insights image builder and extract OS as a tarball
+  hosts: localhost
+  become: false
+  gather_facts: false
+
+  vars:
+    offline_token: "{{ vault_offline_token | default(omit) }}"
+    image_file: "{{ images[0]['name'] }}.qcow2"
+    tar_file: "{{ images[0]['name'] }}.tar"
+
+  pre_tasks:
+    - name: Check that required variables are defined
+      tags: assert
+      ansible.builtin.assert:
+        that:
+          - images is defined
+          - offline_token is defined
+
+  tasks:
+    - name: Check if image already exists
+      tags: filecheck
+      ansible.builtin.import_role:
+        name: image_builder
+        tasks_from: check-images-exist
+
+    - name: Get refresh token
+      tags:
+        - token
+      ansible.builtin.import_role:
+        name: image_builder
+        tasks_from: get-refresh-token
+
+    - name: Request creation of image
+      tags: request
+      ansible.builtin.import_role:
+        name: image_builder
+        tasks_from: request-image-creation
+
+    - name: Verify compose finished
+      tags: verify
+      ansible.builtin.import_role:
+        name: image_builder
+        tasks_from: verify-compose-finished
+
+    - name: Download image
+      tags: download
+      ansible.builtin.import_role:
+        name: image_builder
+        tasks_from: download-images
+  
+    - name: Add simlink to dracut
+      ansible.builtin.shell:
+        virt-customize --link /usr/bin/dracut:/sbin/dracut -a {{ image_file }}
+
+    - name: Extract tarball from qcow2
+      tags: 
+        - tarball
+      ansible.builtin.shell:
+        virt-tar-out -a {{ image_file }} / {{ tar_file  }}
+
+    - name: Compress tarball
+      ansible.builtin.shell:
+        xz {{ tar_file  }}

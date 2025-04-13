@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## 2025-04-13
+ * Added process to create qcow2 image using Red Hat Insights Image Builder, through the ansible-image-builder role
+ * Added new process to documentation
+ * Implements #328
+
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
 
