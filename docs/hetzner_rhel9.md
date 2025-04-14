@@ -19,7 +19,7 @@ Then add your vault's password to ansible.cfg or provide it on the command line.
 
 Then, add the `image_builder` role (optionally customize the role installation path):
 ```shell
-$ ansible-galaxy role install https://github.com/enothen/ansible-image-builder/releases/download/v0.1.0/image_builder.tar.gz
+$ ansible-galaxy role install https://github.com/enothen/ansible-image-builder/releases/download/v0.1.1/image_builder.tar.gz
 ```
 
 Finally, the playbook assumes you have `guestfs-tools` installed. Otherwise, a simple `dnf install guestfs-tools`  will do.
