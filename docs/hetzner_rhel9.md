@@ -85,8 +85,14 @@ FAILED - RETRYING: [localhost]: Confirm image download completed (9 retries left
 FAILED - RETRYING: [localhost]: Confirm image download completed (8 retries left).
 changed: [localhost] => (item=rhel9-hetzner-ocp4)
 
-TASK [Add simlink to dracut] *******************************************************************************************
-changed: [localhost]
+TASK [image_builder : Run virt-customize command] **********************************************************************
+changed: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2)
+
+TASK [image_builder : Run virt-edit commands] **************************************************************************
+included: /home/enothen/.ansible/roles/image_builder/tasks/virt-edit.yml for localhost => (item=./rhel9-hetzner-ocp4.qcow2)
+
+TASK [image_builder : Run virt-edit command] ***************************************************************************
+changed: [localhost] => (item=/etc/lvm/lvm.conf)
 
 TASK [Extract tarball from qcow2] **************************************************************************************
 changed: [localhost]
@@ -95,8 +101,9 @@ TASK [Compress tarball] ********************************************************
 changed: [localhost]
 
 PLAY RECAP *************************************************************************************************************
-localhost                       : ok=11   changed=5    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
+localhost                       : ok=7    changed=6    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
 ```
+Note: The image build may take more than 15 minutes, which causes the token to expire. When this happens, the output on the screen will show a failed task, but the ansible role will renew the token and keep retrying until the image build finishes.
 
 At this point, both the qcow2 image and the tarball will be available in the directory:
 ```shell
