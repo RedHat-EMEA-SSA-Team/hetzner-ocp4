@@ -49,9 +49,11 @@
         name: image_builder
         tasks_from: download-images
   
-    - name: Add simlink to dracut
-      ansible.builtin.shell:
-        virt-customize --link /usr/bin/dracut:/sbin/dracut -a {{ image_file }}
+    - name: Perform offline customizations on the image
+      tags: customize
+      ansible.builtin.import_role:
+        name: image_builder
+        tasks_from: customize-images
 
     - name: Extract tarball from qcow2
       tags: 
