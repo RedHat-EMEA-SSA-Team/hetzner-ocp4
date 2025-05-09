@@ -10,21 +10,25 @@ Use the provided [image definition](../ansible/group_vars/all/rhel-image-definit
 
 #### Prerequisites
 
-You need an offline token in order for the playbook to interact with Red Hat Insights Image builder. You can get one [here](https://access.redhat.com/management/api). Then, put the token in a variable called `vault_offline_token` in your vault:
-```shell
-$ echo 'vault_offline_token: "<your offline token here>"' > group_vars/all/vault
-$ ansible-vault encrypt group_vars/all/vault
-```
-Then add your vault's password to ansible.cfg or provide it on the command line.
-
-Then, add the `image_builder` role (optionally customize the role installation path):
+Add the `image_builder` role (optionally customize the role installation path):
 ```shell
 $ ansible-galaxy role install https://github.com/enothen/ansible-image-builder/releases/download/v0.1.1/image_builder.tar.gz
 ```
+The offline customization in the playbook requires `guestfs-tools`, so make sure you have it installed:
+```shell
+$ sudo dnf install -y guestfs-tools
+```
+Finally, the interaction with the Insights Image Builder API requires an offline token. You can get one [here](https://access.redhat.com/management/api), and then put it in a variable called `vault_offline_token` in your vault:
+```shell
+$ cd ansible
+$ echo 'vault_offline_token: "<your offline token here>"' > group_vars/all/vault
+$ ansible-vault encrypt group_vars/all/vault
+```
+Put the vault password in a password file or provide it on the ansible-playbook command line.
 
-Finally, the playbook assumes you have `guestfs-tools` installed. Otherwise, a simple `dnf install guestfs-tools`  will do.
+#### Image and tarball creation
 
-When all the above is done, run the playbook to get the virtualization image and generate the tarball:
+When the prerequsites are met, run the playbook to get the virtualization image and generate the tarball:
 ```shell
 $ ansible-playbook 00-create-rhel-image.yml
 
