@@ -141,7 +141,7 @@ source ~/.profile
 ## Initialize tools
 
 ```
-ssh-keygen
+ssh-keygen -t rsa -b 4096
 cat ~/.ssh/*.pub >> ~/.ssh/authorized_keys
 ```
 
