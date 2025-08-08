@@ -44,10 +44,10 @@ TASK [image_builder : Set fact with release_str if release_id is set] **********
 skipping: [localhost]
 
 TASK [image_builder : Check if image exists] ***************************************************************************
-ok: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2)
+ok: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2)
 
 TASK [image_builder : Show file status] ********************************************************************************
-ok: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2) => {
+ok: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2) => {
     "msg": "File exists: False"
 }
 
@@ -55,7 +55,7 @@ TASK [image_builder : Get refresh_token from offline_token] ********************
 ok: [localhost]
 
 TASK [image_builder : Request creation of images] **********************************************************************
-ok: [localhost] => (item=rhel9-hetzner-ocp4)
+ok: [localhost] => (item=RHEL-96-el-amd64-minimal)
 
 TASK [image_builder : Set retry counter] *******************************************************************************
 ok: [localhost]
@@ -75,25 +75,25 @@ FAILED - RETRYING: [localhost]: Verify compose request is finished (8 retries le
 FAILED - RETRYING: [localhost]: Verify compose request is finished (7 retries left).
 FAILED - RETRYING: [localhost]: Verify compose request is finished (6 retries left).
 FAILED - RETRYING: [localhost]: Verify compose request is finished (5 retries left).
-ok: [localhost] => (item=rhel9-hetzner-ocp4: compose_status: success, upload_status: success)
+ok: [localhost] => (item=RHEL-96-el-amd64-minimal: compose_status: success, upload_status: success)
 
 TASK [image_builder : Set fact with release_str if release_id is set] **************************************************
 skipping: [localhost]
 
 TASK [image_builder : Start image download] ****************************************************************************
-changed: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2)
+changed: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2)
 
 TASK [image_builder : Confirm image download completed] ****************************************************************
 FAILED - RETRYING: [localhost]: Confirm image download completed (10 retries left).
 FAILED - RETRYING: [localhost]: Confirm image download completed (9 retries left).
 FAILED - RETRYING: [localhost]: Confirm image download completed (8 retries left).
-changed: [localhost] => (item=rhel9-hetzner-ocp4)
+changed: [localhost] => (item=RHEL-96-el-amd64-minimal)
 
 TASK [image_builder : Run virt-customize command] **********************************************************************
-changed: [localhost] => (item=./rhel9-hetzner-ocp4.qcow2)
+changed: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2)
 
 TASK [image_builder : Run virt-edit commands] **************************************************************************
-included: /home/enothen/.ansible/roles/image_builder/tasks/virt-edit.yml for localhost => (item=./rhel9-hetzner-ocp4.qcow2)
+included: /home/enothen/.ansible/roles/image_builder/tasks/virt-edit.yml for localhost => (item=./RHEL-96-el-amd64-minimal.qcow2)
 
 TASK [image_builder : Run virt-edit command] ***************************************************************************
 changed: [localhost] => (item=/etc/lvm/lvm.conf)
@@ -111,9 +111,9 @@ Note: The image build may take more than 15 minutes, which causes the token to e
 
 At this point, both the qcow2 image and the tarball will be available in the directory:
 ```shell
-$ ls -1 rhel9-hetzner-ocp4.*
-rhel9-hetzner-ocp4.qcow2
-rhel9-hetzner-ocp4.tar.xz
+$ ls -1 RHEL-96-el-amd64-minimal.*
+RHEL-96-el-amd64-minimal.qcow2
+RHEL-96-el-amd64-minimal.tar.xz
 ```
 The tar file is ready, proceed to section [Install the image on your server](#install-the-image-on-your-server) down below.
 
