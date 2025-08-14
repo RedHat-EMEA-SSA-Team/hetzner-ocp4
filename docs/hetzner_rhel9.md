@@ -10,9 +10,8 @@ Use the provided [image definition](../ansible/group_vars/all/rhel-image-definit
 #### Prerequisites
 Interaction with the Insights Image Builder API requires an offline token. You can get one [here](https://access.redhat.com/management/api), and then put it in a variable called `vault_offline_token` in your vault:
 ```shell
-$ cd ansible
-$ echo 'vault_offline_token: "<your offline token here>"' > group_vars/all/vault
-$ ansible-vault encrypt group_vars/all/vault
+$ echo 'vault_offline_token: "<your offline token here>"' > ansible/group_vars/all/vault
+$ ansible-vault encrypt ansible/group_vars/all/vault
 ```
 Put the vault password in a password file or provide it on the ansible-playbook command line.
 
