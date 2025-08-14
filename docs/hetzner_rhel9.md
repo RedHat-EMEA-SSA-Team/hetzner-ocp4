@@ -18,7 +18,7 @@ Put the vault password in a password file or provide it on the ansible-playbook 
 #### Image and tarball creation
 Run the playbook to get the virtualization image and generate the tarball:
 ```shell
-$ ansible-navigator run 00-create-rhel-image.yml
+$ ansible-navigator run ansible/00-create-rhel-image.yml
 
 PLAY [Generate RHEL image using insights image builder and extract OS as a tarball] ***
 
@@ -95,7 +95,7 @@ Note: The image build may take more than 15 minutes, which causes the token to e
 
 At this point, both the qcow2 image and the tarball will be available in the directory:
 ```shell
-$ ls -1 RHEL-96-el-amd64-minimal.*
+$ ls -1 ansible/RHEL-96-el-amd64-minimal.*
 RHEL-96-el-amd64-minimal.qcow2
 RHEL-96-el-amd64-minimal.tar.xz
 ```
