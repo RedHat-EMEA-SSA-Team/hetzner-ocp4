@@ -125,6 +125,19 @@ subscription-manager repos \
 
 ```bash
 dnf install -y ansible-navigator git podman
+
+### Red Hat Enterprise Linux 10
+```bash
+subscription-manager repos \
+    --enable=rhel-10-for-x86_64-baseos-rpms \
+    --enable=rhel-10-for-x86_64-appstream-rpms \
+    --enable=rhel-10-for-x86_64-highavailability-rpms \
+    --enable=ansible-automation-platform-2.6-for-rhel-10-x86_64-rpms
+```
+
+```bash
+dnf install -y ansible-navigator git podman
+```
 ```
 
 ## In case of Rocky Linux 8 or Centos 8
