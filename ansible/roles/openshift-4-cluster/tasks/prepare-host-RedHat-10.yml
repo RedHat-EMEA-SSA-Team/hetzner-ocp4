@@ -1,0 +1,84 @@
+---
+- name: Handle Red Hat Entitlement
+  ansible.builtin.include_tasks: prepare-host-RedHat-entitlement.yml
+  vars:
+    rhsm_repository:
+      - rhel-10-for-x86_64-baseos-rpms
+      - rhel-10-for-x86_64-appstream-rpms
+      - rhel-10-for-x86_64-highavailability-rpms
+      - ansible-automation-platform-2.6-for-rhel-10-x86_64-rpms
+  when:
+    - redhat_subscription_activationkey is defined
+    - redhat_subscription_org_id is defined
+    - redhat_subscription_pool is defined
+
+- name: Installing KVM Packages
+  ansible.builtin.yum:
+    name:
+      - "@virtualization-hypervisor"
+      - "@virtualization-client"
+      - "@virtualization-platform"
+      - "@virtualization-tools"
+    state: present
+
+- name: Installing playbook dependencies
+  ansible.builtin.package:
+    name: python3-lxml
+    state: present
+
+- name: Upgrade all packages
+  ansible.builtin.yum:
+    name: '*'
+    state: latest
+    update_only: true
+  register: update
+
+- name: Check if new kernel has been installed and local execution
+  ansible.builtin.set_fact:
+    hetzner_ocp4_prepare_host_reboot_needed: true
+  when:
+    - update.changed
+    - update.results | select('match','Installed:.*kernel.*') | length > 0
+  tags:
+    - skip_ansible_lint
+
+- name: Allow NFS traffic from VM's to Host
+  ansible.posix.firewalld:
+    zone: libvirt
+    state: enabled
+    permanent: yes
+    service: "{{ item }}"
+  with_items:
+    - nfs
+    - mountd
+    - rpc-bind
+  notify: 'reload firewalld'
+
+- name: Allow OpenShift traffic from VM's to Host
+  ansible.posix.firewalld:
+    zone: libvirt
+    state: enabled
+    permanent: yes
+    port: "{{ item }}"
+  with_items:
+    - 80/tcp
+    - 443/tcp
+    - 6443/tcp
+    - 22623/tcp
+  notify: 'reload firewalld'
+
+- name: Allow OpenShift traffic from public to Host
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: yes
+    port: "{{ item }}"
+  with_items:
+    - 80/tcp
+    - 443/tcp
+    - 6443/tcp
+  notify: 'reload firewalld'
+
+- name: firewalld reload
+  ansible.builtin.command: firewall-cmd --reload
+
