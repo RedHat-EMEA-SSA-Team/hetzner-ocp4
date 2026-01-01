@@ -11,7 +11,6 @@
   when:
     - redhat_subscription_activationkey is defined
     - redhat_subscription_org_id is defined
-    - redhat_subscription_pool is defined
 
 - name: Installing KVM Packages
   ansible.builtin.package:
