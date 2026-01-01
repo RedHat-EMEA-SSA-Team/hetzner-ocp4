@@ -6,7 +6,7 @@
       - rhel-9-for-x86_64-baseos-rpms
       - rhel-9-for-x86_64-appstream-rpms
       - rhel-9-for-x86_64-highavailability-rpms
-      - ansible-automation-platform-2.3-for-rhel-9-x86_64-rpms
+      - ansible-automation-platform-2.6-for-rhel-9-x86_64-rpms
   when:
     - redhat_subscription_activationkey is defined
     - redhat_subscription_org_id is defined
