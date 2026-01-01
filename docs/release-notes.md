@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## 2026-01-xx
+  * Red Hat Enterprise Linux 10 
+  * Fix issue #333 - Improve ssh-keyget command
+  * Remove redhat_subscription_pool, not needed anymore
+  * Cleanup: Remove pipeline/ directory
+
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
 
