@@ -10,6 +10,7 @@
   - [In case of Red Hat Enterprise Linux](#in-case-of-red-hat-enterprise-linux)
     - [Red Hat Enterprise Linux 8](#red-hat-enterprise-linux-8)
     - [Red Hat Enterprise Linux 9](#red-hat-enterprise-linux-9)
+    - [Red Hat Enterprise Linux 10](#red-hat-enterprise-linux-10)
   - [In case of Rocky Linux 8 or Centos 8](#in-case-of-rocky-linux-8-or-centos-8)
   - [Initialize tools](#initialize-tools)
   - [Define variables for your cluster](#define-variables-for-your-cluster)
