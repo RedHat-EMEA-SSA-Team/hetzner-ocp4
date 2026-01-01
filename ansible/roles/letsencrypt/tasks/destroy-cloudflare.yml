@@ -1,0 +1,36 @@
+---
+- name: Delete DNS record at CloudFlare via account_api_token
+  delegate_to: localhost
+  community.general.net_tools.cloudflare_dns:
+    zone: "{{ le_cloudflare_zone }}"
+    record: "{{ item.0.key }}"
+    # 1 for automatic
+    ttl: 1
+    type: TXT
+    value: "{{ item.1 }}"
+    account_email: "{{ le_cloudflare_account_email }}"
+    account_api_token: "{{ le_cloudflare_account_api_token }}"
+    state: absent
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when:
+    - le_dns_provider == "cloudflare"
+    - le_cloudflare_account_email is defined
+    - le_cloudflare_account_api_token is defined
+    - sample_com_challenge is changed
+
+- name: Delete DNS record at CloudFlare via api_token
+  delegate_to: localhost
+  community.general.net_tools.cloudflare_dns:
+    zone: "{{ le_cloudflare_zone }}"
+    record: "{{ item.0.key }}"
+    # 1 for automatic
+    ttl: 1
+    type: TXT
+    value: "{{ item.1 }}"
+    api_token: "{{ le_cloudflare_api_token }}"
+    state: absent
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when:
+    - le_dns_provider == "cloudflare"
+    - le_cloudflare_api_token is defined
+    - sample_com_challenge is changed

@@ -8,6 +8,7 @@
     pd_provider: "{{ dns_provider }}"
     pd_public_ip: "{% if 'IPv4' in ip_families %}{{ public_ip | default(listen_address) }}{% endif %}"
     pd_public_ipv6: "{% if 'IPv6' in ip_families %}{{ public_ipv6 | default(listen_address_ipv6) }}{% endif %}"
+    pd_cloudflare_api_token: "{{ cloudflare_api_token }}"
     pd_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
     pd_cloudflare_zone: "{{ cloudflare_zone }}"
     pd_aws_access_key: "{{ aws_access_key }}"

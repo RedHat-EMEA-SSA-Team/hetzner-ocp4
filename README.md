@@ -247,7 +247,7 @@ Please configure in `cluster.yml` all necessary credentials:
 | DNS provider | Variables  |
 |---|---|
 |Azure|`azure_client_id: 'client_id'`<br/>`azure_secret: 'key'`<br/>`azure_subscription_id: 'subscription_id'`<br/>`azure_tenant: 'tenant_id'`<br/>`azure_resource_group: 'dns_zone_resource_group'` |
-|CloudFlare|`cloudflare_account_email: john@example.com` <br> Use the global api key here! (API-Token is not supported!) (Details in #86) <br>`cloudflare_account_api_token: 9348234sdsd894.....` <br>  `cloudflare_zone: domain.tld`|
+|CloudFlare|`cloudflare_zone: domain.tld`<br>api key via <br>`cloudflare_account_api_token:`<br>Or global api key **not recommended** <br>`cloudflare_account_email: john@example.com`<br>`cloudflare_account_api_token: 9348.....`|
 |DigitalOcean|`digitalocean_token: e7a6f82c3245b65cf4.....` <br>  `digitalocean_zone: domain.tld`|
 |Gandi|`gandi_account_api_token: 0123456...` <br>  `gandi_zone: domain.tld`|
 |GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
