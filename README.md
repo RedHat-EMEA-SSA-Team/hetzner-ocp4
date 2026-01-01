@@ -90,6 +90,7 @@ Here is an example Hetzner Firewall configuration:
 |icmp|||||icmp||accept|
 |[outgoing connections](https://docs.hetzner.com/robot/dedicated-server/firewall/#out-going-tcp-connections)||||32768-65535|tcp|ack|accept|
 
+Optional hardening recommendation (especially for publicly reachable hosts): **change the SSH port on RHEL** and adjust both the host firewall and Hetzner Firewall accordingly. See: [docs/rhel-change-ssh-port.md](docs/rhel-change-ssh-port.md)
 
 ## In case of Red Hat Enterprise Linux
 
