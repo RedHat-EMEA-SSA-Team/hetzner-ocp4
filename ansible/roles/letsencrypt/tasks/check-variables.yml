@@ -29,7 +29,22 @@
     - le_cloudflare_account_email
     - le_cloudflare_account_api_token
     - le_cloudflare_zone
-  when: le_dns_provider == "cloudflare"
+  when:
+    - le_dns_provider == "cloudflare"
+    - le_cloudflare_api_token is not defined
+
+- name: Check required CloudFlare variables
+  ansible.builtin.assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_cloudflare_api_token
+    - le_cloudflare_zone
+  when:
+    - le_dns_provider == "cloudflare"
+    - le_cloudflare_account_email is not defined
+    - le_cloudflare_account_api_token is not defined
 
 - name: Check required GCP variables
   ansible.builtin.assert:
@@ -83,6 +98,7 @@
     - le_letsencrypt_account_email
     - le_cloudflare_account_api_token
     - le_cloudflare_zone
+    - le_cloudflare_api_token
     - le_public_domain
     - le_certificates_dir
     - le_public_domain
