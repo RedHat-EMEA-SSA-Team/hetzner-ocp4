@@ -6,7 +6,7 @@
   * Remove redhat_subscription_pool, not needed anymore
   * Cleanup: Remove pipeline/ directory
   * Update to ansible-automation-platform-2.6
-  * Add cloudflare account_api_token support ( Issue #86 )
+  * Add cloudflare_api_token support ( Issue #86 )
 
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
