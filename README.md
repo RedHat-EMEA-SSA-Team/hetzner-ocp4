@@ -112,7 +112,7 @@ subscription-manager repos \
     --enable=rhel-8-for-x86_64-baseos-rpms \
     --enable=rhel-8-for-x86_64-appstream-rpms \
     --enable=rhel-8-for-x86_64-highavailability-rpms \
-    --enable=ansible-automation-platform-2.3-for-rhel-8-x86_64-rpms
+    --enable=ansible-automation-platform-2.6-for-rhel-8-x86_64-rpms
 ```
 
 ### Red Hat Enterprise Linux 9
@@ -121,7 +121,7 @@ subscription-manager repos \
     --enable=rhel-9-for-x86_64-baseos-rpms \
     --enable=rhel-9-for-x86_64-appstream-rpms \
     --enable=rhel-9-for-x86_64-highavailability-rpms \
-    --enable=ansible-automation-platform-2.3-for-rhel-9-x86_64-rpms
+    --enable=ansible-automation-platform-2.6-for-rhel-9-x86_64-rpms
 ```
 
 ```bash
