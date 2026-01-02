@@ -13,6 +13,7 @@
   * Added pre-check routines to avoid failing at a later time
    - all parameters which are required have to be provided, otherwise the playbook will fail early.
   * Removed blocker for installation of OpenShift 4.12 with IPv6 enabled. Installation is now completing without issues.
+  * Switch from k8s.gcr.io to registry.k8s.io ( Issue #305 )
 
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
