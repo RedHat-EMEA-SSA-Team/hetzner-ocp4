@@ -1,19 +1,21 @@
 # RELEASE NOTES
 
 ## 2026-01-xx
-  * Red Hat Enterprise Linux 10 
-  * Fix issue #333 - Improve ssh-keyget command
-  * Remove redhat_subscription_pool, not needed anymore
-  * Cleanup: Remove pipeline/ directory
-  * Update to ansible-automation-platform-2.6
-  * Add cloudflare_api_token support ( Issue #86 )
-  * Update proxy doc
-  * [Add docs about how to change ssh port on rhel](docs/rhel-change-ssh-port.md) ( Issue #292 )
-  * Update Hetzner Firewall documentation - added IPv6 ( Issue #291 )
-  * Added pre-check routines to avoid failing at a later time
-   - all parameters which are required have to be provided, otherwise the playbook will fail early.
-  * Removed blocker for installation of OpenShift 4.12 with IPv6 enabled. Installation is now completing without issues.
-  * Switch from k8s.gcr.io to registry.k8s.io ( Issue #305 )
+ * Red Hat Enterprise Linux 10 
+ * Fix issue #333 - Improve ssh-keyget command
+ * Remove redhat_subscription_pool, not needed anymore
+ * Cleanup: Remove pipeline/ directory
+ * Update to ansible-automation-platform-2.6
+ * Add cloudflare_api_token support ( Issue #86 )
+ * Update proxy doc
+ * [Add docs about how to change ssh port on rhel](docs/rhel-change-ssh-port.md) ( Issue #292 )
+ * Update Hetzner Firewall documentation - added IPv6 ( Issue #291 )
+ * Added pre-check routines to avoid failing at a later time
+   * all parameters which are required have to be provided, otherwise the playbook will fail early.
+ * Removed blocker for installation of OpenShift 4.12 with IPv6 enabled. Installation is now completing without issues.
+ * Switch from k8s.gcr.io to registry.k8s.io ( Issue #305 )
+ * Update the entire ansible execution environment ( Issue #323 )
+   `quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:202601021249`
 
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
