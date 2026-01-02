@@ -16,6 +16,9 @@
  * Switch from k8s.gcr.io to registry.k8s.io ( Issue #305 )
  * Update the entire ansible execution environment ( Issue #323 )
    `quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:202601022229`
+ * Added process to create qcow2 image using Red Hat Insights Image Builder, through the ansible-image-builder role
+   * Added new process to documentation
+   * Implements #328
 
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
