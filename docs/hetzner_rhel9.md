@@ -5,20 +5,10 @@ There's (at least) two ways to get a RHEL9 image ready to use at Hetzner:
 2. [Manually deploying a virtual machine](#download-the-iso-image-and-install-a-RHEL-9-minimal-virtual-machine)
 
 ### Using Red Hat Insights Image Builder
-
-Use the provided [image definition](../ansible/group_vars/all/rhel-image-definition.yaml) with [ansible-image-builder](https://github.com/enothen/ansible-image-builder) in order to request and download a virtualization image, from which the content is extracted into the tarball that you can use at Hetzner.
+Use the provided [image definition](../ansible/group_vars/all/rhel-image-definition.yaml) with [ansible-image-builder](https://github.com/enothen/ansible-image-builder) in order to request and download a virtualization image, from which the content is extracted into the tarball that you can use at Hetzner directly, without further modifications.
 
 #### Prerequisites
-
-Add the `image_builder` role (optionally customize the role installation path):
-```shell
-$ ansible-galaxy role install https://github.com/enothen/ansible-image-builder/releases/download/v0.1.1/image_builder.tar.gz
-```
-The offline customization in the playbook requires `guestfs-tools`, so make sure you have it installed:
-```shell
-$ sudo dnf install -y guestfs-tools
-```
-Finally, the interaction with the Insights Image Builder API requires an offline token. You can get one [here](https://access.redhat.com/management/api), and then put it in a variable called `vault_offline_token` in your vault:
+Interaction with the Insights Image Builder API requires an offline token. You can get one [here](https://access.redhat.com/management/api), and then put it in a variable called `vault_offline_token` in your vault:
 ```shell
 $ cd ansible
 $ echo 'vault_offline_token: "<your offline token here>"' > group_vars/all/vault
@@ -27,43 +17,42 @@ $ ansible-vault encrypt group_vars/all/vault
 Put the vault password in a password file or provide it on the ansible-playbook command line.
 
 #### Image and tarball creation
-
-When the prerequsites are met, run the playbook to get the virtualization image and generate the tarball:
+Run the playbook to get the virtualization image and generate the tarball:
 ```shell
-$ ansible-playbook 00-create-rhel-image.yml
+$ ansible-navigator run 00-create-rhel-image.yml
 
-PLAY [Generate RHEL 9 image using insights image builder and extract OS as a tarball] **********************************
+PLAY [Generate RHEL image using insights image builder and extract OS as a tarball] ***
 
-TASK [Check that required variables are defined] ***********************************************************************
+TASK [Check that required variables are defined] *******************************
 ok: [localhost] => {
     "changed": false,
     "msg": "All assertions passed"
 }
 
-TASK [image_builder : Set fact with release_str if release_id is set] **************************************************
+TASK [enothen.image_builder.check_images_exist : Set fact with release_str if release_id is set] ***
 skipping: [localhost]
 
-TASK [image_builder : Check if image exists] ***************************************************************************
+TASK [enothen.image_builder.check_images_exist : Check if image exists] ********
 ok: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2)
 
-TASK [image_builder : Show file status] ********************************************************************************
+TASK [enothen.image_builder.check_images_exist : Show file status] *************
 ok: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2) => {
     "msg": "File exists: False"
 }
 
-TASK [image_builder : Get refresh_token from offline_token] ************************************************************
+TASK [enothen.image_builder.get_refresh_token : Get refresh_token from offline_token] ***
 ok: [localhost]
 
-TASK [image_builder : Request creation of images] **********************************************************************
+TASK [enothen.image_builder.request_image_creation : Request creation of images] ***
 ok: [localhost] => (item=RHEL-96-el-amd64-minimal)
 
-TASK [image_builder : Set retry counter] *******************************************************************************
+TASK [enothen.image_builder.verify_compose_finished : Set retry counter] *******
 ok: [localhost]
 
-TASK [image_builder : Get compose requests ids if undefined] ***********************************************************
+TASK [Get compose requests ids if undefined] ***********************************
 skipping: [localhost]
 
-TASK [image_builder : Verify compose request is finished] **************************************************************
+TASK [enothen.image_builder.verify_compose_finished : Verify compose request is finished] ***
 FAILED - RETRYING: [localhost]: Verify compose request is finished (15 retries left).
 FAILED - RETRYING: [localhost]: Verify compose request is finished (14 retries left).
 FAILED - RETRYING: [localhost]: Verify compose request is finished (13 retries left).
@@ -75,37 +64,33 @@ FAILED - RETRYING: [localhost]: Verify compose request is finished (8 retries le
 FAILED - RETRYING: [localhost]: Verify compose request is finished (7 retries left).
 FAILED - RETRYING: [localhost]: Verify compose request is finished (6 retries left).
 FAILED - RETRYING: [localhost]: Verify compose request is finished (5 retries left).
+FAILED - RETRYING: [localhost]: Verify compose request is finished (4 retries left).
 ok: [localhost] => (item=RHEL-96-el-amd64-minimal: compose_status: success, upload_status: success)
 
-TASK [image_builder : Set fact with release_str if release_id is set] **************************************************
+TASK [enothen.image_builder.download_images : Set fact with release_str if release_id is set] ***
 skipping: [localhost]
 
-TASK [image_builder : Start image download] ****************************************************************************
+TASK [enothen.image_builder.download_images : Start image download] ************
 changed: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2)
 
-TASK [image_builder : Confirm image download completed] ****************************************************************
-FAILED - RETRYING: [localhost]: Confirm image download completed (10 retries left).
-FAILED - RETRYING: [localhost]: Confirm image download completed (9 retries left).
-FAILED - RETRYING: [localhost]: Confirm image download completed (8 retries left).
+TASK [enothen.image_builder.download_images : Confirm image download completed] ***
+FAILED - RETRYING: [localhost]: Confirm image download completed (20 retries left).
+FAILED - RETRYING: [localhost]: Confirm image download completed (19 retries left).
+FAILED - RETRYING: [localhost]: Confirm image download completed (18 retries left).
 changed: [localhost] => (item=RHEL-96-el-amd64-minimal)
 
-TASK [image_builder : Run virt-customize command] **********************************************************************
-changed: [localhost] => (item=./RHEL-96-el-amd64-minimal.qcow2)
-
-TASK [image_builder : Run virt-edit commands] **************************************************************************
-included: /home/enothen/.ansible/roles/image_builder/tasks/virt-edit.yml for localhost => (item=./RHEL-96-el-amd64-minimal.qcow2)
-
-TASK [image_builder : Run virt-edit command] ***************************************************************************
-changed: [localhost] => (item=/etc/lvm/lvm.conf)
-
-TASK [Extract tarball from qcow2] **************************************************************************************
+TASK [Run virt-customize on the image] *****************************************
 changed: [localhost]
 
-TASK [Compress tarball] ************************************************************************************************
+TASK [Extract tarball from qcow2] **********************************************
 changed: [localhost]
 
-PLAY RECAP *************************************************************************************************************
-localhost                       : ok=7    changed=6    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
+TASK [Compress tarball] ********************************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=12   changed=5    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
+$
 ```
 Note: The image build may take more than 15 minutes, which causes the token to expire. When this happens, the output on the screen will show a failed task, but the ansible role will renew the token and keep retrying until the image build finishes.
 
