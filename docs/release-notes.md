@@ -10,7 +10,10 @@
   * Update proxy doc
   * [Add docs about how to change ssh port on rhel](docs/rhel-change-ssh-port.md) ( Issue #292 )
   * Update Hetzner Firewall documentation - added IPv6 ( Issue #291 )
-  
+  * Added pre-check routines to avoid failing at a later time
+   - all parameters which are required have to be provided, otherwise the playbook will fail early.
+  * Removed blocker for installation of OpenShift 4.12 with IPv6 enabled. Installation is now completing without issues.
+
 ## 2025-04-10
  * Fixed the issue that nfs storage creation did not work with CentOS 10
 
