@@ -7,12 +7,31 @@
     - ../cluster.yml
 
   tasks:
-    - name: Check IPv6 & OpenShift version 4.12 or greater
+
+    - name: Check if `cluster_name` is configured
       ansible.builtin.fail:
-        msg: "Currently, it is not possible to install OpenShift 4.12 with IPv6 enabled with hetzner-ocp4 because of Issue #247"
-      when: (ip_families is defined and "IPv6" in ip_families) and (openshift_version is defined and openshift_version >= "4.12")
+        msg: "`cluster_name` is a mandatory setting, please define it in `cluster.yml`"
+      when: cluster_name is not defined
+
+    - name: Check if `dns_provider` is configured
+      ansible.builtin.fail:
+        msg: |-
+          `dns_provider` is a mandatory setting, please define it in `cluster.yml` with
+          one of the following values: route53, cloudflare, gcp, azure,transip, hetzner or none
+          Please check the README.md for most updated list.
+      when: dns_provider is not defined
+
+    - name: Check if `image_pull_secret` is configured
+      ansible.builtin.fail:
+        msg: "`image_pull_secret` is a mandatory setting, please define it in `cluster.yml`"
+      when: image_pull_secret is not defined and image_pull_secret | json_query('auths.quay\.io') | length == 0
+
+    - name: Check if `public_domain` is configured
+      ansible.builtin.fail:
+        msg: "`public_domain` is a mandatory setting, please define it in `cluster.yml`"
+      when: public_domain is not defined
 
     - name: Deploy cluster
-      import_role:
+      ansible.builtin.import_role:
         name: openshift-4-cluster
         tasks_from: create.yml
