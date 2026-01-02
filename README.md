@@ -340,14 +340,15 @@ source ./ansible-builder/bin/activate
 pip install ansible-builder>=3.1.0
 
 VERSION=$(date +%Y%m%d%H%M)
+IMAGE="quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:$VERSION"
 
 ansible-builder build \
     --verbosity 3 \
     --container-runtime podman \
     --extra-build-cli-args='--platform linux/amd64' \
-    --tag quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:$VERSION
+    --tag $IMAGE
 
-podman push quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:$VERSION
+podman push $IMAGE
 ```
 
 # Stargazers over time

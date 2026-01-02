@@ -1,9 +1,10 @@
-## How to install RHEL 9 and use it as Hetzner base image
+# How to install RHEL 9 and use it as Hetzner base image
 
 There's (at least) two ways to get a RHEL9 image ready to use at Hetzner:
-1. [Automatically from a qcow2 image](#using-red-hat-insights-image-builder)
-2. [Manually deploying a virtual machine](#download-the-iso-image-and-install-a-RHEL-9-minimal-virtual-machine)
+1. [Automatically from a qcow2 image](#automatically-from-a-qcow2-image)
+2. [Manually deploying a virtual machine](#manually-deploying-a-virtual-machine)
 
+## Automatically from a qcow2 image
 ### Using Red Hat Insights Image Builder
 Use the provided [image definition](../ansible/group_vars/all/rhel-image-definition.yaml) with [ansible-image-builder](https://github.com/enothen/ansible-image-builder) in order to request and download a virtualization image, from which the content is extracted into the tarball that you can use at Hetzner directly, without further modifications.
 
@@ -101,6 +102,7 @@ RHEL-96-el-amd64-minimal.tar.xz
 ```
 The tar file is ready, proceed to section [Install the image on your server](#install-the-image-on-your-server) down below.
 
+## Manually deploying a virtual machine
 ### Download the iso image and install a RHEL-9-minimal virtual machine
 
 Download the RHEL 9.1 DVD image from [Red Hat Customer Portal](https://access.redhat.com/downloads/content/479/ver=/rhel---9/9.1/x86_64/product-software)
