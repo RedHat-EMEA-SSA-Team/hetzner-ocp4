@@ -76,19 +76,16 @@ When following the steps below, you will end with a setup similar to this:
 
 ## Strongly recommended: configure Hetzner Firewall
 
-**Important:** Hetzner Firewall only support IPv4 - IPv6 must be solved via the host firewall(d)!
-
 Here is an example Hetzner Firewall configuration:
 
 ![](images/firewall.png)
 
-
-|Name|Source IP|Destination IP|Source port|Destination port|Protocol|TCP flags|Action|
-|---|---|---|---|---|---|---|---|
-|ssh||||22|tcp||accept|
-|api+ingress||||80,443,6443|tcp||accept|
-|icmp|||||icmp||accept|
-|[outgoing connections](https://docs.hetzner.com/robot/dedicated-server/firewall/#out-going-tcp-connections)||||32768-65535|tcp|ack|accept|
+|Name|Version|Source IP|Destination IP|Source port|Destination port|Protocol|TCP flags|Action|
+|---|---|---|---|---|---|---|---|---|
+|ssh|*||||22|tcp||accept|
+|api+ingress|*||||80,443,6443|tcp||accept|
+|icmp|*|||||icmp||accept|
+|[outgoing connections](https://docs.hetzner.com/robot/dedicated-server/firewall/#out-going-tcp-connections)|*||||32768-65535|tcp|ack|accept|
 
 Optional hardening recommendation (especially for publicly reachable hosts): **change the SSH port on RHEL** and adjust both the host firewall and Hetzner Firewall accordingly. See: [docs/rhel-change-ssh-port.md](docs/rhel-change-ssh-port.md)
 
