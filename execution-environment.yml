@@ -29,6 +29,8 @@ dependencies:
       - community.kubernetes
       # Added for community.dns.hetzner_dns_record
       - community.dns
+      # Added to build the OS image using insights image builder
+      - enothen.image_builder
   python:
     - libvirt-python
     - jmespath
@@ -37,6 +39,7 @@ dependencies:
     - libvirt-libs
     - libvirt-devel
     - pkgconf-pkg-config
+    - guestfs-tools
     # https://github.com/ansible-community/images/blob/main/execution-environments/community-ee-minimal/execution-environment.yml#L12
     - openssh-clients
     - sshpass
