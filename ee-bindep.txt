@@ -1,5 +1,0 @@
-# for python-libvirt
-libvirt-client
-libvirt-libs
-libvirt-devel
-pkgconf-pkg-config

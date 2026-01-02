@@ -3,7 +3,7 @@ ansible-navigator:
   execution-environment:
     container-options:
       - --net=host
-    image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:202601021249
+    image: quay.io/redhat-emea-ssa-team/hetzner-ocp4-ansible-ee:202601022229
   logging:
     level: info
   mode: stdout

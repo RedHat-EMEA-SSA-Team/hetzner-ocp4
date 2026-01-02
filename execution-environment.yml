@@ -13,9 +13,34 @@ dependencies:
     package_pip: ansible-core
   ansible_runner:
     package_pip: ansible-runner
-  galaxy: ee-requirements.yml
-  python: ee-python-requirements.txt
-  system: ee-bindep.txt
+  galaxy:
+    collections:
+      - community.libvirt
+      - community.crypto
+      - community.general
+      - community.aws
+      - name: google.cloud
+        version: 1.10.2
+      - name: azure.azcollection
+        version: 3.12.0
+      - kubernetes.core
+      - ansible.posix
+      - community.digitalocean
+      - community.kubernetes
+      # Added for community.dns.hetzner_dns_record
+      - community.dns
+  python:
+    - libvirt-python
+    - jmespath
+  system: 
+    - libvirt-client
+    - libvirt-libs
+    - libvirt-devel
+    - pkgconf-pkg-config
+    # https://github.com/ansible-community/images/blob/main/execution-environments/community-ee-minimal/execution-environment.yml#L12
+    - openssh-clients
+    - sshpass
+    - less
 
 additional_build_steps:
   prepend_base:
