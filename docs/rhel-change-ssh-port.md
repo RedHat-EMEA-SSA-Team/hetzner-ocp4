@@ -115,15 +115,9 @@ Host my-hetzner-host
 
 If you changed the SSH port and run this repo’s playbooks remotely, set `ansible_port` for the target host.
 
-Example (`inventory/hosts.yaml`):
-
-```yaml
-all:
-  hosts:
-    host:
-      ansible_host: pluto.openshift.pub
-      ansible_port: 1984
-      ansible_private_key_file: ~/.ssh/id_ed25519
+```shell
+mkdir -p inventory/group_vars/all/
+echo 'ansible_port: "1984"' > inventory/group_vars/all/custom_ssh_port
 ```
 
 ### 8) (Optional) Remove port 22 again
