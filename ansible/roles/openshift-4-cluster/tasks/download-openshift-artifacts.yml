@@ -165,14 +165,14 @@
     exclude:
       - 'README.md'
     creates: "{{ opm_dest }}/opm"
-  when: opm_download_url | regex_search("^(.*)\.tar\.gz$")
+  when: opm_download_url | regex_search("^(.*)\.tar\.gz$") | ansible.builtin.length > 0
 
 - name: Download OPM
   ansible.builtin.get_url:
     url: "{{ opm_download_url }}"
     dest: "{{ opm_dest }}/opm"
     mode: u+rwx,g+rx,o+rx
-  when: not opm_download_url | regex_search("^(.*)\.tar\.gz$")
+  when: opm_download_url | regex_search("^(.*)\.tar\.gz$") | ansible.builtin.length == 0
 
 - name: Download Helm client
   ansible.builtin.get_url:
