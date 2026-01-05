@@ -9,7 +9,7 @@
   ansible.builtin.set_fact:
     needs_reprovision: true
   when:
-    - host_facts.ansible_facts.ansible_cmdline.BOOT_IMAGE is match("rescue") or (hetzner_force_provisioning is defined and hetzner_force_provisioning )
+    - host_facts.ansible_facts.ansible_cmdline.RFILE is match("rescue") or (hetzner_force_provisioning is defined and hetzner_force_provisioning )
   delegate_to: localhost
 
 - name: Provision server
