@@ -11,7 +11,7 @@
       - "{{ coreos_download_url }}"
       - "{{ tmp_openshift_install_download_url }}"
       - "{{ tmp_openshift_client_download_url }}"
-      - "{{ (download_oc_mirror is true) | ternary('{{ openshift_location }}/oc-mirror.tar.gz', '') }}"
+      - "{{ (download_oc_mirror is true) | ternary(openshift_location + '/oc-mirror.tar.gz', '') }}"
       - "{{ opm_download_url }}"
       - "{{ helm_cli_location }}"
       - "{{ butane_cli_location }}"
