@@ -15,11 +15,10 @@
   tags:
     - public_dns
   when:
-    - (pd_public_ip is defined)
-    - (pd_public_ip|length > 0)
+    - pd_public_ip is iterable
+    - pd_public_ip | ansible.builtin.length > 0
     - cloudflare_account_email is defined
     - cloudflare_account_api_token is defined
-
 
 - name: Create IPv6 Cloudflare DNS records via account_api_token
   community.general.cloudflare_dns:
@@ -37,8 +36,8 @@
   tags:
     - public_dns
   when:
-    - (pd_public_ipv6 is defined)
-    - (pd_public_ipv6|length > 0)
+    - pd_public_ipv6 is iterable
+    - pd_public_ipv6 | ansible.builtin.length > 0
     - cloudflare_account_email is defined
     - cloudflare_account_api_token is defined
 
@@ -57,8 +56,8 @@
   tags:
     - public_dns
   when:
-    - (pd_public_ip is defined)
-    - (pd_public_ip|length > 0)
+    - pd_public_ip is iterable
+    - pd_public_ip | ansible.builtin.length > 0
     - cloudflare_api_token is defined
 
 - name: Create IPv6 Cloudflare DNS records via api_token
@@ -76,6 +75,6 @@
   tags:
     - public_dns
   when:
-    - (pd_public_ipv6 is defined)
-    - (pd_public_ipv6|length > 0)
+    - pd_public_ipv6 is iterable
+    - pd_public_ipv6 | ansible.builtin.length > 0
     - cloudflare_api_token is defined
