@@ -22,8 +22,16 @@
 
 - name: Installing playbook dependencies
   ansible.builtin.package:
-    name: python3-lxml
+    name:
+      - python3-lxml
+      - firewalld
     state: present
+
+- name: Enable & Start firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: true
 
 - name: Upgrade all packages
   ansible.builtin.yum:
