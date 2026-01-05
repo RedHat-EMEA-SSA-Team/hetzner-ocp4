@@ -1,7 +1,7 @@
 ---
 - name: Delete DNS record at CloudFlare via account_api_token
   delegate_to: localhost
-  community.general.net_tools.cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
     # 1 for automatic
@@ -15,12 +15,13 @@
   when:
     - le_dns_provider == "cloudflare"
     - le_cloudflare_account_email is defined
-    - le_cloudflare_account_api_token is defined
+    - le_cloudflare_account_api_token is iterable
+    - le_cloudflare_account_api_token | ansible.builtin.length > 0
     - sample_com_challenge is changed
 
 - name: Delete DNS record at CloudFlare via api_token
   delegate_to: localhost
-  community.general.net_tools.cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: "{{ le_cloudflare_zone }}"
     record: "{{ item.0.key }}"
     # 1 for automatic
@@ -33,4 +34,6 @@
   when:
     - le_dns_provider == "cloudflare"
     - le_cloudflare_api_token is defined
+    - le_cloudflare_api_token is iterable
+    - le_cloudflare_api_token | ansible.builtin.length > 0
     - sample_com_challenge is changed
