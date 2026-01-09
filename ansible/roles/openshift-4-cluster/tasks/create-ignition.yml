@@ -71,7 +71,7 @@
 
     - name: Mangle ignition config
       ansible.builtin.command: |
-        /opt/openshift-client-{{ openshift_version }}/butane \
+        /usr/local/bin/butane \
           --raw \
           --files-dir {{ openshift_install_dir }} \
           --output {{ openshift_install_dir }}/{{ item }}-extra.ign \
