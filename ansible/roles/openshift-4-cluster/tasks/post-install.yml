@@ -5,7 +5,7 @@
       - "For more details, connect to the bootstrap node: ssh -l core {{ vn_subnet.split('.')[:3] | join('.') }}.2"
 
 - name: Waiting for bootstrap to complete
-  ansible.builtin.command: "/opt/openshift-install-{{ openshift_version }}/openshift-install wait-for bootstrap-complete --dir {{ openshift_install_dir }} --log-level debug"
+  ansible.builtin.command: "/usr/local/bin/openshift-install wait-for bootstrap-complete --dir {{ openshift_install_dir }} --log-level debug"
   register: bootstrap_status
   retries: 60
   delay: 60
@@ -24,9 +24,9 @@
     set -o pipefail
     while true
     do
-      /opt/openshift-client-{{ openshift_version }}/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" get csr --no-headers | \
+      /usr/local/bin/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" get csr --no-headers | \
         awk '/Pending/ {print $1}' | \
-        xargs --no-run-if-empty /opt/openshift-client-{{ openshift_version }}/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
+        xargs --no-run-if-empty /usr/local/bin/oc --kubeconfig="{{ openshift_install_dir }}/auth/kubeconfig" adm certificate approve
       sleep 1
     done
   # yamllint enable rule:line-length
@@ -50,7 +50,7 @@
 - name: Set image registry managementState from Removed to Managed
   # yamllint disable rule:line-length
   # noqa var-spacing
-  ansible.builtin.command: "/opt/openshift-client-{{ openshift_version }}/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig"
+  ansible.builtin.command: "/usr/local/bin/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\":{\"managementState\": \"Managed\"}}' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig"
   # yamllint enable rule:line-length
   register: registry_status
   retries: 60
@@ -60,7 +60,7 @@
   tags: storage
 
 - name: Waiting installation to complete
-  ansible.builtin.command: "/opt/openshift-install-{{ openshift_version }}/openshift-install wait-for install-complete --dir {{ openshift_install_dir }}"
+  ansible.builtin.command: "/usr/local/bin/openshift-install wait-for install-complete --dir {{ openshift_install_dir }}"
   register: install_status
   retries: 60
   delay: 60

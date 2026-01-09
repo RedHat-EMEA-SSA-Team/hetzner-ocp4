@@ -46,7 +46,6 @@
     group: root
     exclude:
       - 'README.md'
-    # creates: "/opt/openshift-client-{{ openshift_version }}/oc"
 
 - name: Determine if OpenShift client version
   ansible.builtin.command:
