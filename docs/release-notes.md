@@ -1,6 +1,7 @@
 # RELEASE NOTES
 
-## 2026-01-xx
+## 2026-01-09
+ * Bump OpenShift Version to stable - it will automatically install the stable version.
  * Red Hat Enterprise Linux 10 
  * Auto-detected stable openshift version
     * Removed following variables: opm_dest, coreos_version, coreos_file, coreos_image_location openshift_client_version, opm_version
