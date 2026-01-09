@@ -53,19 +53,17 @@ We are happy to track and discuss ideas, topics and requests via [Issues](https:
 
 # Install Instructions
 
-Our instructions are based on the CentOS Root Server as provided by [Hetzner](https://www.hetzner.com/), please feel free to adapt it to the needs of your preferred hosting provider. We are happy to get pull requests for an updated documentation, which makes consuming this setup easy also for other hosting providers.
+Our instructions are based on the Root Server as provided by [Hetzner](https://www.hetzner.com/), please feel free to adapt it to the needs of your preferred hosting provider. We are happy to get pull requests for an updated documentation, which makes consuming this setup easy also for other hosting providers.
 
-**These instructions are for running CentOS and 'root' machines which are set up following the [Hetzner CentOS](docs/hetzner.md) documentation. You might have to modify commands if running on another Linux distro.  Feel free to provide instructions for alternative providers.**
+**These instructions are for running a Red Hat Enterprise Linux based distro and 'root' machines which are set up following the [Hetzner](docs/hetzner.md) documentation. You might have to modify commands if running on another Linux distro.  Feel free to provide instructions for alternative providers.**
 
-**NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp4#initialize-tools)**
+**NOTE: If you are running on other environments than bare metal servers from Hetzner, check if there is specific instruction under Infra providers list and then jump to section [Initialize tools](#initialize-tools)**
 
 **Supported root server operating systems:**
-- RHEL 8 - How to install RHEL8: https://keithtenzer.com/cloud/how-to-create-a-rhel-8-image-for-hetzner-root-servers/
-- RHEL 9 - leapp update from RHEL 8
-- RHEL 9 ([How to install RHEL9](docs/hetzner_rhel9.md))
-- CentOS Stream 9 base
-- Rocky Linux 9.1 base
-- Debian 11
+
+- RHEL 9 & 10 ([How to create a Red Hat Enterprise Linux (RHEL) Hetzner base image](docs/hetzner_rhel.md))
+- CentOS Stream 9 & 10 base
+- Rocky Linux 9 & 10 base
 
 ## Infra providers
 * [Hetzner CentOS](docs/hetzner.md)
@@ -93,27 +91,13 @@ Optional hardening recommendation (especially for publicly reachable hosts): **c
 
 Subscribe your RHEL host:
 ```bash
-subscription-manager register
-
-# get pool id via:
-# subscription-manager list --available
-subscription-manager attach [--auto] --pool=...
+rhc connect --activation-key <key> --organization <org>
 
 subscription-manager repos --disable=*
-
-```
-
-
-### Red Hat Enterprise Linux 8
-```bash
-subscription-manager repos \
-    --enable=rhel-8-for-x86_64-baseos-rpms \
-    --enable=rhel-8-for-x86_64-appstream-rpms \
-    --enable=rhel-8-for-x86_64-highavailability-rpms \
-    --enable=ansible-automation-platform-2.6-for-rhel-8-x86_64-rpms
 ```
 
 ### Red Hat Enterprise Linux 9
+
 ```bash
 subscription-manager repos \
     --enable=rhel-9-for-x86_64-baseos-rpms \
@@ -140,7 +124,7 @@ subscription-manager repos \
 dnf install -y ansible-navigator git podman
 ```
 
-## In case of Rocky Linux 8 or Centos 8
+## In case of Rocky Linux 9 or Centos 9
 
 Ansible navigator installation based on the upstream [documentation](https://ansible-navigator.readthedocs.io/en/latest/installation/#install-ansible-navigator).
 

@@ -1,18 +1,18 @@
-# How to install RHEL 9 and use it as Hetzner base image
+# How to create a Red Hat Enterprise Linux (RHEL) Hetzner base image
 
-There's (at least) two ways to get a RHEL9 image ready to use at Hetzner:
-1. [Automatically from a qcow2 image](#automatically-from-a-qcow2-image)
-2. [Manually deploying a virtual machine](#manually-deploying-a-virtual-machine)
+There's (at least) two ways to get a RHEL image ready to use at Hetzner:
+1. [Automatically from a qcow2 image (RHEL 9 & 10 )](#automatically-from-a-qcow2-image)
+2. [Manually deploying a virtual machine (RHEL 9](#manually-deploying-a-virtual-machine)
 
 ## Automatically from a qcow2 image
 ### Using Red Hat Insights Image Builder
-Use the provided [image definition](../ansible/group_vars/all/rhel-image-definition.yaml) with [ansible-image-builder](https://github.com/enothen/ansible-image-builder) in order to request and download a virtualization image, from which the content is extracted into the tarball that you can use at Hetzner directly, without further modifications.
+Use the provided [image definition](../inventory/group_vars/all/rhel-image-definition.yaml) with [ansible-image-builder](https://github.com/enothen/ansible-image-builder) in order to request and download a virtualization image, from which the content is extracted into the tarball that you can use at Hetzner directly, without further modifications.
 
 #### Prerequisites
 Interaction with the Insights Image Builder API requires an offline token. You can get one [here](https://access.redhat.com/management/api), and then put it in a variable called `vault_offline_token` in your vault:
 ```shell
-$ echo 'vault_offline_token: "<your offline token here>"' > ansible/group_vars/all/vault
-$ ansible-vault encrypt ansible/group_vars/all/vault
+$ echo 'vault_offline_token: "<your offline token here>"' > inventory/group_vars/all/vault
+$ ansible-vault encrypt inventory/group_vars/all/vault
 ```
 Put the vault password in a password file or provide it on the ansible-playbook command line.
 
@@ -102,7 +102,7 @@ RHEL-96-el-amd64-minimal.tar.xz
 ```
 The tar file is ready, proceed to section [Install the image on your server](#install-the-image-on-your-server) down below.
 
-## Manually deploying a virtual machine
+## Manually deploying via virtual machine (RHEL 9)
 ### Download the iso image and install a RHEL-9-minimal virtual machine
 
 Download the RHEL 9.1 DVD image from [Red Hat Customer Portal](https://access.redhat.com/downloads/content/479/ver=/rhel---9/9.1/x86_64/product-software)
