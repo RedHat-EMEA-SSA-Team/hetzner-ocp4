@@ -2,6 +2,8 @@
 
 ## 2026-01-xx
  * Red Hat Enterprise Linux 10 
+ * Auto-detected stable openshift version
+    * Removed following variables: opm_dest, coreos_version, coreos_file, coreos_image_location openshift_client_version, opm_version
  * Fix issue #333 - Improve ssh-keyget command
  * Remove redhat_subscription_pool, not needed anymore
  * Cleanup: Remove pipeline/ directory

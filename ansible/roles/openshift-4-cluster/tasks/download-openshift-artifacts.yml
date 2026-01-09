@@ -2,13 +2,12 @@
 
 - name: Build OpenShift download urls
   ansible.builtin.set_fact:
-    tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
-    tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
+    tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux.tar.gz"
+    tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux.tar.gz"
 
 - name: Init check_urls
   ansible.builtin.set_fact:
     check_urls:
-      - "{{ coreos_download_url }}"
       - "{{ tmp_openshift_install_download_url }}"
       - "{{ tmp_openshift_client_download_url }}"
       - "{{ (download_oc_mirror is true) | ternary(openshift_location + '/oc-mirror.tar.gz', '') }}"
@@ -19,11 +18,6 @@
 - name: Filter check_urls
   ansible.builtin.set_fact:
     check_urls: "{{ check_urls|select|list }}"
-
-- name: Add coreos_csum_url to check_urls
-  ansible.builtin.set_fact:
-    check_urls: "{{ check_urls + [coreos_csum_url] }}"
-  when: coreos_csum_str is not defined
 
 - name: Check download urls
   ansible.builtin.uri:
@@ -36,141 +30,101 @@
       - 403
   with_items: "{{ check_urls }}"
 
-- name: check if coreos image already downloaded and get checksum
-  ansible.builtin.stat:
-    checksum_algorithm: sha256
-    path: "{{ coreos_path }}/{{ coreos_file }}"
-  register: coreos_old_image
-
-- name: verify existing coreos image is valid
-  ansible.builtin.lineinfile:
-    name: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
-    line: "{{ coreos_old_image.stat.checksum }}  {{ coreos_file }}"
-    state: present
-  check_mode: true
-  register: csum_check
-  failed_when: (csum_check is changed) or (csum_check is failed)
-  ignore_errors: true
-  when: coreos_old_image.stat.exists
-
-- name: Download fresh coreos image if previous doesn't exist
-  block:
-    # Work-a-round for https://github.com/ansible/ansible/issues/71420
-    #   fix not shipped yet
-    - name: Findout exactly sha256
-      ansible.builtin.set_fact:
-        coreos_csum_str: "{{ lookup('url', coreos_csum_url,  split_lines=False ).split('\n') |map('regex_search','.*' + coreos_download_url | basename + '$') | select('string') | first | regex_search('^([a-z0-9])+') }}"  # noqa line-length
-      when: coreos_csum_str is not defined
-
-    - name: download coreos
-      ansible.builtin.get_url:
-        url: "{{ coreos_download_url }}"
-        dest: "{{ coreos_path }}/{{ coreos_download_url | basename }}"
-        checksum: "sha256:{{ coreos_csum_str }}"
-      register: coreos_download
-
-    - name: Get filetype
-      ansible.builtin.stat:
-        path: "{{ coreos_path }}/{{ coreos_download_url | basename }}"
-      register: coreos_stat
-
-    - name: unzip the coreos
-      ansible.builtin.command: "gunzip {{ coreos_path }}/{{ coreos_download_url | basename }}"
-      args:
-        chdir: "{{ coreos_path }}"
-        creates: "{{ coreos_path }}/{{ coreos_file }}"
-      register: unzip
-      when: coreos_stat.stat.mimetype == 'application/x-gzip' or coreos_stat.stat.mimetype == 'application/gzip'
-
-    - name: unxz the coreos
-      ansible.builtin.command: "unxz {{ coreos_path }}/{{ coreos_download_url | basename }}"
-      args:
-        chdir: "{{ coreos_path }}"
-        creates: "{{ coreos_path }}/{{ coreos_file }}"
-      register: unxz
-      when: coreos_stat.stat.mimetype == 'application/x-xz'
-
-    - name: calculate checksum of the new coreos image
-      ansible.builtin.stat:
-        checksum_algorithm: sha256
-        path: "{{ coreos_path }}/{{ coreos_file }}"
-      register: coreos_csum
-
-    - name: store the checksum of the file
-      ansible.builtin.copy:
-        dest: "{{ coreos_path }}/{{ coreos_file }}.sha256.txt"
-        content: "{{ coreos_csum.stat.checksum }}  {{ coreos_file }}\n"
-        mode: 0644
-
-  when: >
-    (not coreos_old_image.stat.exists) or
-    csum_check.changed or
-    csum_check.failed
-
-- name: Create OpenShift artifacts directory
-  ansible.builtin.file:
-    path: "{{ item }}"
+- name: Create temporary OpenSift download directory
+  ansible.builtin.tempfile:
     state: directory
-    mode: u+rwx,g+rx,o+rx
-  with_items:
-    - "/opt/openshift-install-{{ openshift_version }}"
-    - "/opt/openshift-client-{{ openshift_version }}"
-    - "{{ opm_dest }}"
-
-- name: Download OpenShift installer
-  ansible.builtin.unarchive:
-    src: "{{ tmp_openshift_install_download_url }}"
-    dest: "/opt/openshift-install-{{ openshift_version }}/"
-    remote_src: yes
-    mode: u+rwx,g+rx,o+rx
-    owner: root
-    group: root
-    exclude:
-      - 'README.md'
-    creates: "/opt/openshift-install-{{ openshift_version }}/openshift-install"
+    suffix: ocp
+  register: temp_ocp_dir
 
 - name: Download OpenShift client
   ansible.builtin.unarchive:
     src: "{{ tmp_openshift_client_download_url }}"
-    dest: "/opt/openshift-client-{{ openshift_version }}/"
+    dest: "{{ temp_ocp_dir.path }}"
     remote_src: yes
     mode: u+rwx,g+rx,o+rx
     owner: root
     group: root
     exclude:
       - 'README.md'
-    creates: "/opt/openshift-client-{{ openshift_version }}/oc"
+    # creates: "/opt/openshift-client-{{ openshift_version }}/oc"
+
+- name: Determine if OpenShift client version
+  ansible.builtin.command:
+    cmd: "{{ temp_ocp_dir.path }}/oc version -o yaml"
+  register: oc_version
+
+- name: Set detected OpenShift client version raw
+  ansible.builtin.set_fact:
+    detected_openshift_version: "{{ (oc_version.stdout_lines | join('\n') | from_yaml).releaseClientVersion }}"
+
+
+- name: Create OpenShift artifacts directory
+  ansible.builtin.file:
+    path: "/opt/openshift-{{ detected_openshift_version | default(openshift_version) }}/"
+    state: directory
+    mode: u+rwx,g+rx,o+rx
+  register: openshift_artifacts_dir
+
+- name: Copy OpenShift client to artifacts directory
+  ansible.builtin.copy:
+    remote_src: yes
+    src: "{{ temp_ocp_dir.path }}/{{ item }}"
+    dest: "{{ openshift_artifacts_dir.path }}/{{ item | basename }}"
+    mode: u+rwx,g+rx,o+rx
+    owner: root
+    group: root
+    force: yes
+    follow: false
+  with_fileglob:
+    - "{{ temp_ocp_dir.path }}/*"
+
+- name: Delete temporary OpenShift download directory
+  ansible.builtin.file: 
+    path: '{{ temp_ocp_dir.path }}'
+    state: absent
+
+- name: Download OpenShift installer
+  ansible.builtin.unarchive:
+    src: "{{ tmp_openshift_install_download_url }}"
+    dest: "{{ openshift_artifacts_dir.path }}/"
+    remote_src: yes
+    mode: u+rwx,g+rx,o+rx
+    owner: root
+    group: root
+    exclude:
+      - 'README.md'
+    creates: "{{ openshift_artifacts_dir.path }}/openshift-install"
 
 - name: Download OpenShift Mirror
   ansible.builtin.unarchive:
     src: "{{ openshift_location }}/oc-mirror.tar.gz"
-    dest: "/opt/openshift-client-{{ openshift_version }}/"
+    dest: "{{ openshift_artifacts_dir.path }}/"
     remote_src: yes
     mode: u+rwx,g+rx,o+rx
     owner: root
     group: root
     exclude:
       - 'README.md'
-    creates: "/opt/openshift-client-{{ openshift_version }}/oc-mirror"
+    creates: "{{ openshift_artifacts_dir.path }}/oc-mirror"
   when: download_oc_mirror is true
 
 - name: Download OPM (gz)
   ansible.builtin.unarchive:
     src: "{{ opm_download_url }}"
-    dest: "{{ opm_dest }}"
+    dest: "{{ openshift_artifacts_dir.path }}/"
     remote_src: yes
     mode: u+rwx,g+rx,o+rx
     owner: root
     group: root
     exclude:
       - 'README.md'
-    creates: "{{ opm_dest }}/opm"
+    creates: "{{ openshift_artifacts_dir.path }}/opm-rhel9"
   when: opm_download_url | regex_search("^(.*)\.tar\.gz$") | ansible.builtin.length > 0
 
 - name: Download OPM
   ansible.builtin.get_url:
     url: "{{ opm_download_url }}"
-    dest: "{{ opm_dest }}/opm"
+    dest: "{{ openshift_artifacts_dir.path }}/opm-rhel9"
     mode: u+rwx,g+rx,o+rx
   when: opm_download_url | regex_search("^(.*)\.tar\.gz$") | ansible.builtin.length == 0
 
@@ -178,27 +132,64 @@
   ansible.builtin.get_url:
     url: "{{ helm_cli_location }}"
     mode: u+rwx,g+rx,o+rx
-    dest: "/opt/openshift-client-{{ openshift_version }}/helm"
+    dest: "{{ openshift_artifacts_dir.path }}/helm"
 
 - name: Download butane client
   ansible.builtin.get_url:
     url: "{{ butane_cli_location }}"
     mode: u+rwx,g+rx,o+rx
-    dest: "/opt/openshift-client-{{ openshift_version }}/butane"
+    dest: "{{ openshift_artifacts_dir.path }}/butane"
 
 
 - name: Create a symbolic link
   ansible.builtin.file:
-    src: "{{ item.value }}"
+    src: "{{ openshift_artifacts_dir.path }}{{ item.value }}"
     dest: "{{ item.key }}"
     state: link
     force: yes
     follow: false
   with_dict:
-    "/usr/local/bin/oc": "/opt/openshift-client-{{ openshift_version }}/oc"
-    "/usr/local/bin/oc-mirror": "/opt/openshift-client-{{ openshift_version }}/oc-mirror"
-    "/usr/local/bin/kubectl": "/opt/openshift-client-{{ openshift_version }}/kubectl"
-    "/usr/local/bin/openshift-install": "/opt/openshift-install-{{ openshift_version }}/openshift-install"
-    "/usr/local/bin/helm": "/opt/openshift-client-{{ openshift_version }}/helm"
-    "/usr/local/bin/butane": "/opt/openshift-client-{{ openshift_version }}/butane"
-    "/usr/local/bin/opm": "{{ opm_dest }}/opm"
+    "/usr/local/bin/oc": "oc"
+    "/usr/local/bin/oc-mirror": "oc-mirror"
+    "/usr/local/bin/kubectl": "kubectl"
+    "/usr/local/bin/openshift-install": "openshift-install"
+    "/usr/local/bin/helm": "helm"
+    "/usr/local/bin/butane": "butane"
+    "/usr/local/bin/opm": "opm-rhel9"
+
+#
+# CoreOS
+#
+- name: Determinate CoreOS version
+  ansible.builtin.command:
+    cmd: "{{ openshift_artifacts_dir.path }}/openshift-install coreos print-stream-json"
+  register: coreos_version_raw
+
+- name: Set detected CoreOS version raw
+  ansible.builtin.set_fact:
+    detected_coreos_version: "{{ (coreos_version_raw.stdout_lines | join('\n') | from_json).architectures.x86_64.artifacts.qemu.formats['qcow2.gz'].disk }}"
+  
+- name: Set coreos_file & coreos_image_location
+  ansible.builtin.set_fact:
+    coreos_file: "{{ (detected_coreos_version.location | basename).split('.')[0:-1] | join('.') }}"
+    coreos_image_location: "{{ coreos_path }}/{{  (detected_coreos_version.location | basename).split('.')[0:-1] | join('.') }}"
+
+- name: check if coreos image already downloaded and get checksum
+  ansible.builtin.stat:
+    checksum_algorithm: sha256
+    path: "{{ coreos_path }}/{{ coreos_file }}"
+  register: coreos_checksum
+
+- name: Download CoreOS
+  ansible.builtin.get_url:
+    url: "{{ detected_coreos_version.location }}"
+    dest: "{{ coreos_path }}/{{ detected_coreos_version.location | basename }}"
+    checksum: "sha256:{{ detected_coreos_version.sha256 }}"
+  when: (coreos_checksum.stat.exists is false) or 
+        (coreos_checksum.stat.checksum != detected_coreos_version['uncompressed-sha256'])
+
+- name: unzip the coreos
+  ansible.builtin.command: "gunzip {{ coreos_path }}/{{ detected_coreos_version.location | basename }}"
+  args:
+    chdir: "{{ coreos_path }}"
+    creates: "{{ coreos_path }}/{{ coreos_file }}"
