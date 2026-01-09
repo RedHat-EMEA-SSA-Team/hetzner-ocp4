@@ -1,0 +1,82 @@
+---
+images:
+  - name: RHEL-96-el-amd64-minimal
+    distribution: rhel-9
+    description: RHEL 9.latest image customized for OCP4 on Hetzner
+    customizations:
+      kernel:
+        append: rd.auto
+      partitioning_mode: lvm
+      packages:
+        - lvm2
+        - mdadm
+        - bzip2
+        - firewalld
+      filesystem:
+        - mountpoint: /boot
+          min_size: 1024
+        - mountpoint: /
+          min_size: 10240
+      firewall:
+        services:
+          enabled:
+            - ssh
+      services:
+        enabled:
+          - firewalld
+  - name: RHEL-1000-el-amd64-minimal
+    distribution: rhel-10
+    description: RHEL 10 latest image customized for OCP4 on Hetzner
+    customizations:
+      kernel:
+        append: rd.auto
+      partitioning_mode: lvm
+      packages:
+        - lvm2
+        - mdadm
+        - bzip2
+        - firewalld
+      files:
+        - path: /etc/selinux/config
+          mode: "0644"
+          user: root
+          group: root
+          data: |
+            # This file controls the state of SELinux on the system.
+            # SELINUX= can take one of these three values:
+            #     enforcing - SELinux security policy is enforced.
+            #     permissive - SELinux prints warnings instead of enforcing.
+            #     disabled - No SELinux policy is loaded.
+            # See also:
+            # https://docs.fedoraproject.org/en-US/quick-docs/getting-started-with-selinux/#getting-started-with-selinux-selinux-states-and-modes
+            #
+            # NOTE: In earlier Fedora kernel builds, SELINUX=disabled would also
+            # fully disable SELinux during boot. If you need a system with SELinux
+            # fully disabled instead of SELinux running with no policy loaded, you
+            # need to pass selinux=0 to the kernel command line. You can use grubby
+            # to persistently set the bootloader to boot with selinux=0:
+            #
+            #    grubby --update-kernel ALL --args selinux=0
+            #
+            # To revert back to SELinux enabled:
+            #
+            #    grubby --update-kernel ALL --remove-args selinux
+            #
+            SELINUX=permissive
+            # SELINUXTYPE= can take one of these three values:
+            #     targeted - Targeted processes are protected,
+            #     minimum - Modification of targeted policy. Only selected processes are protected.
+            #     mls - Multi Level Security protection.
+            SELINUXTYPE=targeted
+      filesystem:
+        - mountpoint: /boot
+          min_size: 1024
+        - mountpoint: /
+          min_size: 10240
+      firewall:
+        services:
+          enabled:
+            - ssh
+      services:
+        enabled:
+          - firewalld
