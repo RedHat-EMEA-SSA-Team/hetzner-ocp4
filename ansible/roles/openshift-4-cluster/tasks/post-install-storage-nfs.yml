@@ -120,7 +120,7 @@
   # noqa var-spacing
   # yamllint disable rule:line-length
   ansible.builtin.command: |
-    /opt/openshift-client-{{ openshift_version }}/oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig
+    /usr/local/bin/oc patch configs.imageregistry.operator.openshift.io cluster --type='json' -p='[{"op": "remove", "path": "/spec/storage" },{"op": "add", "path": "/spec/storage", "value": {"pvc":{"claim": "registry-storage"}}}]' --kubeconfig {{ openshift_install_dir }}/auth/kubeconfig
   # yamllint enable rule:line-length
   register: registry_status
   retries: 60
