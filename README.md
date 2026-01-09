@@ -173,6 +173,9 @@ Here is an example of a [cluster.yml](cluster-example.yml) file that contains in
 | variable | description  |Default|
 |---|---|---|
 |`cluster_name`               |Name of the cluster to be installed | **Required** |
+|`openshift_version`          |OpenShift verstion ti install, for example `4.20.8`|[stable](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/)|
+|`openshift_mirror`           |Location to download OpenShift artifacts|`https://mirror.openshift.com`|
+|`openshift_location`         |Path at OpenShift mirrro|`{{ openshift_mirror }}/pub/openshift-v4/clients/ocp/{{ openshift_version }}"`|
 |`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_, _hetzner_, _gandi_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
 |`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
 |`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS records, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
@@ -184,6 +187,13 @@ Here is an example of a [cluster.yml](cluster-example.yml) file that contains in
 |`public_ipv6`                |Same as `public_ip` but for IPv6 | `listen_address_ipv6` |
 |`masters_schedulable`        |Optional to overwrite masters schedulable| `false` |
 |`sdn_plugin_name`            |Optional to change the SDN plugin between `OVNKubernetes` or `OpenShiftSDN` | `OVNKubernetes` |
+
+Example to install OpenShift candidate release:
+
+```yaml
+openshift_version: candidate
+openshift_location: "{{ openshift_mirror }}/pub/openshift-v4/clients/ocp-dev-preview/{{ openshift_version }}"
+```
 
 ### Cluster design (single node, compact or normal)
 
