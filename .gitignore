@@ -4,3 +4,4 @@ certificate/
 ansible-navigator.log
 context/
 inventory/group_vars/all/vault
+ansible/RHEL*
