@@ -6,11 +6,19 @@
   ignore_errors: yes
 
 - name: Undefine VM {{ vm_instance_name }}
-  community.libvirt.virt:
-    command: undefine
-    name: "{{ vm_instance_name }}"
-    force: true
-  ignore_errors: yes
+  block:
+    - name: Try to undefine VM {{ vm_instance_name }} with storage
+      community.libvirt.virt:
+        command: undefine
+        name: "{{ vm_instance_name }}"
+        force: true
+  rescue:
+    - name: Fallback - Undefine VM {{ vm_instance_name }} without storage flags
+      community.libvirt.virt:
+        command: undefine
+        name: "{{ vm_instance_name }}"
+        flags: [nvram]
+      ignore_errors: false
 
 - name: Delete logical volume
   community.general.lvol:
