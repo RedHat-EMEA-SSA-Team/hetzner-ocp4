@@ -157,8 +157,11 @@
       ttl: 3600
       records:
       - "\"{{ item.1 }}\""
-    status_code: 201
+    status_code: [201, 429]
   register: record
+  until: record.status == 201
+  retries: 10
+  delay: 5
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "desec" and sample_com_challenge is changed
 
@@ -283,8 +286,11 @@
     method: DELETE
     headers:
       Authorization: "Token {{ le_desec_account_api_token }}"
-    status_code: 204
+    status_code: [204, 429]
   register: record
+  until: record.status == 204
+  retries: 10
+  delay: 5
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "desec" and sample_com_challenge is changed
 
