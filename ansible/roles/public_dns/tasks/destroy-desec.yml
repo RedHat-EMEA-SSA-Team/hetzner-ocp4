@@ -4,10 +4,14 @@
     method: DELETE
     headers:
       Authorization: "Token {{ pd_desec_account_api_token }}"
-    status_code: 204
+    status_code: [204, 429]
   with_items:
     - api
     - '*.apps'
+  register: api_response
+  until: api_response.status == 204
+  retries: 10
+  delay: 5
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip | length > 0)
@@ -18,10 +22,14 @@
     method: DELETE
     headers:
       Authorization: "Token {{ pd_desec_account_api_token }}"
-    status_code: 204
+    status_code: [204, 429]
   with_items:
     - api
     - '*.apps'
+  register: api_response
+  until: api_response.status == 204
+  retries: 10
+  delay: 5
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6 is not none) and (pd_public_ipv6|length > 0)
