@@ -157,10 +157,10 @@ Here is an example of a [cluster.yml](cluster-example.yml) file that contains in
 | variable | description  |Default|
 |---|---|---|
 |`cluster_name`               |Name of the cluster to be installed | **Required** |
-|`openshift_version`          |OpenShift verstion ti install, for example `4.20.8`|[stable](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/)|
+|`openshift_version`          |OpenShift version to install, for example `4.20.8`|[stable](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/)|
 |`openshift_mirror`           |Location to download OpenShift artifacts|`https://mirror.openshift.com`|
-|`openshift_location`         |Path at OpenShift mirrro|`{{ openshift_mirror }}/pub/openshift-v4/clients/ocp/{{ openshift_version }}"`|
-|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_,_transip_, _hetzner_, _gandi_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
+|`openshift_location`         |Path at OpenShift mirror|`{{ openshift_mirror }}/pub/openshift-v4/clients/ocp/{{ openshift_version }}"`|
+|`dns_provider`               |DNS provider, value can be _route53_, _cloudflare_, _gcp_, _azure_, _transip_, _hetzner_, _gandi_, _desec_ or _none_. Check __Setup public DNS records__ for more info. | **Required** |
 |`image_pull_secret`          |Token to be used to authenticate to the Red Hat image registry. You can download your pull secret from https://cloud.redhat.com/openshift/install/metal/user-provisioned | **Required** |
 |`letsencrypt_account_email`  |Email address that is used to create LetsEncrypt certs. If _cloudflare_account_email_ is not present for CloudFlare DNS records, _letsencrypt_account_email_ is also used with CloudFlare DNS account email |  **Required** |
 |`public_domain`              |Root domain that will be used for your cluster.  | **Required** |
@@ -223,8 +223,8 @@ masters_schedulable: false
 
 ### Set up public DNS records
 
-Current tools allow use of three DNS providers: _AWS Route53_, _Cloudflare_, _DigitalOcean_, _GCP DNS_ or _none_.
-If you want to use _Route53_, _Cloudflare_, _DigitalOcean_, _GCP_ or _Gandi_ as your DNS provider, you have to add a few variables. Check the instructions below.
+Current tools allow use of following DNS providers: _AWS Route53_, _Cloudflare_, _DigitalOcean_, _GCP DNS_, _Hetzner_, _deSEC_ or _none_.
+If you want to use _Route53_, _Cloudflare_, _DigitalOcean_, _GCP_, _Gandi_, or _deSEC_ as your DNS provider, you have to add a few variables. Check the instructions below.
 
 DNS records are constructed based on _cluster_name_ and _public_domain_ values. With above values DNS records should be
 - api._cluster_name_._public_domain_
@@ -240,6 +240,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |---|---|
 |Azure|`azure_client_id: 'client_id'`<br/>`azure_secret: 'key'`<br/>`azure_subscription_id: 'subscription_id'`<br/>`azure_tenant: 'tenant_id'`<br/>`azure_resource_group: 'dns_zone_resource_group'` |
 |CloudFlare|`cloudflare_zone: domain.tld`<br>`cloudflare_api_token:`<hr>Or global api key **not recommended**<br><code>cloudflare_zone: domain.tld<br/>cloudflare_account_email: john@example.com<br/>cloudflare_account_api_token: 9348.....</code>|
+|deSEC|`desec_account_api_token: e7a6f82c3245b65cf4.....` <br>  `desec_zone: domain.tld`|
 |DigitalOcean|`digitalocean_token: e7a6f82c3245b65cf4.....` <br>  `digitalocean_zone: domain.tld`|
 |Gandi|`gandi_account_api_token: 0123456...` <br>  `gandi_zone: domain.tld`|
 |GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |

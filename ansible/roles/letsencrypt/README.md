@@ -1,18 +1,18 @@
 letsencrypt
 =========
 
-Create  certificates with DNS challenge through Cloudflare, AWS Route53, GCP Cloud DNS or Hetzner
+Create certificates with DNS challenge through Cloudflare, AWS Route53, GCP Cloud DNS, deSEC or Hetzner
 
 Requirements
 ------------
 
-- cloudflare account
+- account in a DNS provider
 - matching domain to the certificate ;-)
 
 Role Variables
 --------------
 
-| variable | describtion  | example | default |
+| variable | description  | example | default | 
 |---|---|---|---|
 | le_dns_provider | DNS provider | `[route53\|cloudflare\|gcp\|azure\|hetzner\|gandi]` |  non **required** |
 | le_cloudflare_account_email | Cloudflare Account E-Mail for API authentication | `account@domain.tld`| non **required if provider is cloudflare** |
@@ -30,6 +30,8 @@ Role Variables
 | le_hetzner_zone | Hetzner zone in which the entries are created and deleted for the dns challenge | `domain.tld` | non **required if provider is hetzner** |
 | le_gandi_api_key | Gandi API key for API authentication || non **required if provider is gandi** |
 | le_gandi_zone | Gandi zone in which the entries are created and delete for the DNS challenge | `domain.tld` | non **required if provider is gandi** |
+| le_desec_account_api_token | deSEC API token for API authentication | `jdu...zalU`| non **required if provider is desec** |
+| le_desec_zone | deSEC authoritative zone domain in which the entries are created and deleted for the dns challenge | `domain.tld` | non **required if provider is desec** |
 | le_public_domain | Use to create SAN certificate: `DNS:*.apps.{{ le_public_domain }},DNS:api.{{ le_public_domain }}` | cluster.domain.tld | non **required** |
 | le_certificates_dir | Here the certificates are stored  | `/root/certificates` | `{{ playbook_dir }}../certificate/` |
 | le_acme_directory | ACME Directory by default it use staging env because of https://letsencrypt.org/docs/rate-limits/ | `https://acme-v02.api.letsencrypt.org/directory` | `https://acme-staging-v02.api.letsencrypt.org/directory` |
@@ -52,9 +54,9 @@ Example Playbook
   gather_facts: no
   roles:
   - role: letsencrypt-cloudflare
-    lc_cloudflare_account_email: ...
-    lc_cloudflare_account_api_token: ...
-    lc_cloudflare_zone: ...
+    le_cloudflare_account_email: ...
+    le_cloudflare_account_api_token: ...
+    le_cloudflare_zone: ...
 ```
 
 Example in context of hetzner-ocp4
@@ -69,13 +71,13 @@ Example in context of hetzner-ocp4
   - ../cluster.yml
   roles:
   - role: letsencrypt-cloudflare
-    lc_cloudflare_account_email: "{{ cloudflare_account_email }}"
-    lc_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
-    lc_cloudflare_zone: "{{ cloudflare_zone }}"
-    lc_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+    le_cloudflare_account_email: "{{ cloudflare_account_email }}"
+    le_cloudflare_account_api_token: "{{ cloudflare_account_api_token }}"
+    le_cloudflare_zone: "{{ cloudflare_zone }}"
+    le_public_domain: "{{ cluster_name }}.{{ public_domain }}" 
     # Only set if you really want a production letsencrypt certificate
     #   https://letsencrypt.org/docs/rate-limits/
-    # lc_acme_directory: "https://acme-v02.api.letsencrypt.org/directory"
+    # le_acme_directory: "https://acme-v02.api.letsencrypt.org/directory"
 
 ```
 
