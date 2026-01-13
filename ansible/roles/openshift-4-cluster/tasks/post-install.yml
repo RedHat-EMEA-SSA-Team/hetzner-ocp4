@@ -200,8 +200,8 @@
             clientID: "{{ auth_github.client_id }}"
             clientSecret:
               name: github-secret
-            organizations: "{{ auth_github.organizations | default('[]') }}"
-            teams: "{{ auth_github.teams | default('[]') }}"
+            organizations: "{{ auth_github.organizations | default([], true) }}"
+            teams: "{{ auth_github.teams | default([], true) }}"
           mappingMethod: claim
           name: GitHub
           type: GitHub
