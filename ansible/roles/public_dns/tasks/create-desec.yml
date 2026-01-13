@@ -11,10 +11,14 @@
         ttl: 3600
         records:
         - "{{ pd_public_ip }}"
-    status_code: 200
+    status_code: [200, 429]
   with_items:
     - api
     - '*.apps'
+  register: api_response
+  until: api_response.status == 200
+  retries: 10
+  delay: 5
   tags:
     - public_dns
   when: (pd_public_ip is defined) and (pd_public_ip|length > 0)
@@ -32,10 +36,14 @@
         ttl: 3600
         records:
         - "{{ pd_public_ipv6 }}"
-    status_code: 200
+    status_code: [200, 429]
   with_items:
     - api
     - '*.apps'
+  register: api_response
+  until: api_response.status == 200
+  retries: 10
+  delay: 5
   tags:
     - public_dns
   when: (pd_public_ipv6 is defined) and (pd_public_ipv6 is not none) and (pd_public_ipv6|length > 0)
