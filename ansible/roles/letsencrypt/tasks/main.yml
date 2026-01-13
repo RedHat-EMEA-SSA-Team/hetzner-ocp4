@@ -143,6 +143,25 @@
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "gandi" and sample_com_challenge is changed
 
+- name: Create DNS record at deSEC
+  delegate_to: localhost
+  ansible.builtin.uri:
+    url: "https://desec.io/api/v1/domains/{{ le_desec_zone }}/rrsets/"
+    method: POST
+    headers:
+      Authorization: "Token {{ le_desec_account_api_token }}"
+    body_format: json
+    body:
+      subname: "{{ item.0.key | replace(public_domain, '') | regex_replace('\\.$', '') }}"
+      type: TXT
+      ttl: 3600
+      records:
+      - "\"{{ item.1 }}\""
+    status_code: 201
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "desec" and sample_com_challenge is changed
+
 - name: DNS record info
   ansible.builtin.debug:    # noqa no-handler
     msg: "{{ item.0.key }} TXT {{ item.1 }}"
@@ -256,6 +275,18 @@
   register: record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
   when: le_dns_provider == "gandi" and sample_com_challenge is changed
+
+- name: Delete DNS record at deSEC
+  delegate_to: localhost
+  ansible.builtin.uri:
+    url: "https://desec.io/api/v1/domains/{{ le_desec_zone }}/rrsets/{{ item.0.key | replace( le_desec_zone , '') | regex_replace('\\.$', '') }}/TXT/"
+    method: DELETE
+    headers:
+      Authorization: "Token {{ le_desec_account_api_token }}"
+    status_code: 204
+  register: record
+  loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
+  when: le_dns_provider == "desec" and sample_com_challenge is changed
 
 - name: Include DNS provider
   ansible.builtin.include_tasks: "destroy-{{ le_dns_provider }}.yml"

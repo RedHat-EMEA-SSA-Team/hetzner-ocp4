@@ -1,0 +1,27 @@
+- name: Delete DNS record at deSEC
+  ansible.builtin.uri:
+    url: "https://desec.io/api/v1/domains/{{ pd_desec_zone }}/rrsets/{{ item }}.{{ cluster_name }}/A/"
+    method: DELETE
+    headers:
+      Authorization: "Token {{ pd_desec_account_api_token }}"
+    status_code: 204
+  with_items:
+    - api
+    - '*.apps'
+  tags:
+    - public_dns
+  when: (pd_public_ip is defined) and (pd_public_ip | length > 0)
+
+- name: Delete IPv6 DNS record at deSEC
+  ansible.builtin.uri:
+    url: "https://desec.io/api/v1/domains/{{ pd_desec_zone }}/rrsets/{{ item }}.{{ cluster_name }}/AAAA/"
+    method: DELETE
+    headers:
+      Authorization: "Token {{ pd_desec_account_api_token }}"
+    status_code: 204
+  with_items:
+    - api
+    - '*.apps'
+  tags:
+    - public_dns
+  when: (pd_public_ipv6 is defined) and (pd_public_ipv6 is not none) and (pd_public_ipv6|length > 0)
