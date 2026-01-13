@@ -18,7 +18,7 @@
         command: undefine
         name: "{{ vm_instance_name }}"
         flags: [nvram]
-      ignore_errors: false
+      ignore_errors: true
 
 - name: Delete logical volume
   community.general.lvol:
