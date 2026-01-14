@@ -16,7 +16,7 @@ ip_families:
 fips: false
 # set custom public ip for DNS entries. Defaults to: hostvars['localhost']['ansible_default_ipv4']['address']
 # public_ip: 92.100.42.2
-dns_provider: [route53|cloudflare|gcp|azure|hetzner|gandi]
+dns_provider: [route53|cloudflare|gcp|azure|hetzner|gandi|desec]
 letsencrypt_account_email: name@example.com
 # Depending on the dns provider:
 # CloudFlare
@@ -48,6 +48,9 @@ hetzner_zone: example.com
 # Gandi
 gandi_api_key: api_key
 gandi_zone: example.com
+# deSEC
+desec_account_api_token: 3543ade82AA$73.....
+desec_zone: example.com
 
 # Created with: htpasswd -nb admin openshift
 # Example password is openshift

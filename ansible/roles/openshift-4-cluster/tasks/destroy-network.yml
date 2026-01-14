@@ -19,6 +19,8 @@
     pd_gandi_api_key: "{{ gandi_api_key }}"
     pd_gandi_zone: "{{ gandi_zone }}"
     pd_public_domain: "{{ cluster_name }}.{{ public_domain }}"
+    pd_desec_zone: "{{ desec_zone }}"
+    pd_desec_account_api_token: "{{ desec_account_api_token }}"
   tags: public_dns
   when: dns_provider != 'none'
 

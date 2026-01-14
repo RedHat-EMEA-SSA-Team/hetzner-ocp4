@@ -33,5 +33,8 @@
 
     le_gandi_api_key: "{{ gandi_api_key }}"
     le_gandi_zone: "{{ gandi_zone }}"
+
+    le_desec_account_api_token: "{{ desec_account_api_token }}"
+    le_desec_zone: "{{ desec_zone }}"
   tags: letsencrypt
   when: not letsencrypt_disabled
