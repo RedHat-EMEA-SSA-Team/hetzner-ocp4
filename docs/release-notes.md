@@ -1,5 +1,12 @@
 # RELEASE NOTES
 
+## 2026-01-14
+
+ * Add support for DNS provider deSEC
+ * Fix copy of oc and kubectl CLIs
+ * Fix bug when undefining VMs without storage
+ * Fix bug when parsing GitHub organizations/teams
+
 ## 2026-01-09
  * Bump OpenShift Version to stable - it will automatically install the stable version.
  * Red Hat Enterprise Linux 10 
