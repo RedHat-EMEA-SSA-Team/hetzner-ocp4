@@ -90,6 +90,16 @@
     - le_gandi_zone
   when: le_dns_provider == "gandi"
 
+- name: Check required deSEC variables
+  ansible.builtin.assert:
+    that:
+      - lookup('vars',item) is defined
+    msg: "{{ item }} is not defined!"
+  with_items:
+    - le_desec_account_api_token
+    - le_desec_zone
+  when: le_dns_provider == "desec"
+
 - name: Debug var only with -vv CloudFlare
   ansible.builtin.debug:
     msg: "{{ item }}={{ lookup('vars',item) }}"
@@ -168,3 +178,12 @@
     - le_gandi_api_key
     - le_gandi_zone
   when: le_dns_provider == "gandi"
+
+- name: Debug var only with -vv for deSEC
+  ansible.builtin.debug:
+    msg: "{{ item }}={{ lookup('vars',item) }}"
+    verbosity: 2
+  with_items:
+    - le_desec_account_api_token
+    - le_desec_zone
+  when: le_dns_provider == "desec"

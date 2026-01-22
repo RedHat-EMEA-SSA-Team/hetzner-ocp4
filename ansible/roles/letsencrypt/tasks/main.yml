@@ -152,12 +152,12 @@
 - name: Include DNS provider
   ansible.builtin.include_tasks: "create-{{ le_dns_provider }}.yml"
   when:
-    - le_dns_provider in ['hetzner', 'digitalocean', 'cloudflare']
+    - le_dns_provider in ['hetzner', 'digitalocean', 'cloudflare', 'desec']
     - sample_com_challenge is changed
 
 - name: Pause, wait for DNS changes
   ansible.builtin.pause:   # noqa no-handler
-    seconds: 120
+    seconds: 300
   when: sample_com_challenge is changed
 
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
@@ -260,7 +260,7 @@
 - name: Include DNS provider
   ansible.builtin.include_tasks: "destroy-{{ le_dns_provider }}.yml"
   when:
-    - le_dns_provider in ['hetzner', 'digitalocean','cloudflare']
+    - le_dns_provider in ['hetzner', 'digitalocean','cloudflare', 'desec']
     - sample_com_challenge is changed
 
 - name: concat root ca and intermediate
