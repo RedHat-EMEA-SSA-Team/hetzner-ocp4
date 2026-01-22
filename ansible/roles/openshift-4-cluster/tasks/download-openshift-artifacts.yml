@@ -56,7 +56,6 @@
   ansible.builtin.set_fact:
     detected_openshift_version: "{{ (oc_version.stdout_lines | join('\n') | from_yaml).releaseClientVersion }}"
 
-
 - name: Create OpenShift artifacts directory
   ansible.builtin.file:
     path: "/opt/openshift-{{ detected_openshift_version | default(openshift_version) }}/"
@@ -67,16 +66,19 @@
 - name: Copy OpenShift client to artifacts directory
   ansible.builtin.copy:
     remote_src: yes
-    src: "{{ temp_ocp_dir.path }}/{{ item }}"
+    src: "{{ item }}"
     dest: "{{ openshift_artifacts_dir.path }}/"
     mode: u+rwx,g+rx,o+rx
     owner: root
     group: root
     force: yes
     follow: false
-  with_items:
-    - "oc"
-    - "kubectl"
+  with_items: 
+    - "{{ temp_ocp_dir.path }}/oc"
+    - "{{ temp_ocp_dir.path }}/kubectl"
+  # Globing is running locally not at the baremetal server?!
+  #with_fileglob:
+  #  - "{{ temp_ocp_dir.path }}/*"
 
 - name: Delete temporary OpenShift download directory
   ansible.builtin.file: 
