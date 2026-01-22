@@ -46,7 +46,7 @@
         mode: 0644
         content: |
           variant: openshift
-          version: {{ openshift_version.split('.')[:2]|join('.') }}.0
+          version: {{ detected_openshift_version.split('.')[:2]|join('.') }}.0
           metadata:
             name: 99-{{ item }}-ipv6
             labels:
