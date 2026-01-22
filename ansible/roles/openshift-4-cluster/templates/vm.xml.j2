@@ -18,6 +18,10 @@
   <os firmware="efi">
     <type arch="x86_64" machine="q35" >hvm</type>
     <boot dev="hd"/>
+    <firmware>
+      <feature enabled='no' name='enrolled-keys'/>
+      <feature enabled='no' name='secure-boot'/>
+    </firmware>
   </os>
   <features>
     <acpi/>
