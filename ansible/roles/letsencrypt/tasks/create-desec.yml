@@ -19,4 +19,8 @@
   retries: 10
   delay: 5
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
-  when: le_dns_provider == "desec" and sample_com_challenge is changed
+  when:
+    - sample_com_challenge is changed
+    - le_dns_provider == "desec"
+    - le_desec_account_api_token is iterable
+    - le_desec_account_api_token | ansible.builtin.length > 0
