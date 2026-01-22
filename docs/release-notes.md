@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## 2026-01-14
+## 2026-01-xx
 
  * Add support for DNS provider deSEC
  * Fix copy of oc and kubectl CLIs

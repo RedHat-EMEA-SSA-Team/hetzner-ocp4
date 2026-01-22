@@ -68,15 +68,14 @@
   ansible.builtin.copy:
     remote_src: yes
     src: "{{ temp_ocp_dir.path }}/{{ item }}"
-    dest: "{{ openshift_artifacts_dir.path }}/"
+    dest: "{{ openshift_artifacts_dir.path }}/{{ item | basename }}"
     mode: u+rwx,g+rx,o+rx
     owner: root
     group: root
     force: yes
     follow: false
-  with_items:
-    - "oc"
-    - "kubectl"
+  with_fileglob:
+    - "{{ temp_ocp_dir.path }}/*"
 
 - name: Delete temporary OpenShift download directory
   ansible.builtin.file: 
