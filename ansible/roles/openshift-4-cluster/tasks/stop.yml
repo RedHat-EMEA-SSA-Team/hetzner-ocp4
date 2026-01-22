@@ -6,16 +6,16 @@
 
 - name: Init empty vms
   ansible.builtin.set_fact:
-    vms: "[]"
+    vms: []
 
 - name: Add masters to vms
   ansible.builtin.set_fact:
-    vms: "{{ vms }} + [ '{{ cluster_name }}-master-{{ item }}' ]"
+    vms:  "{{ vms + [ cluster_name + '-master-' + item  ] }}"
   with_sequence: start=0 end="{{ master_count|int - 1 }}" stride=1
 
 - name: Add compute to vms
   ansible.builtin.set_fact:
-    vms: "{{ vms }} + [ '{{ cluster_name }}-compute-{{ item }}' ]"
+    vms: "{{ vms + [ cluster_name + '-compute-' + item  ] }}"
   with_sequence: start=0 end="{{ compute_count|int - 1 if compute_count|int > 0 else 0 }}" stride=1
   when: compute_count > 0
 
