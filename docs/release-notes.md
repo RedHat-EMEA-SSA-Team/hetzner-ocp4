@@ -7,6 +7,7 @@
  * Fix bug when undefining VMs without storage
  * Fix bug when parsing GitHub organizations/teams
  * Disable SecureBoot
+ * Enable boot menu
 
 ## 2026-01-09
  * Bump OpenShift Version to stable - it will automatically install the stable version.
