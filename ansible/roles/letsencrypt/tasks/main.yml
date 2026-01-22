@@ -157,7 +157,7 @@
 
 - name: Pause, wait for DNS changes
   ansible.builtin.pause:   # noqa no-handler
-    seconds: 120
+    seconds: 300
   when: sample_com_challenge is changed
 
 - name: Let the challenge be validated and retrieve the cert and intermediate certificate
