@@ -8,6 +8,7 @@
  * Fix bug when parsing GitHub organizations/teams
  * Disable SecureBoot
  * Enable boot menu
+ * Fix Mangle ignition config error with openshift_version = "stable"
 
 ## 2026-01-09
  * Bump OpenShift Version to stable - it will automatically install the stable version.
