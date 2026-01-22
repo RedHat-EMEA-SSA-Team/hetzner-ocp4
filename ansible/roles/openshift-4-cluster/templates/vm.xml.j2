@@ -18,6 +18,8 @@
   <os firmware="efi">
     <type arch="x86_64" machine="q35" >hvm</type>
     <boot dev="hd"/>
+    <bootmenu enable='yes' timeout='3000'/>
+    <bios useserial='yes' rebootTimeout='0'/>
     <firmware>
       <feature enabled='no' name='enrolled-keys'/>
       <feature enabled='no' name='secure-boot'/>
