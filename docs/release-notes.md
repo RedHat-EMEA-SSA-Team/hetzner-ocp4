@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## 2026-01-14
+## 2026-01-23
 
  * Add support for DNS provider deSEC
  * Fix copy of oc and kubectl CLIs
@@ -9,6 +9,7 @@
  * Disable SecureBoot
  * Enable boot menu
  * Fix Mangle ignition config error with openshift_version = "stable"
+ * Build only RHEL10 images by default
 
 ## 2026-01-09
  * Bump OpenShift Version to stable - it will automatically install the stable version.
