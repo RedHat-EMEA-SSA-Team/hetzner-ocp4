@@ -1,5 +1,5 @@
 ---
-images:
+images_ignore:
   - name: RHEL-96-el-amd64-minimal
     distribution: rhel-9
     description: RHEL 9.latest image customized for OCP4 on Hetzner
@@ -24,6 +24,7 @@ images:
       services:
         enabled:
           - firewalld
+images:
   - name: RHEL-1000-el-amd64-minimal
     distribution: rhel-10
     description: RHEL 10 latest image customized for OCP4 on Hetzner
