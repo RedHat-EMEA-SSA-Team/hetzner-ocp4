@@ -244,7 +244,7 @@ Please configure in `cluster.yml` all necessary credentials:
 |DigitalOcean|`digitalocean_token: e7a6f82c3245b65cf4.....` <br>  `digitalocean_zone: domain.tld`|
 |Gandi|`gandi_account_api_token: 0123456...` <br>  `gandi_zone: domain.tld`|
 |GCP|`gcp_project: project-name `<br/>`gcp_managed_zone_name: 'zone-name'`<br/>`gcp_managed_zone_domain: 'example.com.'`<br/>`gcp_serviceaccount_file: ../gcp_service_account.json` |
-|Hetzner|`hetzner_account_api_token: 93543ade82AA$73.....` (legacy DNS) or <br>`hetzner_cloud_api_token: 93543ade82AA$73.....` (Hetzner Console DNS) <br>  `hetzner_zone: domain.tld`|
+|Hetzner|`hetzner_account_api_token: 93543ade82AA$73.....` (legacy DNS) or <br>`hetzner_cloud_api_token: 93543ade82AA$73.....` [(Hetzner Console DNS)](https://docs.hetzner.com/networking/dns/faq/beta) <br>  `hetzner_zone: domain.tld`|
 |Route53 / AWS|`aws_access_key: key` <br/>`aws_secret_key: secret` <br/>`aws_zone: domain.tld` <br/>|
 |TransIP|`transip_token: eyJ0eXAiOiJKV....` <br> `transip_zone: domain.tld`|
 |none|With `dns_provider: none` the playbooks will not create public dns entries. (It will skip letsencrypt too) Please create public dns entries if you want to access your cluster.|
