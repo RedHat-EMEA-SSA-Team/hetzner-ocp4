@@ -28,7 +28,7 @@
     le_gcp_managed_zone_name: "{{ gcp_managed_zone_name }}"
     le_gcp_managed_zone_domain: "{{ gcp_managed_zone_domain }}"
 
-    le_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
+    le_hetzner_account_api_token: "{{ hetzner_cloud_api_token | default(hetzner_account_api_token) | default(omit) }}"
     le_hetzner_zone: "{{ hetzner_zone }}"
 
     le_gandi_api_key: "{{ gandi_api_key }}"

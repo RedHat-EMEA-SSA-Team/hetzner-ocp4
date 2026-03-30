@@ -14,7 +14,7 @@
     pd_aws_access_key: "{{ aws_access_key }}"
     pd_aws_secret_key: "{{ aws_secret_key }}"
     pd_aws_zone: "{{ aws_zone }}"
-    pd_hetzner_account_api_token: "{{ hetzner_account_api_token }}"
+    pd_hetzner_account_api_token: "{{ hetzner_cloud_api_token | default(hetzner_account_api_token) | default(omit) }}"
     pd_hetzner_zone: "{{ hetzner_zone }}"
     pd_gandi_api_key: "{{ gandi_api_key }}"
     pd_gandi_zone: "{{ gandi_zone }}"
