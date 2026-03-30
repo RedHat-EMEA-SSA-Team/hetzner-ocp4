@@ -7,6 +7,9 @@
     type: TXT
     ttl: 60
     value: "{{ item.1 }}"
-    hetzner_token: "{{ hetzner_account_api_token }}"
+    # Hetzner Cloud API (Hetzner Cloud Token)
+    hetzner_api_token: "{{ hetzner_cloud_api_token | default(omit) }}"
+    # Legacy  API (Legacy DNS Token)
+    hetzner_token: "{{ hetzner_account_api_token | default(omit) }}"
   register: hetzner_record
   loop: "{{ challenge_data_dns | default({}) | dict2items | subelements('value') }}"
