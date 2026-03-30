@@ -45,7 +45,7 @@ azure_resource_group: dns_zone_resource_group
 # Hetzner
 # Use 'hetzner_account_api_token' for legacy DNS
 hetzner_account_api_token: 3543ade82AA$73.....
-# Use '' if you already migrated your DNS Zone to hetzner cloud
+# Use 'hetzner_cloud_api_token' if you already migrated your DNS Zone to hetzner cloud
 hetzner_cloud_api_token: 3543ade82AA$73.....
 hetzner_zone: example.com
 # Gandi
