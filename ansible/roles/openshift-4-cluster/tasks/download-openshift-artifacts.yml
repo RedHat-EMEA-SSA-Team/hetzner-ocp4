@@ -49,7 +49,7 @@
 
 - name: Determine if OpenShift client version
   ansible.builtin.command:
-    cmd: "{{ temp_ocp_dir.path }}/oc version -o yaml"
+    cmd: "{{ temp_ocp_dir.path }}/oc version -o yaml --client=true"
   register: oc_version
 
 - name: Set detected OpenShift client version raw
