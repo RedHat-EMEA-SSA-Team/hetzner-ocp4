@@ -1,5 +1,9 @@
 # RELEASE NOTES
 
+## 2026-XX-XX
+
+ * Fix issue #352 - Cluster creation fails when checking OpenShift version
+
 ## 2026-01-23
 
  * Add support for DNS provider deSEC
