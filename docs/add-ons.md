@@ -18,6 +18,12 @@ post_install_add_ons:
   - name: 'web-terminal'
     # Default is main.yml
     tasks_from: 'post-install.yml'
+
+pre_install_add_ons:
+  - name: 'web-terminal'
+    # Default is main.yml
+    tasks_from: 'pre-install.yml'
+
 EOF
 ```
 
