@@ -1,8 +1,13 @@
 # RELEASE NOTES
 
-## 2026-XX-XX
+## 2026-05-29
 
  * Fix issue #352 - Cluster creation fails when checking OpenShift version
+ * Add support for `integration of Hetzner DNS into the Hetzner Console`
+    * use `hetzner_cloud_api_token` instead of `hetzner_account_api_token` if you already migrated your DNS Zone to Hetzner Console
+    * use `hetzner_account_api_token` (as before) if you didn't migrate to Hetzner Console yet
+    * [Migration Process](https://docs.hetzner.com/networking/dns/migration-to-hetzner-console/process)
+    * [Migration FAQ / Timeline etc.](https://docs.hetzner.com/networking/dns/migration-to-hetzner-console/process)
 
 ## 2026-01-23
 
