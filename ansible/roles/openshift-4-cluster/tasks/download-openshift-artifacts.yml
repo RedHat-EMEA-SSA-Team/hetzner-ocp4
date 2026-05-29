@@ -2,8 +2,8 @@
 
 - name: Build OpenShift download urls
   ansible.builtin.set_fact:
-    tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux.tar.gz"
-    tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux.tar.gz"
+    tmp_openshift_install_download_url: "{{ openshift_location }}/openshift-install-linux-{{ openshift_version }}.tar.gz"
+    tmp_openshift_client_download_url: "{{ openshift_location }}/openshift-client-linux-{{ openshift_version }}.tar.gz"
 
 - name: Init check_urls
   ansible.builtin.set_fact:
@@ -121,14 +121,14 @@
     exclude:
       - 'README.md'
     creates: "{{ openshift_artifacts_dir.path }}/opm-rhel9"
-  when: opm_download_url | regex_search("^(.*)\.tar\.gz$") | ansible.builtin.length > 0
+  when: (opm_download_url | default('')) is match('^.*\\.tar\\.gz$')
 
 - name: Download OPM
   ansible.builtin.get_url:
     url: "{{ opm_download_url }}"
     dest: "{{ openshift_artifacts_dir.path }}/opm-rhel9"
     mode: u+rwx,g+rx,o+rx
-  when: opm_download_url | regex_search("^(.*)\.tar\.gz$") | ansible.builtin.length == 0
+  when: not ((opm_download_url | default('')) is match('^.*\\.tar\\.gz$'))
 
 - name: Download Helm client
   ansible.builtin.get_url:
